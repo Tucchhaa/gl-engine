@@ -22,9 +22,25 @@ struct MeshData {
 class Renderer {
 public:
     vector<MeshData> meshes;
-
+    
 public:
+    Renderer();
+    
     void setupMesh(Mesh* mesh);
+    
+    void render(Shader* shader, Shader* screenShader);
+    
+private:
+    unsigned int frameBuffer;
+    
+    unsigned int textureColorBuffer;
+    
+    unsigned int screenVAO;
+    
+private:
+    void initFrameBuffer();
+    
+    void initScreenVAO();
     
     void drawMesh(Shader* shader, MeshData* meshData);
 };

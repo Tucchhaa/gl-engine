@@ -27,9 +27,10 @@ const int SCREEN_HEIGHT = 800;
 
 int main(void) {
     GLFWwindow* window = init();
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
     
-    configureGL();
-
     Loader loader;
     Renderer renderer;
     
@@ -37,7 +38,7 @@ int main(void) {
 
     vector<Mesh> meshes = loader.loadModel("backpack/backpack.obj");
 
-    Transform* objectTransform = new Transform(vec3(0, 0, -5), vec3(1, 1, 1), quat(vec3(0, 0, 0)));
+    Transform* objectTransform = new Transform(vec3(0, 0, -10), vec3(1, 1, 1), quat(vec3(0, 0, 0)));
 
     for(int i=0; i < meshes.size(); i++) {
         Hierarchy::addComponent(object, &meshes[i]);
@@ -75,6 +76,7 @@ int main(void) {
 
     // = Shader =
     Shader baseShader("vertex.vert", "fragment.frag");
+    Shader screenShader("screen-vertex.vert", "screen-fragment.frag");
     
     Input input(window);
     
@@ -101,9 +103,6 @@ int main(void) {
         // = Clear =
         mat4 perspectiveMatrix = camera->getViewProjectionMatrix();
         
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         // = Render cube =
         baseShader.use();
         
@@ -117,10 +116,8 @@ int main(void) {
         
 //        baseShader.setDirectLight(0, directLight0);
         baseShader.setPointLight(0, pointLight0);
-
-        for(int i=0; i < renderer.meshes.size(); i++) {
-            renderer.drawMesh(&baseShader, &renderer.meshes[i]);
-        }
+        
+        renderer.render(&baseShader, &screenShader);
         
 //        glfwSetWindowShouldClose(window, true);
         
@@ -129,6 +126,8 @@ int main(void) {
     }
     
     baseShader.deleteShader();
+    screenShader.deleteShader();
+    
     glfwTerminate();
     
     return 0;
@@ -158,9 +157,3 @@ GLFWwindow* init() {
 
     return window;
 }
-
-void configureGL() {
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-}
-
