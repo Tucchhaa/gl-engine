@@ -54,7 +54,7 @@ out vec4 color;
 vec3 calculateDirectLight(DirectLight lightSource, vec3 _normal, vec3 cameraDir);
 vec3 calculatePointLight(PointLight lightSource, vec3 _normal, vec3 position, vec3 cameraDir);
 LightColors getLightingColors(LightColors lightColors);
-float calculateSpecularCoefficient(vec3 cameraDir, vec3 reflectedDir);
+float calculateBlinnSpecularCoefficient(vec3 cameraDir, vec3 lightDir, vec3 normal);
 
 void main() {
     vec3 _normal = normalize(normal);
@@ -78,10 +78,8 @@ void main() {
 vec3 calculateDirectLight(DirectLight light, vec3 _normal, vec3 cameraDir) {
     LightColors colors = getLightingColors(light.colors);
     
-    vec3 reflectedDir = reflect(light.direction, _normal);
-    
     float diffuse  = max(dot(_normal, -light.direction), 0.0);
-    float specular = calculateSpecularCoefficient(cameraDir, reflectedDir);
+    float specular = calculateBlinnSpecularCoefficient(cameraDir, -light.direction, _normal);
     
     return  
              colors.specular * specular +
@@ -96,10 +94,9 @@ vec3 calculatePointLight(PointLight light, vec3 _normal, vec3 position, vec3 cam
     float _distance = length(lightVec);
     
     vec3 lightDir = normalize(lightVec);
-    vec3 reflectedDir = reflect(-lightDir, _normal);
     
     float diffuse  = max(dot(_normal, lightDir), 0.0);
-    float specular = calculateSpecularCoefficient(cameraDir, reflectedDir);
+    float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
     
     return  (
@@ -118,6 +115,12 @@ LightColors getLightingColors(LightColors lightColors) {
     return result;
 }
 
-float calculateSpecularCoefficient(vec3 cameraDir, vec3 reflectedDir) {
-    return pow(max(dot(cameraDir, reflectedDir), 0.0), material.shininess);
+float calculateBlinnSpecularCoefficient(vec3 cameraDir, vec3 lightDir, vec3 normal) {
+    vec3 halfwayDir = normalize(cameraDir + lightDir);
+    
+    return pow(max(dot(normal, halfwayDir), 0.0), material.shininess * 3);
 }
+
+//float calculateSpecularCoefficient(vec3 cameraDir, vec3 reflectedDir) {
+//    return pow(max(dot(cameraDir, reflectedDir), 0.0), material.shininess);
+//}
