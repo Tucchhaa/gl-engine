@@ -47,16 +47,24 @@ private:
     
     Shader screenShader;
     
+    Shader skyboxShader;
+    
     unsigned int frameBuffer;
     
     unsigned int textureColorBuffer;
     
     unsigned int screenVAO;
     
+    unsigned int skyboxVAO;
+    
+    unsigned int skyboxTexture;
+    
 private:
     void initFrameBuffer();
     
     void initScreenVAO();
+    
+    void initSkybox();
     
     void setupMesh(Mesh* mesh);
     

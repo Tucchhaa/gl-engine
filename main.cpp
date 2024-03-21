@@ -61,9 +61,9 @@ int main(void) {
     // = light source =
     GameObject* lightSource = new GameObject();
     
-    Transform* lightTransform = new Transform(vec3(-2, 0, -3), vec3(0.2));
+    Transform* lightTransform = new Transform(vec3(-10, 20, -50), vec3(0.2));
     DirectLight* directLight0 = new DirectLight();
-    PointLight* pointLight0 = PointLight::D100();
+    PointLight* pointLight0 = PointLight::D3250();
     
     Hierarchy::addGameObject(lightSource);
     Hierarchy::addComponent(lightSource, lightTransform);

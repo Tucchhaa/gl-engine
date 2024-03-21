@@ -10,7 +10,6 @@ const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/gl-engine/res
 const string MODELS_PATH = RESOURCES_PATH + "/models";
 
 Loader::Loader() {
-    stbi_set_flip_vertically_on_load(true);
 }
 
 vector<Mesh> Loader::loadModel(const string &path) {
@@ -116,6 +115,8 @@ vector<unsigned int> Loader::loadTexturesByType(aiMaterial* material, aiTextureT
 }
 
 unsigned int Loader::loadTexture(const char* path) {
+    stbi_set_flip_vertically_on_load(true);
+    
     unsigned int textureId;
 
     glGenTextures(1, &textureId);
@@ -134,9 +135,10 @@ unsigned int Loader::loadTexture(const char* path) {
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
-
+    
     stbi_image_free(data);
-
+    stbi_set_flip_vertically_on_load(false);
+    
     return textureId;
 }
 

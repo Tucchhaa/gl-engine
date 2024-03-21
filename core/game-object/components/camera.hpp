@@ -25,10 +25,10 @@ public:
     Camera(float fov, float near, float far);
     
 private:
-    mat4 getViewMatrix();
+    mat4 getViewMatrix(bool translationEnabled);
 
 public:
-    mat4 getViewProjectionMatrix();
+    mat4 getViewProjectionMatrix(bool translationEnabled = true);
     
     void setScreenSizes(float screenWidth, float screenHeight);
 };

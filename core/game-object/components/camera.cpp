@@ -10,21 +10,24 @@ void Camera::setScreenSizes(float screenWidth, float screenHeight) {
     this->screenHeight = screenHeight;
 }
 
-mat4 Camera::getViewMatrix() {
+mat4 Camera::getViewMatrix(bool translationEnabled) {
     Transform* transform = Hierarchy::getTransform(GameObjectID);
 
     mat4 result = mat4(1.0f);
     
     result = result * mat4_cast(transform->rotation);
-    result = translate(result, -transform->position);
+    
+    if(translationEnabled) {
+        result = translate(result, -transform->position);
+    }
     
     return result;
 }
 
-mat4 Camera::getViewProjectionMatrix() {
+mat4 Camera::getViewProjectionMatrix(bool translationEnabled) {
     mat4 perspectiveMatrix = perspective(fov, aspect, near, far);
     
-    mat4 viewMatrix = getViewMatrix();
+    mat4 viewMatrix = getViewMatrix(translationEnabled);
     
     mat4 viewProjection = perspectiveMatrix * viewMatrix;
     

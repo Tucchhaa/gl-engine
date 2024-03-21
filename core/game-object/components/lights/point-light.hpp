@@ -31,5 +31,9 @@ public:
     static PointLight* D100() {
         return new PointLight(0.045, 0.0075);
     }
+    
+    static PointLight* D3250() {
+        return new PointLight(0.0014, 0.000007);
+    }
 };
 
