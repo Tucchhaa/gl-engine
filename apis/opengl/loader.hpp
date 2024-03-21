@@ -13,7 +13,7 @@
 #include <string>
 #include <map>
 
-#include "../game-object/components/mesh.hpp"
+#include "../../core/game-object/components/mesh.hpp"
 
 using namespace std;
 

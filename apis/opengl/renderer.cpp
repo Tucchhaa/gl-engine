@@ -1,8 +1,17 @@
 #include "renderer.hpp"
+#include <iostream>
 
-Renderer::Renderer() {
+Renderer::Renderer() :
+    baseShader("vertex.vert", "fragment.frag"),
+    screenShader("screen-vertex.vert", "screen-fragment.frag")
+{
     initFrameBuffer();
     initScreenVAO();
+}
+
+Renderer::~Renderer() {
+    baseShader.deleteShader();
+    screenShader.deleteShader();
 }
 
 void Renderer::initFrameBuffer() {
@@ -65,7 +74,29 @@ void Renderer::initScreenVAO() {
     glBindVertexArray(0);
 }
 
-void Renderer::render(Shader* shader, Shader* screenShader) {
+void Renderer::setScene(Scene *scene) {
+    currentScene = scene;
+    vector<Mesh*> meshes = scene->getMeshes();
+    
+    for(Mesh* mesh: meshes) {
+        setupMesh(mesh);
+    }
+    
+    cout << meshes.size() << "\n";
+}
+
+void Renderer::setScreenSize(unsigned int width, unsigned int height) {
+    
+}
+
+void Renderer::render() {
+    baseShader.use();
+    
+    baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
+    baseShader.setVec3("cameraPos", Hierarchy::getTransform(currentScene->getCamera())->position);
+    
+    baseShader.setPointLight(0, currentScene->getPointLights()[0]);
+    
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -74,21 +105,22 @@ void Renderer::render(Shader* shader, Shader* screenShader) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     for(int i=0; i < meshes.size(); i++) {
-        drawMesh(shader, &meshes[i]);
+        drawMesh(&meshes[i]);
     }
+    
     // ===
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    screenShader->use();
+    screenShader.use();
     glBindVertexArray(screenVAO);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-    screenShader->setInt("screenTexture", 0);
+    screenShader.setInt("screenTexture", 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -124,8 +156,13 @@ void Renderer::setupMesh(Mesh* mesh) {
     meshes.push_back(meshData);
 }
 
-void Renderer::drawMesh(Shader* shader, MeshData* meshData) {
-    shader->setMaterial(&meshData->mesh->material);
+void Renderer::drawMesh(MeshData* meshData) {
+    Transform* transform = Hierarchy::getTransform(meshData->mesh);
+    
+    baseShader.setMat4("transform", transform->getModelMatrix());
+    baseShader.setMat3("normalTransform", transform->getNormalMatrix());
+    
+    baseShader.setMaterial(&meshData->mesh->material);
 
     glBindVertexArray(meshData->VAO);
     

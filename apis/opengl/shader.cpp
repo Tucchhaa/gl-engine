@@ -119,7 +119,7 @@ uint Shader::compileShader(uint type, string& code) {
 uint Shader::createShader(string& verterxShaderFile, string& fragmentShaderFile) {
     uint shaderProgramID = glCreateProgram();
     
-    const string path = "/Users/tucha/Repositories/gl-engine/gl-engine/resources/shaders";
+    const string path = "/Users/tucha/Repositories/gl-engine/gl-engine/apis/opengl/shaders";
     
     string vertexCode = readShader(path + "/" + verterxShaderFile);
     string fragmentCode = readShader(path + "/" + fragmentShaderFile);

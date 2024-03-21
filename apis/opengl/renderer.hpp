@@ -7,7 +7,10 @@
 #include <vector>
 
 #include "shader.hpp"
-#include "../game-object/components/mesh.hpp"
+
+#include "../base/irenderer.hpp"
+
+#include "../../core/game-object/components/mesh.hpp"
 
 using namespace std;
 
@@ -19,18 +22,28 @@ struct MeshData {
     Mesh* mesh;
 };
 
-class Renderer {
-public:
+class Renderer : public IRenderer {
+private:
+    Scene* currentScene;
+    
     vector<MeshData> meshes;
     
 public:
     Renderer();
     
-    void setupMesh(Mesh* mesh);
+    ~Renderer();
     
-    void render(Shader* shader, Shader* screenShader);
+    virtual void setScene(Scene* scene);
+    
+    virtual void render();
+    
+    virtual void setScreenSize(unsigned int width, unsigned int height);
     
 private:
+    Shader baseShader;
+    
+    Shader screenShader;
+    
     unsigned int frameBuffer;
     
     unsigned int textureColorBuffer;
@@ -42,6 +55,8 @@ private:
     
     void initScreenVAO();
     
-    void drawMesh(Shader* shader, MeshData* meshData);
+    void setupMesh(Mesh* mesh);
+    
+    void drawMesh(MeshData* meshData);
 };
 

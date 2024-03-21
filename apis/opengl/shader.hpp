@@ -12,10 +12,10 @@
 #include <iostream>
 #include <string>
 
-#include "../game-object/hierarchy.hpp"
-#include "../game-object/components/mesh.hpp"
-#include "../game-object/components/lights/direct-light.hpp"
-#include "../game-object/components/lights/point-light.hpp"
+#include "../../core/game-object/hierarchy.hpp"
+#include "../../core/game-object/components/mesh.hpp"
+#include "../../core/game-object/components/lights/direct-light.hpp"
+#include "../../core/game-object/components/lights/point-light.hpp"
 
 using namespace std;
 using namespace glm;

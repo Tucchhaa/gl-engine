@@ -9,10 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/include.hpp"
-#include "game-object/include.hpp"
-
-#include "gl-check-error.hpp"
+#include "apis/opengl/include.hpp"
+#include "core/include.hpp"
 
 using namespace glm;
 using namespace std;
@@ -31,6 +29,7 @@ int main(void) {
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
     
+    Scene scene;
     Loader loader;
     Renderer renderer;
     
@@ -42,7 +41,6 @@ int main(void) {
 
     for(int i=0; i < meshes.size(); i++) {
         Hierarchy::addComponent(object, &meshes[i]);
-        renderer.setupMesh(&meshes[i]);
     }
     
     Hierarchy::addGameObject(object);
@@ -73,16 +71,18 @@ int main(void) {
     Hierarchy::addComponent(lightSource, pointLight0);
     
     lightTransform->rotate(quat(vec3(0, radians(180.0), 0)));
-
-    // = Shader =
-    Shader baseShader("vertex.vert", "fragment.frag");
-    Shader screenShader("screen-vertex.vert", "screen-fragment.frag");
     
     Input input(window);
     
     // = = =
+    
+    scene.setCamera(camera);
+    scene.processHierarchy();
+    renderer.setScene(&scene);
+    
     float speed = 7.5f;
     float rotationSpeed = 2.0f;
+    
 
     while (!glfwWindowShouldClose(window))
     {
@@ -100,34 +100,16 @@ int main(void) {
             cameraTransform->translate(input.axisVec3() * speed * input.deltaTime);
         }
         
-        // = Clear =
-        mat4 perspectiveMatrix = camera->getViewProjectionMatrix();
-        
-        // = Render cube =
-        baseShader.use();
-        
         objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
 
-        baseShader.setMat4("transform", objectTransform->getModelMatrix());
-        baseShader.setMat3("normalTransform", objectTransform->getNormalMatrix());
-        baseShader.setMat4("perspective", perspectiveMatrix);
-        
-        baseShader.setVec3("cameraPos", cameraTransform->position);
-        
-//        baseShader.setDirectLight(0, directLight0);
-        baseShader.setPointLight(0, pointLight0);
-        
-        renderer.render(&baseShader, &screenShader);
+        renderer.render();
         
 //        glfwSetWindowShouldClose(window, true);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    
-    baseShader.deleteShader();
-    screenShader.deleteShader();
-    
+
     glfwTerminate();
     
     return 0;
