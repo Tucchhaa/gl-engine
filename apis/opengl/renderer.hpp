@@ -28,6 +28,9 @@ private:
     
     vector<MeshData> meshes;
     
+    unsigned int width = 2000;
+    unsigned int height = 1600;
+    
 public:
     Renderer();
     

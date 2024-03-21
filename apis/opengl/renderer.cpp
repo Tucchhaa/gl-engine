@@ -1,5 +1,4 @@
 #include "renderer.hpp"
-#include <iostream>
 
 Renderer::Renderer() :
     baseShader("vertex.vert", "fragment.frag"),
@@ -21,7 +20,7 @@ void Renderer::initFrameBuffer() {
     glGenTextures(1, &textureColorBuffer);
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2000, 1600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -29,7 +28,7 @@ void Renderer::initFrameBuffer() {
     unsigned int RBO;
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2000, 1600);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
@@ -81,12 +80,11 @@ void Renderer::setScene(Scene *scene) {
     for(Mesh* mesh: meshes) {
         setupMesh(mesh);
     }
-    
-    cout << meshes.size() << "\n";
 }
 
 void Renderer::setScreenSize(unsigned int width, unsigned int height) {
-    
+    this->width = width;
+    this->height = height;
 }
 
 void Renderer::render() {
@@ -114,13 +112,18 @@ void Renderer::render() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    // ===
+    
     screenShader.use();
+    
     glBindVertexArray(screenVAO);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
     screenShader.setInt("screenTexture", 0);
+    
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
