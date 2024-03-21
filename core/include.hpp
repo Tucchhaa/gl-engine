@@ -1,8 +1,8 @@
 #pragma once
 
 #include "scene.hpp"
+#include "hierarchy.hpp"
 
-#include "game-object/hierarchy.hpp"
 #include "game-object/game-object.hpp"
 
 #include "game-object/components/transform.hpp"

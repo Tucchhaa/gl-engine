@@ -74,7 +74,7 @@ int main(void) {
     
     Input input(window);
     
-    // = = =
+    // ===
     
     scene.setCamera(camera);
     scene.processHierarchy();

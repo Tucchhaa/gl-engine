@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 
-#include "./game-object/hierarchy.hpp"
+#include "./hierarchy.hpp"
 
 #include "./game-object/game-object.hpp"
 #include "./game-object/components/camera.hpp"
@@ -37,5 +37,6 @@ public:
     void processHierarchy();
     
 private:
-    void loadComponents();
+    template<typename T>
+    void loadComponents(vector<T*>* array);
 };

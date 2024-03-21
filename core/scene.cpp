@@ -23,13 +23,14 @@ const vector<DirectLight*>& Scene::getDirectLights() {
 }
 
 void Scene::processHierarchy() {
-    loadComponents();
+    loadComponents(&meshes);
+    loadComponents(&directLights);
+    loadComponents(&pointLights);
 }
 
-void Scene::loadComponents() {
-    this->meshes.clear();
-    this->directLights.clear();
-    this->pointLights.clear();
+template<typename T>
+void Scene::loadComponents(vector<T*>* array) {
+    array->clear();
     
     map<int, GameObject*>* gameObjects = Hierarchy::getGameObjects();
     
@@ -38,13 +39,8 @@ void Scene::loadComponents() {
     for(iterator = gameObjects->begin(); iterator != gameObjects->end(); iterator++) {
         int objectId = iterator->second->ID;
         
-        vector<Mesh*> meshes = Hierarchy::getComponents<Mesh>(objectId);
-        vector<DirectLight*> directLights = Hierarchy::getComponents<DirectLight>(objectId);
-        vector<PointLight*> pointLights = Hierarchy::getComponents<PointLight>(objectId);
+        vector<T*> components = Hierarchy::Components<T>::getAll(objectId);
         
-        this->meshes.insert(this->meshes.end(), meshes.begin(), meshes.end());
-        this->directLights.insert(this->directLights.end(), directLights.begin(), directLights.end());
-        this->pointLights.insert(this->pointLights.end(), pointLights.begin(), pointLights.end());
+        array->insert(array->end(), components.begin(), components.end());
     }
 }
-

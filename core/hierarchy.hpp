@@ -3,12 +3,13 @@
 #include <vector>
 #include <map>
 
-#include "./game-object.hpp"
-#include "./components/component.hpp"
-#include "./components/transform.hpp"
-#include "./components/mesh.hpp"
-#include "./components/lights/direct-light.hpp"
-#include "./components/lights/point-light.hpp"
+#include "./game-object/game-object.hpp"
+
+#include "./game-object/components/component.hpp"
+#include "./game-object/components/transform.hpp"
+#include "./game-object/components/mesh.hpp"
+#include "./game-object/components/lights/direct-light.hpp"
+#include "./game-object/components/lights/point-light.hpp"
 
 using namespace std;
 
@@ -24,33 +25,29 @@ private:
      */
     static map<int, GameObject*> gameObjects;
     
-    template<typename T>
-    static vector<T*> _getComponents(int objectId, bool all, bool required = false);
     
 public:
-    static vector<Mesh*> getMeshes(int objectId);
-    static vector<DirectLight*> getDirectLights(int objectId);
-    static vector<PointLight*> getPointLights(int objectId);
-    
-    // ===
-    
     // TODO: limit T type to ObjectComponent
     template<typename T>
-    static T* getComponent(int objectId);
-    
-    template<typename T>
-    static T* getComponent(const GameObject* gameObject);
-    
-    template<typename T>
-    static T* getRequiredComponent(const GameObject* gameObject);
-    
-    // ===
-    
-    template<typename T>
-    static vector<T*> getComponents(int objectId);
-    
-    // ===
-    
+    class Components {
+    private:
+        /**
+         * returns components of objectId
+         */
+        static vector<T*> _get(int objectId, bool all, bool required = false);
+        
+    public:
+        Components();
+        
+        static T* get(int objectId);
+        
+        static T* get(const GameObject* gameObject);
+        
+        static T* getRequired(const GameObject* gameObject);
+        
+        static vector<T*> getAll(int objectId);
+    };
+public:
     static Transform* getTransform(int objectId);
     
     static Transform* getTransform(const ObjectComponent* component);
@@ -73,4 +70,3 @@ public:
     
     static void addComponent(GameObject* gameObject, ObjectComponent* component);
 };
-

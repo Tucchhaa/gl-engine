@@ -4,9 +4,10 @@ map<int, vector<ObjectComponent*>> Hierarchy::components;
 
 map<int, GameObject*> Hierarchy::gameObjects;
 
+// ===
 
 template<typename T>
-vector<T*> Hierarchy::_getComponents(int objectId, bool all, bool required) {
+vector<T*> Hierarchy::Components<T>::_get(int objectId, bool all, bool required) {
     vector<T*> components;
     
     for(ObjectComponent* component : Hierarchy::components[objectId]) {
@@ -33,37 +34,29 @@ T* getFrontOrNull(vector<T*> array) {
 }
 
 template<typename T>
-T* Hierarchy::getComponent(int objectId) {
-    return getFrontOrNull(_getComponents<T>(objectId, false));
+T* Hierarchy::Components<T>::get(int objectId) {
+    return getFrontOrNull(_get(objectId, false));
 }
 
 template<typename T>
-T* Hierarchy::getComponent(const GameObject* gameObject) {
-    return getComponent<T>(gameObject->ID);
+T* Hierarchy::Components<T>::get(const GameObject* gameObject) {
+    return get(gameObject->ID);
 }
 
 template<typename T>
-T* Hierarchy::getRequiredComponent(const GameObject* gameObject) {
-    return _getComponents<T>(gameObject->ID, false, true)[0];
+T* Hierarchy::Components<T>::getRequired(const GameObject* gameObject) {
+    return _get(gameObject->ID, false, true)[0];
 }
 
 template<typename T>
-vector<T*> Hierarchy::getComponents(int objectId) {
-    return _getComponents<T>(objectId, true);
+vector<T*> Hierarchy::Components<T>::getAll(int objectId) {
+    return _get(objectId, true);
 }
 
+// ===
 
 Transform* Hierarchy::getTransform(int objectId) {
-    return getComponent<Transform>(objectId);
-}
-vector<Mesh*> Hierarchy::getMeshes(int objectId) {
-    return getComponents<Mesh>(objectId);
-}
-vector<DirectLight*> Hierarchy::getDirectLights(int objectId) {
-    return getComponents<DirectLight>(objectId);
-}
-vector<PointLight*> Hierarchy::getPointLights(int objectId) {
-    return getComponents<PointLight>(objectId);
+    return Components<Transform>::get(objectId);
 }
 
 Transform* Hierarchy::getTransform(const GameObject* gameObject) {
@@ -73,6 +66,8 @@ Transform* Hierarchy::getTransform(const GameObject* gameObject) {
 Transform* Hierarchy::getTransform(const ObjectComponent* component) {
     return getTransform(getGameObject(component->GameObjectID));
 }
+
+// ===
 
 GameObject* Hierarchy::getGameObject(int objectId) {
     return Hierarchy::gameObjects[objectId];
@@ -85,6 +80,8 @@ GameObject* Hierarchy::getGameObject(const ObjectComponent* component) {
 map<int, GameObject*>* Hierarchy::getGameObjects() {
     return &gameObjects;
 }
+
+// ===
 
 void Hierarchy::addGameObject(GameObject* gameObject) {
     Hierarchy::gameObjects[gameObject->ID] = gameObject;
@@ -99,3 +96,7 @@ void Hierarchy::addComponent(int objectId, ObjectComponent* component) {
 void Hierarchy::addComponent(GameObject* gameObject, ObjectComponent* component) {
     addComponent(gameObject->ID, component);
 }
+
+template class Hierarchy::Components<Mesh>;
+template class Hierarchy::Components<DirectLight>;
+template class Hierarchy::Components<PointLight>;

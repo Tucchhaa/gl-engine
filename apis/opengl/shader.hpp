@@ -12,7 +12,8 @@
 #include <iostream>
 #include <string>
 
-#include "../../core/game-object/hierarchy.hpp"
+#include "../../core/hierarchy.hpp"
+
 #include "../../core/game-object/components/mesh.hpp"
 #include "../../core/game-object/components/lights/direct-light.hpp"
 #include "../../core/game-object/components/lights/point-light.hpp"
