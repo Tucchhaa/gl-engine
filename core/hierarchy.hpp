@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 #include <map>
 
@@ -42,7 +43,9 @@ public:
         static T* get(int objectId);
         
         static T* get(const GameObject* gameObject);
-        
+
+        static T* getRequired(int objectId);
+
         static T* getRequired(const GameObject* gameObject);
         
         static vector<T*> getAll(int objectId);
@@ -69,4 +72,8 @@ public:
     static void addComponent(int objectId, ObjectComponent* component);
     
     static void addComponent(GameObject* gameObject, ObjectComponent* component);
+
+    // ===
+
+    static void setParent(GameObject* parent, GameObject* child);
 };

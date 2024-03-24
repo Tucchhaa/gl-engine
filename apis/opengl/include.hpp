@@ -1,6 +1,6 @@
 #pragma once
 
-#include "loader.hpp"
 #include "renderer.hpp"
+#include "resource-manager.hpp"
 #include "shader.hpp"
 #include "input.hpp"

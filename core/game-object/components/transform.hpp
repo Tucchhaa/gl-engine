@@ -17,8 +17,10 @@ public:
     vec3 scale;
     quat rotation;
     
-    Transform(vec3 position = vec3(0, 0, 0), vec3 scale = vec3(1, 1, 1), quat rotation = quat(vec3(0, 0, 0)));
-    
+    Transform(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
+
+    void setValues(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
+
     mat4 getModelMatrix();
     
     mat3 getNormalMatrix();

@@ -12,7 +12,7 @@ void Shader::deleteShader() {
     glDeleteProgram(ID);
 }
 
-int Shader::getLocation(const string name) const {
+int Shader::getLocation(const string& name) const {
     return glGetUniformLocation(ID, name.c_str());
 }
 
@@ -42,11 +42,11 @@ void Shader::setVec3(const string& name, const vec3& vector) const {
 
 void Shader::setMaterial(const Material* material) const {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, material->diffuseTextures[0]);
+    glBindTexture(GL_TEXTURE_2D, ResourceManager::getTextureId(material, glApi_DIFFUSE_TEXTURE));
     setInt("material.diffuse", 0);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, material->specularTextures[0]);
+    glBindTexture(GL_TEXTURE_2D, ResourceManager::getTextureId(material, glApi_SPECULAR_TEXTURE));
     setInt("material.specular", 1);
     
     setFloat("material.shininess", 32);
@@ -116,12 +116,12 @@ uint Shader::compileShader(uint type, string& code) {
     return shaderId;
 }
 
-uint Shader::createShader(string& verterxShaderFile, string& fragmentShaderFile) {
+uint Shader::createShader(string& vertexShaderFile, string& fragmentShaderFile) {
     uint shaderProgramID = glCreateProgram();
     
     const string path = "/Users/tucha/Repositories/gl-engine/gl-engine/apis/opengl/shaders";
     
-    string vertexCode = readShader(path + "/" + verterxShaderFile);
+    string vertexCode = readShader(path + "/" + vertexShaderFile);
     string fragmentCode = readShader(path + "/" + fragmentShaderFile);
     
     uint vertexShaderID = compileShader(GL_VERTEX_SHADER, vertexCode);

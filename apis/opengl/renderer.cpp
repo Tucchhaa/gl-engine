@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stb_image.h>
 
+#include "gl-check-error.hpp"
+
 Renderer::Renderer() :
     baseShader("vertex.vert", "fragment.frag"),
     screenShader("screen-vertex.vert", "screen-fragment.frag"),
@@ -9,12 +11,12 @@ Renderer::Renderer() :
 {
     initFrameBuffer();
     initScreenVAO();
-    initSkybox();
 }
 
 Renderer::~Renderer() {
     baseShader.deleteShader();
     screenShader.deleteShader();
+    skyboxShader.deleteShader();
 }
 
 void Renderer::initFrameBuffer() {
@@ -77,103 +79,6 @@ void Renderer::initScreenVAO() {
     glBindVertexArray(0);
 }
 
-void Renderer::initSkybox() {
-    float vertices[] = {
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
-    };
-    
-    glGenVertexArrays(1, &skyboxVAO);
-    glBindVertexArray(skyboxVAO);
-    
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
-    
-    unsigned int stride = 3 * sizeof(float);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-    
-    glEnableVertexAttribArray(0);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    
-    glGenTextures(1, &skyboxTexture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-    
-    const string PATH = "/Users/tucha/Repositories/gl-engine/gl-engine/resources/textures/skybox/";
-    vector<string> textures_faces = {
-        "right.jpg",
-        "left.jpg",
-        "top.jpg",
-        "bottom.jpg",
-        "front.jpg",
-        "back.jpg"
-    };
-    
-    int width, height, nrChannels;
-    unsigned char *data;
-    for(unsigned int i = 0; i < textures_faces.size(); i++) {
-        data = stbi_load((PATH + textures_faces[i]).c_str(), &width, &height, &nrChannels, 0);
-        
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-        );
-        
-        stbi_image_free(data);
-    }
-    
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-}
-
 void Renderer::setScene(Scene *scene) {
     currentScene = scene;
     vector<Mesh*> meshes = scene->getMeshes();
@@ -189,49 +94,55 @@ void Renderer::setScreenSize(unsigned int width, unsigned int height) {
 }
 
 void Renderer::render() {
+    Camera* camera = currentScene->getCamera();
+
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glCheckError();
     
     // ===
-    
-    skyboxShader.use();
-    
-    skyboxShader.setMat4("rotationMatrix", currentScene->getCamera()->getViewProjectionMatrix(false));
-    
-    glDepthMask(GL_FALSE);
-    
-    glBindVertexArray(skyboxVAO);
-    
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-    
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    
-    glDepthMask(GL_TRUE);
-    
+    CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
+    if(cubeMap != nullptr) {
+        skyboxShader.use();
+
+        skyboxShader.setMat4("rotationMatrix", camera->getViewProjectionMatrix(false));
+
+        glDepthMask(GL_FALSE);
+
+        glBindVertexArray(cubeMap->VAO);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->textureId);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glDepthMask(GL_TRUE);
+    }
+    glCheckError();
+
     // ===
     
     baseShader.use();
-    
+
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
     baseShader.setVec3("cameraPos", Hierarchy::getTransform(currentScene->getCamera())->position);
-    
+
     baseShader.setPointLight(0, currentScene->getPointLights()[0]);
-    
-    
+
+
     for(int i=0; i < meshes.size(); i++) {
         drawMesh(&meshes[i]);
     }
-    
-    // ===
+
+//    // ===
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
+
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-    
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -246,6 +157,7 @@ void Renderer::render() {
     screenShader.setInt("screenTexture", 0);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    glCheckError();
 }
 
 void Renderer::setupMesh(Mesh* mesh) {

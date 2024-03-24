@@ -2,7 +2,7 @@
 
 class ObjectComponent {
 private:
-    static inline int componentId = 0;
+    static inline int componentId = 1;
     
     static int generateComponentId() {
         return componentId++;

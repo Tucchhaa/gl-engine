@@ -2,6 +2,7 @@
 
 #include "scene.hpp"
 #include "hierarchy.hpp"
+#include "loader.hpp"
 
 #include "game-object/game-object.hpp"
 

@@ -33,3 +33,4 @@ mat4 Camera::getViewProjectionMatrix(bool translationEnabled) {
     
     return viewProjection;
 }
+

@@ -15,7 +15,6 @@ include_directories(/Users/tucha/C-libs)
 add_executable(gl_engine
         apis/opengl/gl-check-error.cpp
         apis/opengl/input.cpp
-        apis/opengl/loader.cpp
         apis/opengl/renderer.cpp
         apis/opengl/shader.cpp
         core/game-object/components/lights/direct-light.cpp
@@ -29,4 +28,8 @@ add_executable(gl_engine
         core/game-object/game-object.cpp
         core/hierarchy.cpp
         core/scene.cpp
-        main.cpp)
+        main.cpp
+        core/loader.cpp
+        core/structures/vectors.cpp
+        apis/opengl/resource-manager.cpp
+)

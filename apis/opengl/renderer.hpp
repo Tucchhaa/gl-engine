@@ -6,11 +6,12 @@
 
 #include <vector>
 
-#include "shader.hpp"
+#include "../../core/game-object/components/mesh.hpp"
 
 #include "../base/irenderer.hpp"
 
-#include "../../core/game-object/components/mesh.hpp"
+#include "shader.hpp"
+#include "resource-manager.hpp"
 
 using namespace std;
 
@@ -63,8 +64,6 @@ private:
     void initFrameBuffer();
     
     void initScreenVAO();
-    
-    void initSkybox();
     
     void setupMesh(Mesh* mesh);
     

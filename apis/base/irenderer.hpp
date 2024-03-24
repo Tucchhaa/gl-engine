@@ -4,7 +4,7 @@
 
 class IRenderer {
 public:
-    virtual ~IRenderer() {}
+    virtual ~IRenderer() = default;
     
     virtual void setScene(Scene* scene) = 0;
     

@@ -12,7 +12,7 @@ vec4 negative(vec4 color);
 vec4 kernelEffect(float[9] matrix);
 
 void main() {
-    float kernel[9] = float[](
+    float edgeDetetctionKernel[9] = float[](
         1, 1, 1,
         1, -8, 1,
         1, 1, 1

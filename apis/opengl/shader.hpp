@@ -12,6 +12,8 @@
 #include <iostream>
 #include <string>
 
+#include "resource-manager.hpp"
+
 #include "../../core/hierarchy.hpp"
 
 #include "../../core/game-object/components/mesh.hpp"
@@ -27,7 +29,7 @@ class Shader {
 private:
     string readShader(const string& filepath);
     uint compileShader(uint type, string& code);
-    uint createShader(string& verterxShaderFile, string& fragmentShaderFile);
+    uint createShader(string& vertexShaderFile, string& fragmentShaderFile);
     
 public:
     uint ID;
@@ -36,13 +38,15 @@ public:
     
     void use();
     void deleteShader();
-    
+
+    // ===
     // utility uniform functions
-    int getLocation(const string name) const;
+    // ===
+    int getLocation(const string& name) const;
     
-    void setBool(const string &name, const bool value) const;
-    void setInt(const string &name, const int value) const;
-    void setFloat(const string &name, const float value) const;
+    void setBool(const string &name, bool value) const;
+    void setInt(const string &name, int value) const;
+    void setFloat(const string &name, float value) const;
     
     void setMat4(const string& name, const mat4& matrix) const;
     void setMat3(const string& name, const mat3& matrix) const;

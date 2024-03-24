@@ -23,55 +23,46 @@ uint createTexture(const char* textureFileName);
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 
-int main(void) {
+int main() {
     GLFWwindow* window = init();
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
-    
+
+    ResourceManager* resourceManager = &ResourceManager::getInstance();
     Scene scene;
-    Loader loader;
+    CoreLoader loader(resourceManager);
     Renderer renderer;
-    
-    GameObject* object = new GameObject();
 
-    vector<Mesh> meshes = loader.loadModel("backpack/backpack.obj");
+    GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
-    Transform* objectTransform = new Transform(vec3(0, 0, -10), vec3(1, 1, 1), quat(vec3(0, 0, 0)));
-
-    for(int i=0; i < meshes.size(); i++) {
-        Hierarchy::addComponent(object, &meshes[i]);
-    }
-    
     Hierarchy::addGameObject(object);
-    Hierarchy::addComponent(object, objectTransform);
-    
+    Transform* objectTransform = Hierarchy::getTransform(object);
+
     // = camera =
-    GameObject* cameraObject = new GameObject();
-    
-    Camera* camera = new Camera(radians(45.0f), 0.1f, 100.0f);
-    Transform* cameraTransform = new Transform(vec3(0, 0, 0), vec3(1), quat(vec3(0, 0, 0)));
-    
+    auto* cameraObject = new GameObject();
     Hierarchy::addGameObject(cameraObject);
+    Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
+
+    loader.loadCubeMap("textures/skybox");
+    auto* camera = new Camera(radians(45.0f), 0.1f, 100.0f);
+    camera->cubeMap = "textures/skybox";
     Hierarchy::addComponent(cameraObject, camera);
-    Hierarchy::addComponent(cameraObject, cameraTransform);
-    
+
     camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);
 
     // = light source =
-    GameObject* lightSource = new GameObject();
-    
-    Transform* lightTransform = new Transform(vec3(-10, 20, -50), vec3(0.2));
-    DirectLight* directLight0 = new DirectLight();
-    PointLight* pointLight0 = PointLight::D3250();
-    
+    auto* lightSource = new GameObject();
     Hierarchy::addGameObject(lightSource);
-    Hierarchy::addComponent(lightSource, lightTransform);
+
+    Hierarchy::getTransform(lightSource)->setValues(vec3(-10, 20, -50), quat(vec3(0, radians(180.0), 0)));
+
+    auto* directLight0 = new DirectLight();
+    PointLight* pointLight0 = PointLight::D3250();
+
     Hierarchy::addComponent(lightSource, directLight0);
     Hierarchy::addComponent(lightSource, pointLight0);
-    
-    lightTransform->rotate(quat(vec3(0, radians(180.0), 0)));
-    
+
     Input input(window);
     
     // ===
@@ -94,7 +85,7 @@ int main(void) {
             quat verticalRotation   = quat(vec3(input.axisVertical() * rotationSpeed * input.deltaTime, 0, 0));
             
             cameraTransform->rotate(horizontalRotation);
-            cameraTransform->rotate(verticalRotation, objectTransform->World);
+            cameraTransform->rotate(verticalRotation, Transform::World);
         }
         else {
             cameraTransform->translate(input.axisVec3() * speed * input.deltaTime);
@@ -103,7 +94,7 @@ int main(void) {
         objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
 
         renderer.render();
-        
+
 //        glfwSetWindowShouldClose(window, true);
         
         glfwSwapBuffers(window);

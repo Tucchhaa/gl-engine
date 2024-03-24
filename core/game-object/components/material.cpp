@@ -1,3 +1,5 @@
 #include "material.hpp"
 
-Material::Material() {}
+Texture::Texture(string path): path(std::move(path)) {
+    ID = generateId();
+}

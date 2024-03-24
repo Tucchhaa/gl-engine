@@ -1,21 +1,22 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <utility>
+
+
+#include "../../structures/vectors.hpp"
 
 #include "component.hpp"
 #include "material.hpp"
 
 using namespace std;
-using namespace glm;
 
 struct Vertex {
-    vec3 position;
-    vec3 normal;
-    vec2 texCoords;
+    Vec3 position;
+    Vec3 normal;
+    Vec2 texCoords;
 };
 
 class Mesh : public ObjectComponent {

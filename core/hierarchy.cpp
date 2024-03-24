@@ -5,6 +5,8 @@ map<int, vector<ObjectComponent*>> Hierarchy::components;
 map<int, GameObject*> Hierarchy::gameObjects;
 
 // ===
+// Components Getters
+// ===
 
 template<typename T>
 vector<T*> Hierarchy::Components<T>::_get(int objectId, bool all, bool required) {
@@ -34,6 +36,9 @@ T* getFrontOrNull(vector<T*> array) {
 }
 
 template<typename T>
+Hierarchy::Components<T>::Components() { }
+
+template<typename T>
 T* Hierarchy::Components<T>::get(int objectId) {
     return getFrontOrNull(_get(objectId, false));
 }
@@ -41,6 +46,11 @@ T* Hierarchy::Components<T>::get(int objectId) {
 template<typename T>
 T* Hierarchy::Components<T>::get(const GameObject* gameObject) {
     return get(gameObject->ID);
+}
+
+template<typename T>
+T* Hierarchy::Components<T>::getRequired(int objectId) {
+    return _get(objectId, false, true)[0];
 }
 
 template<typename T>
@@ -54,9 +64,10 @@ vector<T*> Hierarchy::Components<T>::getAll(int objectId) {
 }
 
 // ===
-
+//
+// ===
 Transform* Hierarchy::getTransform(int objectId) {
-    return Components<Transform>::get(objectId);
+    return Components<Transform>::getRequired(objectId);
 }
 
 Transform* Hierarchy::getTransform(const GameObject* gameObject) {
@@ -85,6 +96,10 @@ map<int, GameObject*>* Hierarchy::getGameObjects() {
 
 void Hierarchy::addGameObject(GameObject* gameObject) {
     Hierarchy::gameObjects[gameObject->ID] = gameObject;
+
+    auto* transform = new Transform();
+
+    addComponent(gameObject, transform);
 }
 
 void Hierarchy::addComponent(int objectId, ObjectComponent* component) {
@@ -95,6 +110,18 @@ void Hierarchy::addComponent(int objectId, ObjectComponent* component) {
 
 void Hierarchy::addComponent(GameObject* gameObject, ObjectComponent* component) {
     addComponent(gameObject->ID, component);
+}
+
+// ===
+
+void Hierarchy::setParent(GameObject *parent, GameObject *child) {
+    parent->children.insert(child->ID);
+
+    if(child->parentID != 0) {
+        getGameObject(child->parentID)->children.erase(child->ID);
+    }
+
+    child->parentID = parent->ID;
 }
 
 template class Hierarchy::Components<Mesh>;

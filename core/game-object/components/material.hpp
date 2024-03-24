@@ -1,14 +1,29 @@
 #pragma once
 
+#include <string>
 #include <vector>
+#include <utility>
 
 using namespace std;
 
-class Material {
+struct Texture {
+private:
+    static inline int lastID = 1;
+
+    static int generateId() {
+        return lastID++;
+    }
+
 public:
-    vector<unsigned int> specularTextures;
-    vector<unsigned int> diffuseTextures;
-    
-    Material();
+    int ID;
+    string path;
+
+    Texture(string path);
+};
+
+struct Material {
+public:
+    vector<Texture> specularTextures;
+    vector<Texture> diffuseTextures;
 };
 

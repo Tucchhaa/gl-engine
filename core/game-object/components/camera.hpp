@@ -21,7 +21,9 @@ public:
     
     int screenWidth;
     int screenHeight;
-    
+
+    string cubeMap;
+
     Camera(float fov, float near, float far);
     
 private:
@@ -31,4 +33,6 @@ public:
     mat4 getViewProjectionMatrix(bool translationEnabled = true);
     
     void setScreenSizes(float screenWidth, float screenHeight);
+
+    void setCubeMap(const string& path);
 };

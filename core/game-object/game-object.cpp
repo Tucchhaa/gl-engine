@@ -2,4 +2,6 @@
 
 GameObject::GameObject() {
     ID = generateId();
+
+    parentID = 0;
 }

@@ -2,11 +2,17 @@
 
 using namespace std;
 
-const Transform* Transform::World = new Transform(vec3(0), vec3(1), quat(vec3(0, 0, 0)));
+const Transform* Transform::World = new Transform(vec3(0), quat(vec3(0, 0, 0)), vec3(1));
 
-Transform::Transform(vec3 position, vec3 scale, quat rotation) :
+Transform::Transform(vec3 position, quat rotation, vec3 scale) :
     position(position), scale(scale), rotation(rotation)
 { }
+
+void Transform::setValues(vec3 position, quat rotation, vec3 scale) {
+    this->position = position;
+    this->rotation = rotation;
+    this->scale = scale;
+}
 
 mat4 Transform::getModelMatrix() {
     mat4 matrix = mat4(1.0f);
