@@ -29,19 +29,23 @@ private:
     
     vector<MeshData> meshes;
     
-    unsigned int width = 2000;
-    unsigned int height = 1600;
-    
+    int width = 2000;
+    int height = 1600;
+
 public:
     Renderer();
     
-    ~Renderer();
+    ~Renderer() override;
+
+// ===
+// Overrode methods
+// ===
+public:
+    void setScene(Scene* scene) override;
     
-    virtual void setScene(Scene* scene);
+    void render() override;
     
-    virtual void render();
-    
-    virtual void setScreenSize(unsigned int width, unsigned int height);
+    void setScreenSize(int width, int height) override;
     
 private:
     Shader baseShader;

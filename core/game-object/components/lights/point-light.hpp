@@ -7,8 +7,6 @@ public:
     float linear;
     float quadratic;
     
-    PointLight();
-    
     PointLight(float linear, float quadratic);
     
     PointLight(vec3 ambient, vec3 diffuse, vec3 specular, float linear, float quadratic);

@@ -16,5 +16,5 @@ public:
     /**
      *  Updates size of frame
      */
-    virtual void setScreenSize(unsigned int width, unsigned int height) = 0;
+    virtual void setScreenSize(int width, int height) = 0;
 };

@@ -1,6 +1,4 @@
 #include "renderer.hpp"
-#include <iostream>
-#include <stb_image.h>
 
 #include "gl-check-error.hpp"
 
@@ -88,7 +86,7 @@ void Renderer::setScene(Scene *scene) {
     }
 }
 
-void Renderer::setScreenSize(unsigned int width, unsigned int height) {
+void Renderer::setScreenSize(int width, int height) {
     this->width = width;
     this->height = height;
 }
@@ -132,9 +130,8 @@ void Renderer::render() {
 
     baseShader.setPointLight(0, currentScene->getPointLights()[0]);
 
-
-    for(int i=0; i < meshes.size(); i++) {
-        drawMesh(&meshes[i]);
+    for(auto &mesh : meshes) {
+        drawMesh(&mesh);
     }
 
 //    // ===
@@ -172,14 +169,14 @@ void Renderer::setupMesh(Mesh* mesh) {
     glBindVertexArray(meshData.VAO);
     
     glBindBuffer(GL_ARRAY_BUFFER, meshData.VBO);
-    glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (long)(mesh->vertices.size() * sizeof(Vertex)), &mesh->vertices[0], GL_STATIC_DRAW);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(mesh->indices.size() * sizeof(unsigned int)), &mesh->indices[0], GL_STATIC_DRAW);
     
     int stride = sizeof(Vertex);
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)nullptr);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, normal));
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, texCoords));
     
@@ -202,7 +199,7 @@ void Renderer::drawMesh(MeshData* meshData) {
 
     glBindVertexArray(meshData->VAO);
     
-    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(meshData->mesh->indices.size()), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, (int)static_cast<unsigned int>(meshData->mesh->indices.size()), GL_UNSIGNED_INT, 0);
     
     glBindVertexArray(0);
     glActiveTexture(GL_TEXTURE0);

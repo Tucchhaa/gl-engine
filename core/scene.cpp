@@ -1,6 +1,6 @@
 #include "scene.hpp"
 
-Scene::Scene() { }
+Scene::Scene() = default;
 
 Camera* Scene::getCamera() {
     return camera;

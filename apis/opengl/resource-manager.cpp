@@ -125,7 +125,7 @@ void ResourceManager::handleCubeMap(
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
     int stride = 3 * sizeof(float);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)nullptr);
     glEnableVertexAttribArray(0);
 
     glGenTextures(1, &cubeMap.textureId);

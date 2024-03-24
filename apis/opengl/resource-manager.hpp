@@ -49,13 +49,17 @@ public:
 public:
     ResourceManager();
 
-    // ===
-    // Getters
-    // ===
+// ===
+// Getters
+// ===
+public:
     static unsigned int getTextureId(const Material* material, glApiTextureTypes textureType);
 
     static CubeMap* getCubeMap(const string& path);
 
+// ===
+// Overrode methods
+// ===
 public:
     bool isResourceLoaded(ResourceType type, const string& path) override;
 

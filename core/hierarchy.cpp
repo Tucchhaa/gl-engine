@@ -10,24 +10,24 @@ map<int, GameObject*> Hierarchy::gameObjects;
 
 template<typename T>
 vector<T*> Hierarchy::Components<T>::_get(int objectId, bool all, bool required) {
-    vector<T*> components;
+    vector<T*> result;
     
     for(ObjectComponent* component : Hierarchy::components[objectId]) {
-        T* result = dynamic_cast<T*>(component);
+        T* castedComponent = dynamic_cast<T*>(component);
         
-        if(result != nullptr) {
-            components.push_back(result);
+        if(castedComponent != nullptr) {
+            result.push_back(castedComponent);
             
             if(!all)
-                return components;
+                return result;
         }
     }
     
-    if(required && components.size() == 0) {
+    if(required && result.size() == 0) {
         throw std::runtime_error("No ObjectComponent found with the provided type");
     }
     
-    return components;
+    return result;
 }
 
 template<typename T>
@@ -36,7 +36,7 @@ T* getFrontOrNull(vector<T*> array) {
 }
 
 template<typename T>
-Hierarchy::Components<T>::Components() { }
+Hierarchy::Components<T>::Components() = default;
 
 template<typename T>
 T* Hierarchy::Components<T>::get(int objectId) {

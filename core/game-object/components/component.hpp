@@ -9,11 +9,12 @@ private:
     }
 
 public:
-    int GameObjectID;
+    int GameObjectID = 0;
     
     int ComponentID;
     
     ObjectComponent();
-    
+
+    // === Need this to make ObjectComponent polymorphic, so the dynamic_cast will work ===
     virtual void func() {}
 };
