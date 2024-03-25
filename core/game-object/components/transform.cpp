@@ -35,13 +35,14 @@ void Transform::rotate(quat rotation, const Transform* transform) {
         this->rotation *= rotation;
 }
 
-void Transform::scaleBy(vec3 scalation) {
+void Transform::scaleBy(vec3 scale) {
 
 }
 
 // ===
 // Getters
 // ===
+
 mat4 Transform::getModelMatrix() const {
     return modelMatrix;
 }

@@ -2,14 +2,14 @@
 
 #define GL_SILENCE_DEPRECATION
 
-#include "../base/iresource-manager.hpp"
-
-#include "../../core/game-object/components/material.hpp"
-
 #include <OpenGL/gl3.h>
 
 #include <map>
 #include <string>
+
+#include "../base/iresource-manager.hpp"
+
+#include "../../core/game-object/components/material.hpp"
 
 using namespace std;
 
@@ -68,5 +68,4 @@ public:
     void handleCubeMap(const string& path, const vector<unsigned char*>* data, TextureFormat format, int height, int width) override;
 
     void handleModel(const string& path) override;
-
 };

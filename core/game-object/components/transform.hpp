@@ -13,8 +13,6 @@ public:
     static const Transform* World;
 
 private:
-    bool isCached = false;
-
     mat4 modelMatrix;
 
     mat3 normalMatrix;
@@ -27,7 +25,9 @@ private:
 
 public:
     vec3 position;
+
     vec3 scale;
+
     quat rotation;
     
     Transform(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
@@ -39,7 +39,7 @@ public:
 
     void rotate(quat rotation, const Transform* transform = nullptr);
 
-    void scaleBy(vec3 scalation);
+    void scaleBy(vec3 scale);
 
 // ===
 // Computations

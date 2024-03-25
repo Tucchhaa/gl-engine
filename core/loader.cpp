@@ -6,13 +6,13 @@
 
 const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/gl-engine/resources";
 
-CoreLoader::CoreLoader(IResourceManager* resourceManager) : resourceManager(resourceManager)
+Loader::Loader(IResourceManager* resourceManager) : resourceManager(resourceManager)
     {}
 
 // ===
 // Loader functions
 // ===
-void CoreLoader::loadTexture(const char *path) {
+void Loader::loadTexture(const char *path) {
     if(resourceManager->isResourceLoaded(RESOURCE_TEXTURE, path)) {
         return;
     }
@@ -32,7 +32,7 @@ void CoreLoader::loadTexture(const char *path) {
     stbi_set_flip_vertically_on_load(false);
 }
 
-void CoreLoader::loadCubeMap(const char *path) {
+void Loader::loadCubeMap(const char *path) {
     if(resourceManager->isResourceLoaded(RESOURCE_CUBE_MAP, path)) {
         return;
     }
@@ -66,7 +66,7 @@ void CoreLoader::loadCubeMap(const char *path) {
     }
 }
 
-GameObject *CoreLoader::loadModel(const char *path) {
+GameObject *Loader::loadModel(const char *path) {
     string strPath(path);
     string directory = strPath.substr(0, strPath.find_last_of('/'));
     string fullPath = RESOURCES_PATH + "/" + strPath;
@@ -88,11 +88,11 @@ GameObject *CoreLoader::loadModel(const char *path) {
 // ===
 // Model Loader
 // ===
-CoreLoader::ModelParser::ModelParser(CoreLoader *loader, string directory):
+Loader::ModelParser::ModelParser(Loader *loader, string directory):
         loader(loader), directory(std::move(directory))
     {}
 
-GameObject* CoreLoader::ModelParser::parse(const aiScene* scene) {
+GameObject* Loader::ModelParser::parse(const aiScene* scene) {
     for(int i=0; i < scene->mNumMaterials; i++) {
         aiMaterial* _material = scene->mMaterials[i];
 
@@ -106,7 +106,7 @@ GameObject* CoreLoader::ModelParser::parse(const aiScene* scene) {
     return result;
 }
 
-GameObject* CoreLoader::ModelParser::parseNodeToGameObject(const aiScene* scene, aiNode* node) {
+GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, aiNode* node) {
     auto* result = new GameObject();
 
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -127,7 +127,7 @@ GameObject* CoreLoader::ModelParser::parseNodeToGameObject(const aiScene* scene,
     return result;
 }
 
-Mesh* CoreLoader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
+Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
     auto convertToVec3 = [](aiVector3D vec) { return Vec3(vec.x, vec.y, vec.z); };
     auto convertToVec2 = [](aiVector3D vec) { return Vec2(vec.x, vec.y); };
 
@@ -166,7 +166,7 @@ Mesh* CoreLoader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
     return new Mesh(vertices, indices, material);
 }
 
-Material CoreLoader::ModelParser::processMaterial(aiMaterial* material) {
+Material Loader::ModelParser::processMaterial(aiMaterial* material) {
     Material result;
 
     result.diffuseTextures = loadTexturesByType(material, aiTextureType_DIFFUSE);
@@ -175,7 +175,7 @@ Material CoreLoader::ModelParser::processMaterial(aiMaterial* material) {
     return result;
 }
 
-vector<Texture> CoreLoader::ModelParser::loadTexturesByType(aiMaterial* material, aiTextureType type) {
+vector<Texture> Loader::ModelParser::loadTexturesByType(aiMaterial* material, aiTextureType type) {
     vector<Texture> textures;
 
     for(int i = 0; i < material->GetTextureCount(type); i++)
@@ -197,7 +197,7 @@ vector<Texture> CoreLoader::ModelParser::loadTexturesByType(aiMaterial* material
 // Loader private methods
 // ===
 
-TextureFormat CoreLoader::getTextureFormat(int nrChannels) {
+TextureFormat Loader::getTextureFormat(int nrChannels) {
     if (nrChannels == 1)
         return TEXTURE_FORMAT_R;
     else if (nrChannels == 3)

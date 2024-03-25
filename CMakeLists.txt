@@ -13,11 +13,20 @@ include_directories(/opt/homebrew/Cellar/assimp/5.3.1/include)
 include_directories(/Users/tucha/C-libs)
 
 add_executable(gl_engine
+        # base
+        apis/base/iwindow.hpp
+        apis/base/irenderer.hpp
+        apis/base/iresource-manager.hpp
+        apis/base/iinput.hpp
+
         # apis/opengl
         apis/opengl/include.hpp
 
         apis/opengl/gl-check-error.cpp
         apis/opengl/gl-check-error.hpp
+
+        apis/opengl/window.cpp
+        apis/opengl/window.hpp
 
         apis/opengl/input.cpp
         apis/opengl/input.hpp

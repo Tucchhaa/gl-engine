@@ -1,24 +1,33 @@
 #include "input.hpp"
 
-Input::Input(GLFWwindow* window) : window(window) {
-    lastFrame = (float)glfwGetTime();
+Input::Input(IWindow* window) {
+    lastFrameTime = (float)glfwGetTime();
+    deltaTime = 0;
+
+    glfwWindow = dynamic_cast<Window*>(window)->getGLFWWindow();
 }
+
+// ===
 
 void Input::process() {
-    deltaTime = getDeltaTime();
-    
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    
-    yPositivePressed = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-    yNegativePressed = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-    
-    xPositivePressed = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-    xNegativePressed = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-    
-    isShiftPressed = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+    if (glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(glfwWindow, true);
+
+    yPositivePressed = glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS;
+    yNegativePressed = glfwGetKey(glfwWindow, GLFW_KEY_S) == GLFW_PRESS;
+
+    xPositivePressed = glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS;
+    xNegativePressed = glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS;
+
+    _isShiftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+
+    calculateDeltaTime();
 }
 
+
+// ===
+// Getters
+// ===
 vec3 Input::axisVec3() {
     return vec3(
         axisHorizontal(), 0, axisVertical()
@@ -33,13 +42,22 @@ float Input::axisVertical() {
     return yPositivePressed - yNegativePressed;
 }
 
-// = Private functions =
+bool Input::isShiftPressed() {
+    return _isShiftPressed;
+}
 
 float Input::getDeltaTime() {
-    float currentFrame = (float)glfwGetTime();
-    float deltaTime = (float)glfwGetTime() - lastFrame;
-    
-    lastFrame = currentFrame;
-    
     return deltaTime;
+}
+
+// ===
+// Private functions
+// ===
+
+void Input::calculateDeltaTime() {
+    auto currentFrame = (float)glfwGetTime();
+
+    deltaTime = currentFrame - lastFrameTime;
+
+    lastFrameTime = currentFrame;
 }

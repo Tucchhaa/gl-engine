@@ -17,12 +17,12 @@
 
 using namespace std;
 
-class CoreLoader {
+class Loader {
 private:
     IResourceManager* resourceManager;
 
 public:
-    CoreLoader(IResourceManager* resourceManager);
+    Loader(IResourceManager* resourceManager);
 
     GameObject* loadModel(const char* path);
 
@@ -39,12 +39,12 @@ private:
         // MaterialId - Material struct
         map<int, Material> materials;
 
-        CoreLoader* loader;
+        Loader* loader;
 
         const string directory;
 
     public:
-        ModelParser(CoreLoader* loader, string directoryPath);
+        ModelParser(Loader* loader, string directoryPath);
 
         GameObject* parse(const aiScene* scene);
 

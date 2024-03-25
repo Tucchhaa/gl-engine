@@ -1,35 +1,24 @@
-#define GL_SILENCE_DEPRECATION
-
 #include <iostream>
-
-#include <OpenGL/gl3.h>
-#include <GLFW/glfw3.h>
 
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
 
-using namespace glm;
 using namespace std;
-
-GLFWwindow* init();
-void configureGL();
-void processInput(GLFWwindow* window, float deltaTime);
-uint createTexture(const char* textureFileName);
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 
 int main() {
-    GLFWwindow* window = init();
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    glViewport(0, 0, width, height);
+    IWindow* window = new Window();
+    window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    ResourceManager* resourceManager = &ResourceManager::getInstance();
-    Scene scene;
-    CoreLoader loader(resourceManager);
-
+    IInput* input = new Input(window);
+    IResourceManager* resourceManager = &ResourceManager::getInstance();
     IRenderer* renderer = new Renderer();
+
+    Loader loader(resourceManager);
+    Scene scene;
+
 
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
@@ -42,6 +31,8 @@ int main() {
     auto* cameraObject = new GameObject();
     Hierarchy::addGameObject(cameraObject);
     Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
+    cameraTransform->translate(vec3(0, 0, 20));
+    cameraTransform->rotate(vec3(0, 3.141592, 0));
 
     loader.loadCubeMap("textures/skybox");
     auto* camera = new Camera(radians(45.0f), 0.1f, 100.0f);
@@ -62,32 +53,29 @@ int main() {
     Hierarchy::addComponent(lightSource, directLight0);
     Hierarchy::addComponent(lightSource, pointLight0);
 
-    Input input(window);
-    
     // ===
-    
+
     scene.setCamera(camera);
     scene.processHierarchy();
     renderer->setScene(&scene);
-    
+
     float speed = 7.5f;
     float rotationSpeed = 2.0f;
-    
 
-    while (!glfwWindowShouldClose(window))
+    while (window->isOpen())
     {
         // = Input =
-        input.process();
-        
-        if(input.isShiftPressed) {
-            quat horizontalRotation = quat(vec3(0, input.axisHorizontal() * rotationSpeed * input.deltaTime, 0));
-            quat verticalRotation   = quat(vec3(input.axisVertical() * rotationSpeed * input.deltaTime, 0, 0));
-            
+        input->process();
+
+        if(input->isShiftPressed()) {
+            quat horizontalRotation = quat(vec3(0, input->axisHorizontal() * rotationSpeed * input->getDeltaTime(), 0));
+            quat verticalRotation   = quat(vec3(input->axisVertical() * rotationSpeed * input->getDeltaTime(), 0, 0));
+
             cameraTransform->rotate(horizontalRotation);
             cameraTransform->rotate(verticalRotation, Transform::World);
         }
         else {
-            cameraTransform->translate(input.axisVec3() * speed * input.deltaTime);
+            cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
         objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
@@ -95,38 +83,10 @@ int main() {
 
         renderer->render();
 
-//        glfwSetWindowShouldClose(window, true);
-        
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window->onRendered();
     }
 
-    glfwTerminate();
-    
+    window->terminate();
+
     return 0;
-}
-
-GLFWwindow* init() {
-    if (!glfwInit())
-        exit(-1);
-    
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
-
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello World", nullptr, nullptr);
-    
-    if (!window)
-    {
-        glfwTerminate();
-        exit(-1);
-    }
-
-    glfwMakeContextCurrent(window);
-    
-    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-
-    return window;
 }

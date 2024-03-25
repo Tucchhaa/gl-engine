@@ -6,36 +6,48 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../base/iwindow.hpp"
+#include "../base/iinput.hpp"
+
+#include "window.hpp"
+
 using namespace glm;
 
-class Input {
+class Input : public IInput {
 private:
-    GLFWwindow* window;
-    
+    GLFWwindow* glfwWindow;
+
 private:
-    float yPositivePressed;
-    float yNegativePressed;
-    float xPositivePressed;
-    float xNegativePressed;
-    
-    float lastFrame;
-    float getDeltaTime();
-    
+    float yPositivePressed = 0;
+    float yNegativePressed = 0;
+    float xPositivePressed = 0;
+    float xNegativePressed = 0;
+
+    float lastFrameTime;
+    float deltaTime;
+
+    bool _isShiftPressed = false;
+
+    void calculateDeltaTime();
+
 public:
-    Input(GLFWwindow* window);
-    
+    Input(IWindow* window);
+
 public:
-    int isShiftPressed;
-    
-    float deltaTime = 0;
-    
+
+    void process() override;
+
     // ===
-    
-    void process();
-    
-    vec3 axisVec3();
-    
-    float axisHorizontal();
-    
-    float axisVertical();
+
+    vec3 axisVec3() override;
+
+    float axisHorizontal() override;
+
+    float axisVertical() override;
+
+    // ===
+
+    bool isShiftPressed() override;
+
+    float getDeltaTime() override;
 };
