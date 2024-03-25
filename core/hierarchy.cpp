@@ -114,7 +114,7 @@ void Hierarchy::addComponent(GameObject* gameObject, ObjectComponent* component)
 
 // ===
 
-void Hierarchy::setParent(GameObject *parent, GameObject *child) {
+void Hierarchy::setParent(GameObject* parent, GameObject* child) {
     parent->children.insert(child->ID);
 
     if(child->parentID != 0) {
@@ -123,6 +123,27 @@ void Hierarchy::setParent(GameObject *parent, GameObject *child) {
 
     child->parentID = parent->ID;
 }
+
+void Hierarchy::updateTransformTree(Transform* transform) {
+    queue<Transform*> q;
+    q.push(transform);
+
+    while(!q.empty()) {
+        Transform* parentTransform = q.front();
+
+        q.pop();
+
+        for(auto childId: getGameObject(parentTransform->GameObjectID)->children) {
+            Transform* childTransform = getTransform(childId);
+
+            childTransform->updateAbsoluteValues(parentTransform);
+
+            q.push(childTransform);
+        }
+    }
+}
+
+// ===
 
 template class Hierarchy::Components<Mesh>;
 template class Hierarchy::Components<DirectLight>;

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <queue>
 
 #include "./game-object/game-object.hpp"
 
@@ -25,7 +26,6 @@ private:
      * Key - gameObjectID, value - gameObject
      */
     static map<int, GameObject*> gameObjects;
-    
     
 public:
     // TODO: limit T type to ObjectComponent
@@ -76,4 +76,6 @@ public:
     // ===
 
     static void setParent(GameObject* parent, GameObject* child);
+
+    static void updateTransformTree(Transform* transform);
 };

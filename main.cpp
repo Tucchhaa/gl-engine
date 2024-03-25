@@ -5,10 +5,6 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
 
@@ -32,12 +28,15 @@ int main() {
     ResourceManager* resourceManager = &ResourceManager::getInstance();
     Scene scene;
     CoreLoader loader(resourceManager);
-    Renderer renderer;
+
+    IRenderer* renderer = new Renderer();
 
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
     Hierarchy::addGameObject(object);
     Transform* objectTransform = Hierarchy::getTransform(object);
+    objectTransform->translate(vec3(0, 0, 10));
+    Hierarchy::updateTransformTree(objectTransform);
 
     // = camera =
     auto* cameraObject = new GameObject();
@@ -69,7 +68,7 @@ int main() {
     
     scene.setCamera(camera);
     scene.processHierarchy();
-    renderer.setScene(&scene);
+    renderer->setScene(&scene);
     
     float speed = 7.5f;
     float rotationSpeed = 2.0f;
@@ -90,10 +89,11 @@ int main() {
         else {
             cameraTransform->translate(input.axisVec3() * speed * input.deltaTime);
         }
-        
-        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
 
-        renderer.render();
+        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
+        Hierarchy::updateTransformTree(objectTransform);
+
+        renderer->render();
 
 //        glfwSetWindowShouldClose(window, true);
         
