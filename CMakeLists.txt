@@ -13,23 +13,69 @@ include_directories(/opt/homebrew/Cellar/assimp/5.3.1/include)
 include_directories(/Users/tucha/C-libs)
 
 add_executable(gl_engine
+        # apis/opengl
+        apis/opengl/include.hpp
+
         apis/opengl/gl-check-error.cpp
+        apis/opengl/gl-check-error.hpp
+
         apis/opengl/input.cpp
+        apis/opengl/input.hpp
+
         apis/opengl/renderer.cpp
+        apis/opengl/renderer.hpp
+
         apis/opengl/shader.cpp
-        core/game-object/components/lights/direct-light.cpp
-        core/game-object/components/lights/light.cpp
-        core/game-object/components/lights/point-light.cpp
-        core/game-object/components/camera.cpp
-        core/game-object/components/component.cpp
-        core/game-object/components/material.cpp
-        core/game-object/components/mesh.cpp
-        core/game-object/components/transform.cpp
-        core/game-object/game-object.cpp
-        core/hierarchy.cpp
-        core/scene.cpp
-        main.cpp
-        core/loader.cpp
-        core/structures/vectors.cpp
+        apis/opengl/shader.hpp
+
         apis/opengl/resource-manager.cpp
+        apis/opengl/resource-manager.hpp
+
+        # core
+        core/include.hpp
+
+        core/hierarchy.cpp
+        core/hierarchy.hpp
+
+        core/scene.cpp
+        core/scene.hpp
+
+        core/loader.cpp
+        core/loader.hpp
+
+        # core/game-object
+        core/game-object/components/lights/direct-light.cpp
+        core/game-object/components/lights/direct-light.hpp
+
+        core/game-object/components/lights/light.cpp
+        core/game-object/components/lights/light.hpp
+
+        core/game-object/components/lights/point-light.cpp
+        core/game-object/components/lights/point-light.hpp
+
+        core/game-object/components/camera.cpp
+        core/game-object/components/camera.hpp
+
+        core/game-object/components/component.cpp
+        core/game-object/components/component.hpp
+
+        core/game-object/components/material.cpp
+        core/game-object/components/material.hpp
+
+        core/game-object/components/mesh.cpp
+        core/game-object/components/mesh.hpp
+
+        core/game-object/components/transform.cpp
+        core/game-object/components/transform.hpp
+
+        core/game-object/game-object.cpp
+        core/game-object/game-object.hpp
+
+        # core/structures
+        core/structures/vectors.cpp
+        core/structures/vectors.hpp
+
+        # other
+        main.cpp
 )
+
