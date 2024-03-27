@@ -19,6 +19,7 @@
 #include "../../core/game-object/components/mesh.hpp"
 #include "../../core/game-object/components/lights/direct-light.hpp"
 #include "../../core/game-object/components/lights/point-light.hpp"
+#include "../../core/game-object/components/lights/spot-light.hpp"
 
 using namespace std;
 using namespace glm;
@@ -26,24 +27,24 @@ using namespace glm;
 using uint = unsigned int;
 
 class Shader {
-private:
-    string readShader(const string& filepath);
-    uint compileShader(uint type, string& code);
-    uint createShader(string& vertexShaderFile, string& fragmentShaderFile);
-    
 public:
     uint ID;
     
     Shader(string vertexShaderFile, string fragmentShaderFile);
-    
-    void use();
-    void deleteShader();
 
-    // ===
-    // utility uniform functions
-    // ===
+// ===
+// Basic methods
+// ===
+public:
+    void use() const;
+    void deleteShader() const;
     int getLocation(const string& name) const;
-    
+
+
+// ==
+// Primitive setters
+// ===
+public:
     void setBool(const string &name, bool value) const;
     void setInt(const string &name, int value) const;
     void setFloat(const string &name, float value) const;
@@ -52,9 +53,27 @@ public:
     void setMat3(const string& name, const mat3& matrix) const;
     
     void setVec3(const string& name, const vec3& vector) const;
-    
+
+public:
+    // ===
+    // Material
+    // ===
+
     void setMaterial(const Material* material) const;
-    
+
+    // ==
+    // Light components
+    // ===
+
     void setDirectLight(uint index, const DirectLight* lightSource) const;
     void setPointLight(uint index, const PointLight* lightSource) const;
+    void setSpotLight(uint index, const SpotLight* lightSource) const;
+
+// ===
+// Shader initialization
+// ===
+private:
+    string readShader(const string& filepath);
+    uint compileShader(uint type, string& code);
+    uint createShader(string& vertexShaderFile, string& fragmentShaderFile);
 };

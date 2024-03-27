@@ -22,10 +22,15 @@ const vector<DirectLight*>& Scene::getDirectLights() {
     return directLights;
 }
 
+const vector<SpotLight*> &Scene::getSpotLights() {
+    return spotLights;
+}
+
 void Scene::processHierarchy() {
     loadComponents(&meshes);
     loadComponents(&directLights);
     loadComponents(&pointLights);
+    loadComponents(&spotLights);
 }
 
 template<typename T>

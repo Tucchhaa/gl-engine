@@ -17,19 +17,20 @@ private:
 
     mat3 normalMatrix;
 
-    vec3 absolutePosition = vec3(0, 0, 0);
+    vec3 parentAbsolutePosition = vec3(0, 0, 0);
 
-    vec3 absoluteScale = vec3(1, 1, 1);
+    vec3 parentAbsoluteScale = vec3(1, 1, 1);
 
-    quat absoluteRotation = quat(vec3(0, 0, 0));
+    quat parentAbsoluteRotation = quat(vec3(0, 0, 0));
 
-public:
     vec3 position;
 
     vec3 scale;
 
     quat rotation;
-    
+
+public:
+
     Transform(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
 
 public:
@@ -62,4 +63,16 @@ public:
     mat3 getNormalMatrix() const;
     
     vec3 getDirectionVector() const;
+
+    vec3 getPosition() const;
+
+    vec3 getScale() const;
+
+    quat getRotation() const;
+
+    vec3 getAbsolutePosition() const;
+
+    vec3 getAbsoluteScale() const;
+
+    quat getAbsoluteRotation() const;
 };

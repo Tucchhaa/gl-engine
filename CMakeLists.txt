@@ -53,14 +53,17 @@ add_executable(gl_engine
         core/loader.hpp
 
         # core/game-object
-        core/game-object/components/lights/direct-light.cpp
-        core/game-object/components/lights/direct-light.hpp
-
         core/game-object/components/lights/light.cpp
         core/game-object/components/lights/light.hpp
 
+        core/game-object/components/lights/direct-light.cpp
+        core/game-object/components/lights/direct-light.hpp
+
         core/game-object/components/lights/point-light.cpp
         core/game-object/components/lights/point-light.hpp
+
+        core/game-object/components/lights/spot-light.cpp
+        core/game-object/components/lights/spot-light.hpp
 
         core/game-object/components/camera.cpp
         core/game-object/components/camera.hpp

@@ -8,8 +8,10 @@
 #include "./game-object/game-object.hpp"
 #include "./game-object/components/camera.hpp"
 #include "./game-object/components/mesh.hpp"
-#include "./game-object/components/lights/point-light.hpp"
+
 #include "./game-object/components/lights/direct-light.hpp"
+#include "./game-object/components/lights/point-light.hpp"
+#include "./game-object/components/lights/spot-light.hpp"
 
 class Scene {
 private:
@@ -20,6 +22,8 @@ private:
     vector<DirectLight*> directLights;
     
     vector<PointLight*> pointLights;
+
+    vector<SpotLight*> spotLights;
     
 public:
     Scene();
@@ -29,11 +33,13 @@ public:
     void setCamera(Camera* camera);
     
     const vector<Mesh*>& getMeshes();
-    
-    const vector<PointLight*>& getPointLights();
-    
+
     const vector<DirectLight*>& getDirectLights();
-    
+
+    const vector<PointLight*>& getPointLights();
+
+    const vector<SpotLight*>& getSpotLights();
+
     void processHierarchy();
     
 private:

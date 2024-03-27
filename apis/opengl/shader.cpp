@@ -4,17 +4,25 @@ Shader::Shader(string vertexShaderFile, string fragmentShaderFile) {
     this->ID = this->createShader(vertexShaderFile, fragmentShaderFile);
 }
 
-void Shader::use() {
+// ===
+// Basic methods
+// ===
+
+void Shader::use() const {
     glUseProgram(ID);
 }
 
-void Shader::deleteShader() {
+void Shader::deleteShader() const {
     glDeleteProgram(ID);
 }
 
 int Shader::getLocation(const string& name) const {
     return glGetUniformLocation(ID, name.c_str());
 }
+
+// ==
+// Primitive setters
+// ===
 
 void Shader::setBool(const string &name, bool value) const {
     glUniform1i(getLocation(name), (int)value);
@@ -40,6 +48,10 @@ void Shader::setVec3(const string& name, const vec3& vector) const {
     glUniform3f(getLocation(name), vector.x, vector.y, vector.z);
 }
 
+// ===
+// Material
+// ===
+
 void Shader::setMaterial(const Material* material) const {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ResourceManager::getTextureId(material, glApi_DIFFUSE_TEXTURE));
@@ -52,16 +64,20 @@ void Shader::setMaterial(const Material* material) const {
     setFloat("material.shininess", 32);
 }
 
+// ==
+// Light components
+// ===
+
 void Shader::setDirectLight(uint index, const DirectLight* lightSource) const {
     string _index = to_string(index);
     
     Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
     
-    setVec3(("directLights[" + _index + "].direction").c_str(), transform->getDirectionVector());
+    setVec3("directLights[" + _index + "].direction", transform->getDirectionVector());
     
-    setVec3(("directLights[" + _index + "].colors.ambient").c_str(),  lightSource->ambient);
-    setVec3(("directLights[" + _index + "].colors.diffuse").c_str(),  lightSource->diffuse);
-    setVec3(("directLights[" + _index + "].colors.specular").c_str(), lightSource->specular);
+    setVec3("directLights[" + _index + "].colors.ambient",  lightSource->ambient);
+    setVec3("directLights[" + _index + "].colors.diffuse",  lightSource->diffuse);
+    setVec3("directLights[" + _index + "].colors.specular", lightSource->specular);
 }
 
 void Shader::setPointLight(uint index, const PointLight* lightSource) const {
@@ -69,15 +85,39 @@ void Shader::setPointLight(uint index, const PointLight* lightSource) const {
     
     Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
     
-    setVec3(("pointLights[" + _index + "].position").c_str(), transform->position);
+    setVec3("pointLights[" + _index + "].position", transform->getAbsolutePosition());
     
-    setFloat(("pointLights[" + _index + "].linear").c_str(), lightSource->linear);
-    setFloat(("pointLights[" + _index + "].quadratic").c_str(), lightSource->quadratic);
+    setFloat("pointLights[" + _index + "].linear", lightSource->linear);
+    setFloat("pointLights[" + _index + "].quadratic", lightSource->quadratic);
     
-    setVec3(("pointLights[" + _index + "].colors.ambient").c_str(),  lightSource->ambient);
-    setVec3(("pointLights[" + _index + "].colors.diffuse").c_str(),  lightSource->diffuse);
-    setVec3(("pointLights[" + _index + "].colors.specular").c_str(), lightSource->specular);
+    setVec3("pointLights[" + _index + "].colors.ambient",  lightSource->ambient);
+    setVec3("pointLights[" + _index + "].colors.diffuse",  lightSource->diffuse);
+    setVec3("pointLights[" + _index + "].colors.specular", lightSource->specular);
 }
+
+
+void Shader::setSpotLight(uint index, const SpotLight* lightSource) const {
+    string _index = to_string(index);
+
+    Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
+
+    setVec3("spotLights[" + _index + "].position", transform->getAbsolutePosition());
+    setVec3("spotLights[" + _index + "].direction", transform->getDirectionVector());
+
+    setFloat("spotLights[" + _index + "].coneAngleCosine", glm::cos(lightSource->coneAngle));
+    setFloat("spotLights[" + _index + "].edgeAngleCosine", glm::cos(lightSource->coneAngle + lightSource->outerAngle));
+
+    setFloat("spotLights[" + _index + "].linear", lightSource->linear);
+    setFloat("spotLights[" + _index + "].quadratic", lightSource->quadratic);
+
+    setVec3("spotLights[" + _index + "].colors.ambient",  lightSource->ambient);
+    setVec3("spotLights[" + _index + "].colors.diffuse",  lightSource->diffuse);
+    setVec3("spotLights[" + _index + "].colors.specular", lightSource->specular);
+}
+
+// ===
+// Shader initialization
+// ===
 
 string Shader::readShader(const string& filepath) {
     std::ifstream stream(filepath);

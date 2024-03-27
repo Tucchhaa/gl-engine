@@ -149,3 +149,4 @@ template class Hierarchy::Components<Transform>;
 template class Hierarchy::Components<Mesh>;
 template class Hierarchy::Components<DirectLight>;
 template class Hierarchy::Components<PointLight>;
+template class Hierarchy::Components<SpotLight>;

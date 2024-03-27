@@ -15,10 +15,10 @@ mat4 Camera::getViewMatrix(bool translationEnabled) {
 
     mat4 result = mat4(1.0f);
     
-    result = result * mat4_cast(transform->rotation);
+    result = result * mat4_cast(conjugate(transform->getAbsoluteRotation()));
     
     if(translationEnabled) {
-        result = translate(result, -transform->position);
+        result = translate(result, -transform->getAbsolutePosition());
     }
     
     return result;

@@ -20,7 +20,7 @@ void Transform::translate(vec3 vector, const Transform* transform) {
     
     vector.z = -vector.z;
     
-    vec3 displacement = vector * rotation;
+    vec3 displacement = rotation * vector;
     
     position += displacement;
 }
@@ -36,7 +36,9 @@ void Transform::rotate(quat rotation, const Transform* transform) {
 }
 
 void Transform::scaleBy(vec3 scale) {
-
+    this->scale.x *= scale.x;
+    this->scale.y *= scale.y;
+    this->scale.z *= scale.z;
 }
 
 // ===
@@ -55,10 +57,34 @@ mat3 Transform::getNormalMatrix() const {
 vec3 Transform::getDirectionVector() const {
     vec3 direction = vec3(0, 0, 1);
 
-    vec3 rotatedDirection = rotation * direction;
+    vec3 rotatedDirection = getAbsoluteRotation() * direction;
 
     // TODO: maybe don't need normalization here
     return normalize(rotatedDirection);
+}
+
+vec3 Transform::getPosition() const {
+    return position;
+}
+
+vec3 Transform::getScale() const {
+    return scale;
+}
+
+quat Transform::getRotation() const {
+    return rotation;
+}
+
+vec3 Transform::getAbsolutePosition() const {
+    return parentAbsolutePosition + position;
+}
+
+vec3 Transform::getAbsoluteScale() const {
+    return parentAbsoluteScale * scale;
+}
+
+quat Transform::getAbsoluteRotation() const {
+    return parentAbsoluteRotation * rotation;
 }
 
 // ===
@@ -66,9 +92,9 @@ vec3 Transform::getDirectionVector() const {
 // ===
 
 void Transform::updateAbsoluteValues(Transform* parentTransform) {
-    absolutePosition = parentTransform->absolutePosition + parentTransform->position;
-    absoluteRotation = parentTransform->absoluteRotation * parentTransform->rotation;
-    absoluteScale = parentTransform->absoluteScale * parentTransform->scale;
+    parentAbsolutePosition = parentTransform->parentAbsolutePosition + parentTransform->position;
+    parentAbsoluteRotation = parentTransform->parentAbsoluteRotation * parentTransform->rotation;
+    parentAbsoluteScale = parentTransform->parentAbsoluteScale * parentTransform->scale;
 
     calculateMatrices();
 }
@@ -81,9 +107,9 @@ void Transform::calculateMatrices() {
 mat4 Transform::calculateModelMatrix() {
     mat4 matrix = mat4(1.0f);
 
-    matrix = glm::translate(matrix, absolutePosition + position);
-    matrix = matrix * mat4_cast(absoluteRotation * rotation);
-    matrix = glm::scale(matrix, absoluteScale * scale);
+    matrix = glm::translate(matrix, parentAbsolutePosition + position);
+    matrix = matrix * mat4_cast(parentAbsoluteRotation * rotation);
+    matrix = glm::scale(matrix, parentAbsoluteScale * scale);
 
     return matrix;
 }
@@ -91,11 +117,11 @@ mat4 Transform::calculateModelMatrix() {
 mat3 Transform::calculateNormalMatrix() {
     mat3 inverseScale(0);
 
-    inverseScale[0][0] = 1/(absoluteScale.x * scale.x);
-    inverseScale[1][1] = 1/(absoluteScale.y * scale.y);
-    inverseScale[2][2] = 1/(absoluteScale.z * scale.z);
+    inverseScale[0][0] = 1/(parentAbsoluteScale.x * scale.x);
+    inverseScale[1][1] = 1/(parentAbsoluteScale.y * scale.y);
+    inverseScale[2][2] = 1/(parentAbsoluteScale.z * scale.z);
 
-    mat3 matrix = inverseScale * mat3_cast(absoluteRotation * rotation);
+    mat3 matrix = inverseScale * mat3_cast(parentAbsoluteRotation * rotation);
 
     return matrix;
 }

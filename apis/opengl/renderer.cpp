@@ -126,9 +126,10 @@ void Renderer::render() {
     baseShader.use();
 
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
-    baseShader.setVec3("cameraPos", Hierarchy::getTransform(currentScene->getCamera())->position);
+    baseShader.setVec3("cameraPos", Hierarchy::getTransform(currentScene->getCamera())->getAbsolutePosition());
 
-    baseShader.setPointLight(0, currentScene->getPointLights()[0]);
+//    baseShader.setPointLight(0, currentScene->getPointLights()[0]);
+    baseShader.setSpotLight(0, currentScene->getSpotLights()[0]);
 
     for(auto &mesh : meshes) {
         drawMesh(&mesh);
