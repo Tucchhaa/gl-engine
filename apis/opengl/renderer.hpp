@@ -53,6 +53,8 @@ private:
     Shader screenShader;
     
     Shader skyboxShader;
+
+    Shader terrainShader;
     
     unsigned int frameBuffer;
     
@@ -72,5 +74,12 @@ private:
     void setupMesh(Mesh* mesh);
     
     void drawMesh(MeshData* meshData);
+
+// TEMP
+private:
+
+    void initTerrain();
+
+    unsigned int terrainVAO, terrainEBO, heightMapTextureId;
 };
 

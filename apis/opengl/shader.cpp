@@ -1,7 +1,19 @@
 #include "shader.hpp"
 
-Shader::Shader(string vertexShaderFile, string fragmentShaderFile) {
-    this->ID = this->createShader(vertexShaderFile, fragmentShaderFile);
+Shader::Shader(
+        const string& vertexShaderFile,
+        const string& fragmentShaderFile,
+        const string& tessControlShaderFile,
+        const string& tessEvalShaderFile
+        ) {
+    vector<const string*> shaders = {
+        &vertexShaderFile,
+        &fragmentShaderFile,
+        &tessControlShaderFile,
+        &tessEvalShaderFile
+    };
+
+    this->ID = this->createShaderProgram(shaders);
 }
 
 // ===
@@ -156,34 +168,51 @@ uint Shader::compileShader(uint type, string& code) {
     return shaderId;
 }
 
-uint Shader::createShader(string& vertexShaderFile, string& fragmentShaderFile) {
-    uint shaderProgramID = glCreateProgram();
+uint Shader::createShaderProgram(vector<const string*> shaderFiles) {
+    uint programId = glCreateProgram();
+    vector<uint> shaderIds;
+
+    const string SHADERS_DIR = "/Users/tucha/Repositories/gl-engine/gl-engine/apis/opengl/shaders";
+
+    for(const string* path: shaderFiles) {
+        if(path->empty())
+            continue;
+
+        string shaderCode = readShader(SHADERS_DIR + "/" + *path);
+
+        string extension = path->substr(path->rfind('.')+1);
+
+        uint shaderType;
+
+        if(extension == "vert") shaderType = GL_VERTEX_SHADER;
+        else if(extension == "frag") shaderType = GL_FRAGMENT_SHADER;
+        else if(extension == "tesc") shaderType = GL_TESS_CONTROL_SHADER;
+        else if(extension == "tese") shaderType = GL_TESS_EVALUATION_SHADER;
+        else throw std::runtime_error("unsupported shader extension");
+
+        uint shaderId = compileShader(shaderType, shaderCode);
+
+        glAttachShader(programId, shaderId);
+
+        shaderIds.push_back(shaderId);
+    }
     
-    const string path = "/Users/tucha/Repositories/gl-engine/gl-engine/apis/opengl/shaders";
-    
-    string vertexCode = readShader(path + "/" + vertexShaderFile);
-    string fragmentCode = readShader(path + "/" + fragmentShaderFile);
-    
-    uint vertexShaderID = compileShader(GL_VERTEX_SHADER, vertexCode);
-    uint fragmentShaderID = compileShader(GL_FRAGMENT_SHADER, fragmentCode);
-    
-    glAttachShader(shaderProgramID, vertexShaderID);
-    glAttachShader(shaderProgramID, fragmentShaderID);
-    
-    glLinkProgram(shaderProgramID);
-    glValidateProgram(shaderProgramID);
+    glLinkProgram(programId);
+    glValidateProgram(programId);
     
     int result;
-    glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &result);
+    glGetProgramiv(programId, GL_LINK_STATUS, &result);
     
     if(result == GL_FALSE) {
         char message[512];
-        glGetProgramInfoLog(ID, 512, NULL, message);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << message << std::endl;
+        glGetProgramInfoLog(programId, 512, NULL, message);
+
+        throw std::runtime_error("ERROR::SHADER::PROGRAM::LINKING_FAILED\n" + string(message) + "\n");
     }
-    
-    glDeleteShader(vertexShaderID);
-    glDeleteShader(fragmentShaderID);
-    
-    return shaderProgramID;
+
+    for(uint shaderId: shaderIds) {
+        glDeleteShader(shaderId);
+    }
+
+    return programId;
 }

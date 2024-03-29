@@ -29,8 +29,9 @@ using uint = unsigned int;
 class Shader {
 public:
     uint ID;
-    
-    Shader(string vertexShaderFile, string fragmentShaderFile);
+    Shader(
+            const string& vertexShaderFile, const string& fragmentShaderFile,
+            const string& tessControlShaderFile = "", const string& tessEvalShaderFile = "");
 
 // ===
 // Basic methods
@@ -75,5 +76,5 @@ public:
 private:
     string readShader(const string& filepath);
     uint compileShader(uint type, string& code);
-    uint createShader(string& vertexShaderFile, string& fragmentShaderFile);
+    uint createShaderProgram(vector<const string*> shaderFiles);
 };

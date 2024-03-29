@@ -36,7 +36,7 @@ int main() {
 //    cameraTransform->rotate(vec3(0, 3.141592, 0));
 
     loader.loadCubeMap("textures/skybox");
-    auto* camera = new Camera(radians(45.0f), 0.1f, 100.0f);
+    auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = "textures/skybox";
     Hierarchy::addComponent(cameraObject, camera);
 
@@ -72,8 +72,8 @@ int main() {
     scene.processHierarchy();
     renderer->setScene(&scene);
 
-    float speed = 7.5f;
-    float rotationSpeed = 2.0f;
+    float speed = 150.0f;
+    float rotationSpeed = 1.0f;
 
     while (window->isOpen())
     {
