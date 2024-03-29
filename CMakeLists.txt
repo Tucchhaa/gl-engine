@@ -91,5 +91,9 @@ add_executable(gl_engine
         main.cpp
         core/game-object/components/terrain.cpp
         core/game-object/components/terrain.hpp
+        core/structures/texture.cpp
+        core/structures/texture.hpp
+        core/structures/texture-options.cpp
+        core/structures/texture-options.hpp
 )
 

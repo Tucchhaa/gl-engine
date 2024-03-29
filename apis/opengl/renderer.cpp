@@ -223,7 +223,7 @@ void Renderer::render() {
     glDrawArrays(GL_PATCHES, 0, 4*rez*rez);
 
     // ===
-    
+
 //    baseShader.use();
 //
 //    baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());

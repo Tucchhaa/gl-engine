@@ -67,4 +67,9 @@ public:
     void handleCubeMap(const Texture* texture) override;
 
     void handleModel(const string& path) override;
+
+private:
+    static int convertTextureWrap(TextureWrap wrap);
+
+    static int convertTextureFilter(TextureFilter filter);
 };

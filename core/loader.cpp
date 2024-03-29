@@ -21,7 +21,12 @@ Loader::~Loader() {
 // ===
 // Loader functions
 // ===
-Texture* Loader::loadTexture(const char *path) {
+
+Texture* Loader::loadTexture(const char* path) {
+    return loadTexture(path, TEXTURE_2D_OPTIONS);
+}
+
+Texture* Loader::loadTexture(const char *path, const TextureOptions options) {
     auto cached = textures.find(path);
 
     if(cached != textures.end())
@@ -36,7 +41,7 @@ Texture* Loader::loadTexture(const char *path) {
 
     TextureFormat format = getTextureFormat(nrChannels);
 
-    auto* texture = new Texture(fullPath, width, height, format, data);
+    auto* texture = new Texture(fullPath, width, height, format, data, options);
 
     resourceManager->handleTexture(texture);
     textures[path] = texture;
@@ -70,7 +75,7 @@ Texture* Loader::loadCubeMap(const char *path) {
 
     TextureFormat format = getTextureFormat(nrChannels);
 
-    auto* texture = new Texture(path, width, height, format, &data);
+    auto* texture = new Texture(path, width, height, format, &data, CUBE_MAP_TEXTURE_OPTIONS);
 
     resourceManager->handleCubeMap(texture);
     textures[path] = texture;

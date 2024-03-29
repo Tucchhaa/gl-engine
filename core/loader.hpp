@@ -13,6 +13,7 @@
 #include "hierarchy.hpp"
 #include "game-object/game-object.hpp"
 
+#include "game-object/components/material.hpp"
 #include "../apis/base/iresource-manager.hpp"
 
 using namespace std;
@@ -29,6 +30,7 @@ public:
     GameObject* loadModel(const char* path);
 
     Texture* loadTexture(const char* path);
+    Texture* loadTexture(const char* path, const TextureOptions options);
 
     Texture* loadCubeMap(const char* path);
 

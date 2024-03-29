@@ -37,15 +37,16 @@ CubeMap* ResourceManager::getCubeMap(const Texture* texture) {
 // ===
 
 void ResourceManager::handleTexture(const Texture* texture) {
+    TextureOptions options = texture->options;
     unsigned int textureId;
 
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convertTextureWrap(options.xWrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convertTextureWrap(options.yWrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convertTextureFilter(options.minFilter));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convertTextureFilter(options.magFilter));
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -100,6 +101,8 @@ void ResourceManager::handleCubeMap(const Texture* texture) {
             1.0f, -1.0f,  1.0f
     };
 
+    TextureOptions options = texture->options;
+
     CubeMap cubeMap;
     unsigned int VBO;
     glGenVertexArrays(1, &cubeMap.VAO);
@@ -128,11 +131,11 @@ void ResourceManager::handleCubeMap(const Texture* texture) {
         );
     }
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, convertTextureFilter(options.magFilter));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, convertTextureFilter(options.minFilter));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, convertTextureWrap(options.xWrap));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, convertTextureWrap(options.yWrap));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, convertTextureWrap(options.zWrap));
 
     cubeMaps[texture->ID] = cubeMap;
 
@@ -143,4 +146,28 @@ void ResourceManager::handleCubeMap(const Texture* texture) {
 
 void ResourceManager::handleModel(const string &path) {
 
+}
+
+int ResourceManager::convertTextureWrap(TextureWrap wrap) {
+    switch (wrap) {
+        case TEXTURE_WRAP_REPEAT:
+            return GL_REPEAT;
+        case TEXTURE_WRAP_CLAMP_TO_EDGE:
+            return GL_CLAMP_TO_EDGE;
+        default:
+            throw std::runtime_error("unsupported TEXTURE_WRAP");
+    }
+}
+
+int ResourceManager::convertTextureFilter(TextureFilter filter) {
+    switch (filter) {
+        case TEXTURE_FILTER_NEAREST:
+            return GL_NEAREST;
+        case TEXTURE_FILTER_LINEAR:
+            return GL_LINEAR;
+        case TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+            return GL_LINEAR_MIPMAP_LINEAR;
+        default:
+            throw std::runtime_error("unsupported TEXTURE_FILTER");
+    }
 }
