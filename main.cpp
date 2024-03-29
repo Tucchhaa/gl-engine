@@ -35,9 +35,8 @@ int main() {
     cameraTransform->translate(vec3(0, 0, -20));
 //    cameraTransform->rotate(vec3(0, 3.141592, 0));
 
-    loader.loadCubeMap("textures/skybox");
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
-    camera->cubeMap = "textures/skybox";
+    camera->cubeMap = loader.loadCubeMap("textures/skybox");
     Hierarchy::addComponent(cameraObject, camera);
 
     camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);

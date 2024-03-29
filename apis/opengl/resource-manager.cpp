@@ -18,12 +18,12 @@ unsigned int ResourceManager::getTextureId(const Material* material, glApiTextur
             break;
     }
 
-    return getInstance().textures[(*textures)[0].path];
+    return getInstance().textures[(*textures)[0].ID];
 }
 
-CubeMap* ResourceManager::getCubeMap(const string &path) {
+CubeMap* ResourceManager::getCubeMap(const Texture* texture) {
     ResourceManager* instance = &getInstance();
-    auto iterator = instance->cubeMaps.find(path);
+    auto iterator = instance->cubeMaps.find(texture->ID);
 
     if(iterator == instance->cubeMaps.end())
         return nullptr;
@@ -36,18 +36,7 @@ CubeMap* ResourceManager::getCubeMap(const string &path) {
 // Override methods
 // ===
 
-bool ResourceManager::isResourceLoaded(ResourceType type, const string& path) {
-    switch (type) {
-        case RESOURCE_TEXTURE:
-            return textures.count(path);
-        case RESOURCE_CUBE_MAP:
-            return cubeMaps.count(path);
-        case RESOURCE_MODEL:
-            return models.count(path);
-    }
-}
-
-void ResourceManager::handleTexture(const string& path, unsigned char *data, TextureFormat format, int height, int width) {
+void ResourceManager::handleTexture(const Texture* texture) {
     unsigned int textureId;
 
     glGenTextures(1, &textureId);
@@ -58,18 +47,15 @@ void ResourceManager::handleTexture(const string& path, unsigned char *data, Tex
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    textures[path] = textureId;
+    textures[texture->ID] = textureId;
 }
 
-void ResourceManager::handleCubeMap(
-    const string& path, const vector<unsigned char *> *data,
-    TextureFormat format, int height,  int width
-) {
+void ResourceManager::handleCubeMap(const Texture* texture) {
     float vertices[] = {
             -1.0f,  1.0f, -1.0f,
             -1.0f, -1.0f, -1.0f,
@@ -131,19 +117,14 @@ void ResourceManager::handleCubeMap(
     glGenTextures(1, &cubeMap.textureId);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap.textureId);
 
-    vector<string> textures_faces = {
-        "right.jpg",
-        "left.jpg",
-        "top.jpg",
-        "bottom.jpg",
-        "front.jpg",
-        "back.jpg"
-    };
+    const int CUBE_MAP_FACE_NUMBER = 6;
 
-    for(unsigned int i = 0; i < textures_faces.size(); i++) {
+    vector<unsigned char*>* _data = texture->getCubeMapData();
+
+    for(unsigned int i = 0; i < CUBE_MAP_FACE_NUMBER; i++) {
         glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, (*data)[i]
+                0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, (*_data)[i]
         );
     }
 
@@ -153,7 +134,7 @@ void ResourceManager::handleCubeMap(
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    cubeMaps[path] = cubeMap;
+    cubeMaps[texture->ID] = cubeMap;
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

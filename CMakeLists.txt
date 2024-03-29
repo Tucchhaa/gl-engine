@@ -89,5 +89,7 @@ add_executable(gl_engine
 
         # other
         main.cpp
+        core/game-object/components/terrain.cpp
+        core/game-object/components/terrain.hpp
 )
 

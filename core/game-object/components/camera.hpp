@@ -22,14 +22,14 @@ public:
     int screenWidth;
     int screenHeight;
 
-    string cubeMap;
+    Texture* cubeMap;
 
     Camera(float fov, float near, float far);
     
 public:
-    mat4 getViewMatrix(bool translationEnabled = true);
+    mat4 getViewMatrix(bool needTranslation = true);
 
-    mat4 getViewProjectionMatrix(bool translationEnabled = true);
+    mat4 getViewProjectionMatrix(bool needTranslation = true);
     
     void setScreenSizes(float screenWidth, float screenHeight);
 };

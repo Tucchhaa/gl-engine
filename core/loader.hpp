@@ -24,14 +24,18 @@ private:
 public:
     Loader(IResourceManager* resourceManager);
 
+    ~Loader();
+
     GameObject* loadModel(const char* path);
 
-    void loadTexture(const char* path);
+    Texture* loadTexture(const char* path);
 
-    void loadCubeMap(const char* path);
+    Texture* loadCubeMap(const char* path);
 
 private:
     static TextureFormat getTextureFormat(int nrChannels);
+
+    map<string, Texture*> textures;
 
 private:
     class ModelParser {

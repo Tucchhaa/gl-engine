@@ -25,14 +25,14 @@ struct CubeMap {
 
 class ResourceManager: public IResourceManager {
 private:
-    // Key: path, Value: TextureID
-    map<string, unsigned int> textures;
+    // Key: Loader.TextureID, Value: GL.TextureID
+    map<int, unsigned int> textures;
 
-    // Key: path
-    map<string, CubeMap> cubeMaps;
+    // Key: Loader.TextureID,
+    map<int, CubeMap> cubeMaps;
 
-    // Key: path, Value: VAO
-    map<string, unsigned int> models;
+    // Key: Loader.TextureID,, Value: VAO
+    map<int, unsigned int> models;
 
 // ===
 // Singleton pattern
@@ -55,17 +55,16 @@ public:
 public:
     static unsigned int getTextureId(const Material* material, glApiTextureTypes textureType);
 
-    static CubeMap* getCubeMap(const string& path);
+    static CubeMap* getCubeMap(const Texture* texture);
 
 // ===
 // Overrode methods
 // ===
 public:
-    bool isResourceLoaded(ResourceType type, const string& path) override;
 
-    void handleTexture(const string& path, unsigned char* data, TextureFormat format, int height, int width) override;
+    void handleTexture(const Texture* texture) override;
 
-    void handleCubeMap(const string& path, const vector<unsigned char*>* data, TextureFormat format, int height, int width) override;
+    void handleCubeMap(const Texture* texture) override;
 
     void handleModel(const string& path) override;
 };

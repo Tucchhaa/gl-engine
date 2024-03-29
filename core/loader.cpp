@@ -12,13 +12,20 @@ const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/gl-engine/res
 Loader::Loader(IResourceManager* resourceManager) : resourceManager(resourceManager)
     {}
 
+Loader::~Loader() {
+    for(const auto& it: textures) {
+        free(it.second);
+    }
+}
+
 // ===
 // Loader functions
 // ===
-void Loader::loadTexture(const char *path) {
-    if(resourceManager->isResourceLoaded(RESOURCE_TEXTURE, path)) {
-        return;
-    }
+Texture* Loader::loadTexture(const char *path) {
+    auto cached = textures.find(path);
+
+    if(cached != textures.end())
+        return cached->second;
 
     string fullPath = RESOURCES_PATH + "/" + path;
 
@@ -29,26 +36,27 @@ void Loader::loadTexture(const char *path) {
 
     TextureFormat format = getTextureFormat(nrChannels);
 
-    resourceManager->handleTexture(path, data, format, height, width);
+    auto* texture = new Texture(fullPath, width, height, format, data);
+
+    resourceManager->handleTexture(texture);
+    textures[path] = texture;
 
     stbi_image_free(data);
     stbi_set_flip_vertically_on_load(false);
+
+    return texture;
 }
 
-void Loader::loadCubeMap(const char *path) {
-    if(resourceManager->isResourceLoaded(RESOURCE_CUBE_MAP, path)) {
-        return;
-    }
+Texture* Loader::loadCubeMap(const char *path) {
+    auto cached = textures.find(path);
+
+    if(cached != textures.end())
+        return cached->second;
 
     string fullPath = RESOURCES_PATH + "/" + path;
 
     vector<string> textures_faces = {
-        "right.jpg",
-        "left.jpg",
-        "top.jpg",
-        "bottom.jpg",
-        "front.jpg",
-        "back.jpg"
+        "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg"
     };
 
     const int N = 6;
@@ -62,11 +70,16 @@ void Loader::loadCubeMap(const char *path) {
 
     TextureFormat format = getTextureFormat(nrChannels);
 
-    resourceManager->handleCubeMap(path, &data, format, height, width);
+    auto* texture = new Texture(path, width, height, format, &data);
+
+    resourceManager->handleCubeMap(texture);
+    textures[path] = texture;
 
     for(int i=0; i < N; i++) {
         stbi_image_free(data[i]);
     }
+
+    return texture;
 }
 
 GameObject *Loader::loadModel(const char *path) {
@@ -188,9 +201,9 @@ vector<Texture> Loader::ModelParser::loadTexturesByType(aiMaterial* material, ai
 
         string path = directory + "/" + file.C_Str();
 
-        loader->loadTexture(path.c_str());
+        Texture texture = *loader->loadTexture(path.c_str());
 
-        textures.emplace_back(Texture(path));
+        textures.emplace_back(texture);
     }
 
     return textures;
