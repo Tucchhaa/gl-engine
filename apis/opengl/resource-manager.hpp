@@ -53,6 +53,8 @@ public:
 // Getters
 // ===
 public:
+    static unsigned int getTextureId(Texture* texture);
+
     static unsigned int getTextureId(const Material* material, glApiTextureTypes textureType);
 
     static CubeMap* getCubeMap(const Texture* texture);
@@ -68,8 +70,13 @@ public:
 
     void handleModel(const string& path) override;
 
+// ===
+// Converters
+// ===
 private:
     static int convertTextureWrap(TextureWrap wrap);
 
     static int convertTextureFilter(TextureFilter filter);
+
+    static int convertTextureFormat(TextureFormat format);
 };

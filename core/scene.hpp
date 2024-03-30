@@ -8,6 +8,7 @@
 #include "./game-object/game-object.hpp"
 #include "./game-object/components/camera.hpp"
 #include "./game-object/components/mesh.hpp"
+#include "./game-object/components/terrain.hpp"
 
 #include "./game-object/components/lights/direct-light.hpp"
 #include "./game-object/components/lights/point-light.hpp"
@@ -18,6 +19,8 @@ private:
     Camera* camera;
 
     vector<Mesh*> meshes;
+
+    vector<Terrain*> terrains;
     
     vector<DirectLight*> directLights;
     
@@ -33,6 +36,8 @@ public:
     void setCamera(Camera* camera);
     
     const vector<Mesh*>& getMeshes();
+
+    const vector<Terrain*>& getTerrains();
 
     const vector<DirectLight*>& getDirectLights();
 

@@ -16,6 +16,9 @@ private:
 public:
     Terrain(Texture* terrainTexture, int patchResolution);
 
-private:
-    vector<float> calculateVertices();
+    vector<float> calculatePatches();
+
+    int getPatchesNum();
+
+    Texture* getTexture();
 };

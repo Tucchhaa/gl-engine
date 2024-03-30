@@ -19,13 +19,22 @@ int main() {
     Loader loader(resourceManager);
     Scene scene;
 
+    // = terrain =
+    auto* terrainObject = new GameObject();
+    Hierarchy::addGameObject(terrainObject);
+
+    Texture* terrainTexture = loader.loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
+    Terrain terrain(terrainTexture, 20);
+
+    Hierarchy::addComponent(terrainObject, &terrain);
+
     // = backpack model =
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
     Hierarchy::addGameObject(object);
     Transform* objectTransform = Hierarchy::getTransform(object);
-    objectTransform->translate(vec3(0, 0, 10));
-    objectTransform->scaleBy(vec3(10, 10, 10));
+    objectTransform->translate(vec3(0, 20, 10));
+    objectTransform->scaleBy(vec3(1, 1, 1));
     Hierarchy::updateTransformTree(objectTransform);
 
     // = camera =

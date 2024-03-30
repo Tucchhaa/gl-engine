@@ -6,6 +6,16 @@ ResourceManager::ResourceManager() = default;
 // ===
 // Getters
 // ===
+unsigned int ResourceManager::getTextureId(Texture* texture) {
+    auto textureIt = getInstance().textures.find(texture->ID);
+
+    if(textureIt != getInstance().textures.end())
+        return textureIt->second;
+
+    return 0;
+}
+
+
 unsigned int ResourceManager::getTextureId(const Material* material, glApiTextureTypes textureType) {
     const vector<Texture>* textures;
 
@@ -37,8 +47,10 @@ CubeMap* ResourceManager::getCubeMap(const Texture* texture) {
 // ===
 
 void ResourceManager::handleTexture(const Texture* texture) {
-    TextureOptions options = texture->options;
     unsigned int textureId;
+
+    TextureOptions options = texture->options;
+    int format = convertTextureFormat(texture->format);
 
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
@@ -48,7 +60,7 @@ void ResourceManager::handleTexture(const Texture* texture) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convertTextureFilter(options.minFilter));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convertTextureFilter(options.magFilter));
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -122,12 +134,13 @@ void ResourceManager::handleCubeMap(const Texture* texture) {
 
     const int CUBE_MAP_FACE_NUMBER = 6;
 
+    int format = convertTextureFormat(texture->format);
     vector<unsigned char*>* _data = texture->getCubeMapData();
 
     for(unsigned int i = 0; i < CUBE_MAP_FACE_NUMBER; i++) {
         glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                0, GL_RGB, texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, (*_data)[i]
+                0, format, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, (*_data)[i]
         );
     }
 
@@ -147,6 +160,10 @@ void ResourceManager::handleCubeMap(const Texture* texture) {
 void ResourceManager::handleModel(const string &path) {
 
 }
+
+// ===
+// Converters
+// ===
 
 int ResourceManager::convertTextureWrap(TextureWrap wrap) {
     switch (wrap) {
@@ -169,5 +186,18 @@ int ResourceManager::convertTextureFilter(TextureFilter filter) {
             return GL_LINEAR_MIPMAP_LINEAR;
         default:
             throw std::runtime_error("unsupported TEXTURE_FILTER");
+    }
+}
+
+int ResourceManager::convertTextureFormat(TextureFormat format) {
+    switch (format) {
+        case TEXTURE_FORMAT_R:
+            return GL_RED;
+        case TEXTURE_FORMAT_RGB:
+            return GL_RGB;
+        case TEXTURE_FORMAT_RGBA:
+            return GL_RGBA;
+        default:
+            throw std::runtime_error("unsupported TEXTURE_FORMAT");
     }
 }

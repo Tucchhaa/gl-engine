@@ -23,11 +23,20 @@ struct MeshData {
     Mesh* mesh;
 };
 
+struct TerrainData {
+    unsigned int VAO;
+    unsigned int VBO;
+
+    Terrain* terrain;
+};
+
 class Renderer : public IRenderer {
 private:
     Scene* currentScene;
     
     vector<MeshData> meshes;
+
+    vector<TerrainData> terrains;
     
     int width = 2000;
     int height = 1600;
@@ -62,10 +71,6 @@ private:
     
     unsigned int screenVAO;
     
-    unsigned int skyboxVAO;
-    
-    unsigned int skyboxTexture;
-    
 private:
     void initFrameBuffer();
     
@@ -75,11 +80,8 @@ private:
     
     void drawMesh(MeshData* meshData);
 
-// TEMP
-private:
+    void setupTerrain(Terrain* terrain);
 
-    void initTerrain();
-
-    unsigned int terrainVAO, terrainEBO, heightMapTextureId;
+    void drawTerrain(TerrainData* terrainData);
 };
 

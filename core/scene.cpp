@@ -14,6 +14,10 @@ const vector<Mesh*>& Scene::getMeshes() {
     return meshes;
 }
 
+const vector<Terrain*>& Scene::getTerrains() {
+    return terrains;
+}
+
 const vector<PointLight*>& Scene::getPointLights() {
     return pointLights;
 }
@@ -28,6 +32,7 @@ const vector<SpotLight*> &Scene::getSpotLights() {
 
 void Scene::processHierarchy() {
     loadComponents(&meshes);
+    loadComponents(&terrains);
     loadComponents(&directLights);
     loadComponents(&pointLights);
     loadComponents(&spotLights);
