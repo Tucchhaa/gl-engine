@@ -8,6 +8,8 @@
 #include "transform.hpp"
 #include "component.hpp"
 
+#include "../../structures/texture.hpp"
+
 using namespace glm;
 
 class Camera : public ObjectComponent {

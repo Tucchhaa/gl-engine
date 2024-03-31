@@ -1,11 +1,7 @@
 #include "loader.hpp"
 
-#ifndef aboba
-#define aboba
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#endif
-
 
 const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/gl-engine/resources";
 

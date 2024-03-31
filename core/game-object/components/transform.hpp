@@ -13,7 +13,7 @@ public:
     static const Transform* World;
 
 private:
-    mat4 modelMatrix;
+    mat4 transformMatrix;
 
     mat3 normalMatrix;
 

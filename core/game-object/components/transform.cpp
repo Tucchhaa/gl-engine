@@ -46,7 +46,7 @@ void Transform::scaleBy(vec3 scale) {
 // ===
 
 mat4 Transform::getModelMatrix() const {
-    return modelMatrix;
+    return transformMatrix;
 }
 
 mat3 Transform::getNormalMatrix() const {
@@ -100,7 +100,7 @@ void Transform::updateAbsoluteValues(Transform* parentTransform) {
 }
 
 void Transform::calculateMatrices() {
-    modelMatrix = calculateModelMatrix();
+    transformMatrix = calculateModelMatrix();
     normalMatrix = calculateNormalMatrix();
 }
 

@@ -1,5 +1,14 @@
 #include "hierarchy.hpp"
 
+#include "./game-object/components/mesh.hpp"
+#include "./game-object/components/terrain.hpp"
+
+#include "./game-object/components/camera.hpp"
+
+#include "./game-object/components/lights/direct-light.hpp"
+#include "./game-object/components/lights/point-light.hpp"
+#include "./game-object/components/lights/spot-light.hpp"
+
 map<int, vector<ObjectComponent*>> Hierarchy::components;
 
 map<int, GameObject*> Hierarchy::gameObjects;
@@ -146,8 +155,12 @@ void Hierarchy::updateTransformTree(Transform* transform) {
 // ===
 
 template class Hierarchy::Components<Transform>;
+
+template class Hierarchy::Components<Camera>;
+
 template class Hierarchy::Components<Mesh>;
 template class Hierarchy::Components<Terrain>;
+
 template class Hierarchy::Components<DirectLight>;
 template class Hierarchy::Components<PointLight>;
 template class Hierarchy::Components<SpotLight>;

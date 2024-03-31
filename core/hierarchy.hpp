@@ -10,14 +10,22 @@
 #include "./game-object/components/component.hpp"
 #include "./game-object/components/transform.hpp"
 
-#include "./game-object/components/mesh.hpp"
-#include "./game-object/components/terrain.hpp"
-
-#include "./game-object/components/lights/direct-light.hpp"
-#include "./game-object/components/lights/point-light.hpp"
-#include "./game-object/components/lights/spot-light.hpp"
-
 using namespace std;
+
+
+// ===
+// Forward declarations of object components
+// ===
+class Mesh;
+class Terrain;
+
+class Camera;
+
+class DirectLight;
+class PointLight;
+class SpotLight;
+
+// ===
 
 class Hierarchy {
 private:

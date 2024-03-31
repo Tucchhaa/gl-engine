@@ -11,9 +11,13 @@
 #include <utility>
 
 #include "hierarchy.hpp"
-#include "game-object/game-object.hpp"
 
+#include "game-object/game-object.hpp"
 #include "game-object/components/material.hpp"
+#include "game-object/components/mesh.hpp"
+
+#include "structures/texture.hpp"
+
 #include "../apis/base/iresource-manager.hpp"
 
 using namespace std;

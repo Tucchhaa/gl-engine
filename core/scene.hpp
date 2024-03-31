@@ -14,6 +14,8 @@
 #include "./game-object/components/lights/point-light.hpp"
 #include "./game-object/components/lights/spot-light.hpp"
 
+#include "./structures/texture.hpp"
+
 class Scene {
 private:
     Camera* camera;
