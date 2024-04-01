@@ -18,6 +18,10 @@ const vector<Terrain*>& Scene::getTerrains() {
     return terrains;
 }
 
+const vector<CubicPatch*> &Scene::getCubicPatches() {
+    return cubicPatches;
+}
+
 const vector<PointLight*>& Scene::getPointLights() {
     return pointLights;
 }
@@ -33,6 +37,7 @@ const vector<SpotLight*> &Scene::getSpotLights() {
 void Scene::processHierarchy() {
     loadComponents(&meshes);
     loadComponents(&terrains);
+    loadComponents(&cubicPatches);
     loadComponents(&directLights);
     loadComponents(&pointLights);
     loadComponents(&spotLights);

@@ -6,7 +6,8 @@ Renderer::Renderer() :
     baseShader("vertex.vert", "fragment.frag"),
     screenShader("screen-vertex.vert", "screen-fragment.frag"),
     skyboxShader("skybox-vertex.vert", "skybox-fragment.frag"),
-    terrainShader("terrain-vertex.vert", "terrain-fragment.frag", "terrain-tess-control.tesc", "terrain-tess-eval.tese")
+    terrainShader("terrain-vertex.vert", "terrain-fragment.frag", "terrain-tess-control.tesc", "terrain-tess-eval.tese"),
+    cubicPatchShader("cubic-vertex.vert", "cubic-fragment.frag", "cubic-tess-control.tesc", "cubic-tess-eval.tese")
 {
     initFrameBuffer();
     initScreenVAO();
@@ -82,6 +83,7 @@ void Renderer::setScene(Scene *scene) {
     currentScene = scene;
     vector<Mesh*> meshes = scene->getMeshes();
     vector<Terrain*> terrains = scene->getTerrains();
+    vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
     
     for(Mesh* mesh: meshes) {
         setupMesh(mesh);
@@ -89,6 +91,10 @@ void Renderer::setScene(Scene *scene) {
 
     for(Terrain* terrain: terrains) {
         setupTerrain(terrain);
+    }
+
+    for(CubicPatch* cubicPatch: cubicPatches) {
+        setupCubicPatch(cubicPatch);
     }
 }
 
@@ -127,6 +133,14 @@ void Renderer::render() {
     }
     glCheckError();
 
+    cubicPatchShader.use();
+    cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
+
+    for(auto &cubicPatch : cubicPatches) {
+        drawCubicPatch(&cubicPatch);
+    }
+
+    glCheckError();
 
     // draw terrain
     terrainShader.use();
@@ -264,6 +278,44 @@ void Renderer::drawTerrain(TerrainData* terrainData) {
 
     glPatchParameteri(GL_PATCH_VERTICES, 4);
     glDrawArrays(GL_PATCHES, 0, terrainData->terrain->getPatchesNum());
+
+    glBindVertexArray(0);
+}
+
+void Renderer::setupCubicPatch(CubicPatch* cubicPatch) {
+    CubicPatchData cubicPatchData;
+    cubicPatchData.cubicPatch = cubicPatch;
+
+    const vector<float>* vertices = cubicPatch->getControlPoints();
+
+    glGenVertexArrays(1, &cubicPatchData.VAO);
+
+    glGenBuffers(1, &cubicPatchData.VBO);
+
+    glBindVertexArray(cubicPatchData.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubicPatchData.VBO);
+
+    glBufferData(GL_ARRAY_BUFFER, (long)(vertices->size() * sizeof(float)), vertices->data(), GL_STATIC_DRAW);
+
+    int stride = 3 * sizeof(float);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
+
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    cubicPatches.push_back(cubicPatchData);
+}
+
+void Renderer::drawCubicPatch(CubicPatchData* cubicPatchData) {
+    cubicPatchShader.setFloat("tesselationLevel", 20.0f);
+
+    glBindVertexArray(cubicPatchData->VAO);
+
+    const int VERTICES_PER_PATCH = 16;
+
+    glPatchParameteri(GL_PATCH_VERTICES, VERTICES_PER_PATCH);
+    glDrawArrays(GL_PATCHES, 0, VERTICES_PER_PATCH * cubicPatchData->cubicPatch->getPatchesNum());
 
     glBindVertexArray(0);
 }

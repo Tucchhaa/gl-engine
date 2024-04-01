@@ -28,21 +28,26 @@ int main() {
 
     Hierarchy::addComponent(terrainObject, &terrain);
 
+    // = cubic patch =
+    auto* cubicPatchObject = new GameObject();
+    Hierarchy::addGameObject(cubicPatchObject);
+
+    CubicPatch cubicPatch;
+    Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
+
     // = backpack model =
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
     Hierarchy::addGameObject(object);
     Transform* objectTransform = Hierarchy::getTransform(object);
-    objectTransform->translate(vec3(0, 20, 10));
-    objectTransform->scaleBy(vec3(1, 1, 1));
+    objectTransform->translate(vec3(0, 25, 10));
+    objectTransform->scaleBy(vec3(5, 5, 5));
     Hierarchy::updateTransformTree(objectTransform);
 
     // = camera =
     auto* cameraObject = new GameObject();
     Hierarchy::addGameObject(cameraObject);
     Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
-    cameraTransform->translate(vec3(0, 0, -20));
-//    cameraTransform->rotate(vec3(0, 3.141592, 0));
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = loader.loadCubeMap("textures/skybox");
@@ -68,7 +73,7 @@ int main() {
     auto* flashlight = new GameObject();
     Hierarchy::addGameObject(flashlight);
 
-    auto* spotLight0 = SpotLight::D3250(radians(15.0));
+    auto* spotLight0 = SpotLight::D3250(radians(10.0));
     Hierarchy::addComponent(flashlight, spotLight0);
 
     Hierarchy::setParent(cameraObject, flashlight);

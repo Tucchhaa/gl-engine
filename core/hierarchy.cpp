@@ -2,6 +2,7 @@
 
 #include "./game-object/components/mesh.hpp"
 #include "./game-object/components/terrain.hpp"
+#include "./game-object/components/cubic-patch.hpp"
 
 #include "./game-object/components/camera.hpp"
 
@@ -160,6 +161,7 @@ template class Hierarchy::Components<Camera>;
 
 template class Hierarchy::Components<Mesh>;
 template class Hierarchy::Components<Terrain>;
+template class Hierarchy::Components<CubicPatch>;
 
 template class Hierarchy::Components<DirectLight>;
 template class Hierarchy::Components<PointLight>;

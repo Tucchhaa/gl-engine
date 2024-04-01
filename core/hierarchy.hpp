@@ -18,6 +18,7 @@ using namespace std;
 // ===
 class Mesh;
 class Terrain;
+class CubicPatch;
 
 class Camera;
 

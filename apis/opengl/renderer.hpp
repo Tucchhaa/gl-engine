@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "../../core/game-object/components/mesh.hpp"
+#include "../../core/game-object/components/terrain.hpp"
+#include "../../core/game-object/components/cubic-patch.hpp"
 
 #include "../base/irenderer.hpp"
 
@@ -30,6 +32,13 @@ struct TerrainData {
     Terrain* terrain;
 };
 
+struct CubicPatchData {
+    unsigned int VAO;
+    unsigned int VBO;
+
+    CubicPatch* cubicPatch;
+};
+
 class Renderer : public IRenderer {
 private:
     Scene* currentScene;
@@ -37,6 +46,8 @@ private:
     vector<MeshData> meshes;
 
     vector<TerrainData> terrains;
+
+    vector<CubicPatchData> cubicPatches;
     
     int width = 2000;
     int height = 1600;
@@ -53,6 +64,8 @@ public:
     void setScene(Scene* scene) override;
     
     void render() override;
+
+    void cubicPatchRender();
     
     void setScreenSize(int width, int height) override;
     
@@ -64,6 +77,8 @@ private:
     Shader skyboxShader;
 
     Shader terrainShader;
+
+    Shader cubicPatchShader;
     
     unsigned int frameBuffer;
     
@@ -83,5 +98,9 @@ private:
     void setupTerrain(Terrain* terrain);
 
     void drawTerrain(TerrainData* terrainData);
+
+    void setupCubicPatch(CubicPatch* cubicPatch);
+
+    void drawCubicPatch(CubicPatchData* cubicPatchData);
 };
 

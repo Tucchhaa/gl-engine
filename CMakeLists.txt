@@ -77,6 +77,12 @@ add_executable(gl_engine
         core/game-object/components/mesh.cpp
         core/game-object/components/mesh.hpp
 
+        core/game-object/components/terrain.cpp
+        core/game-object/components/terrain.hpp
+
+        core/game-object/components/cubic-patch.cpp
+        core/game-object/components/cubic-patch.hpp
+
         core/game-object/components/transform.cpp
         core/game-object/components/transform.hpp
 
@@ -87,13 +93,13 @@ add_executable(gl_engine
         core/structures/vectors.cpp
         core/structures/vectors.hpp
 
-        # other
-        main.cpp
-        core/game-object/components/terrain.cpp
-        core/game-object/components/terrain.hpp
         core/structures/texture.cpp
         core/structures/texture.hpp
+
         core/structures/texture-options.cpp
         core/structures/texture-options.hpp
+
+        # other
+        main.cpp
 )
 

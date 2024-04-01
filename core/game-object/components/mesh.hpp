@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <utility>
 
-
 #include "../../structures/vectors.hpp"
 
 #include "component.hpp"
