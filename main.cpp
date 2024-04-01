@@ -12,7 +12,7 @@ int main() {
     IWindow* window = new Window();
     window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    IInput* input = new Input(window);
+    auto* input = new Input(window);
     IResourceManager* resourceManager = &ResourceManager::getInstance();
     IRenderer* renderer = new Renderer();
 
@@ -48,6 +48,10 @@ int main() {
     auto* cameraObject = new GameObject();
     Hierarchy::addGameObject(cameraObject);
     Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
+
+    cameraTransform->translate(vec3(-5, 5, -0.75));
+    cameraTransform->rotate(vec3(0, -3.141592/2, 0));
+    cameraTransform->rotate(vec3(-3.141592/4.5, 0, 0));
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = loader.loadCubeMap("textures/skybox");
@@ -103,10 +107,23 @@ int main() {
         else {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
-        Hierarchy::updateTransformTree(cameraTransform);
+
+        if(input->isQPressed) {
+            cubicPatch.resolution--;
+        }
+        if(input->isEPressed) {
+            cubicPatch.resolution++;
+        }
+        if(cubicPatch.resolution < 1)
+            cubicPatch.resolution = 1;
+
+        if(cubicPatch.resolution > 500)
+            cubicPatch.resolution = 100;
 
 //        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
 //        Hierarchy::updateTransformTree(objectTransform);
+
+        Hierarchy::updateTransformTree(cameraTransform);
 
         renderer->render();
 

@@ -50,4 +50,12 @@ public:
     bool isShiftPressed() override;
 
     float getDeltaTime() override;
+
+    // === TEMP ===
+    bool wasQPressedLastFrame;
+    bool wasEPressedLastFrame;
+
+    bool isQPressed = false;
+    bool isEPressed = false;
+
 };
