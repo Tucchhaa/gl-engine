@@ -49,10 +49,6 @@ int main() {
     Hierarchy::addGameObject(cameraObject);
     Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
 
-    cameraTransform->translate(vec3(-5, 5, -0.75));
-    cameraTransform->rotate(vec3(0, -3.141592/2, 0));
-    cameraTransform->rotate(vec3(-3.141592/4.5, 0, 0));
-
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = loader.loadCubeMap("textures/skybox");
     Hierarchy::addComponent(cameraObject, camera);
@@ -63,15 +59,14 @@ int main() {
     auto* lightSource = new GameObject();
     Hierarchy::addGameObject(lightSource);
 
-    Hierarchy::getTransform(lightSource)->setValues(vec3(-10, 20, -50), quat(vec3(0, radians(180.0), 0)));
+    Transform* lightTransform = Hierarchy::getTransform(lightSource);
+    lightTransform->setValues(vec3(-10, 20, -50), quat(vec3(0, radians(180.0), 0)));
 
     auto* directLight0 = new DirectLight();
     PointLight* pointLight0 = PointLight::D3250();
 
     Hierarchy::addComponent(lightSource, directLight0);
     Hierarchy::addComponent(lightSource, pointLight0);
-
-    cameraTransform->rotate(quat(vec3(0, 0.1, 0)));
 
     // = Flashlight =
     auto* flashlight = new GameObject();
@@ -107,18 +102,6 @@ int main() {
         else {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
-
-        if(input->isQPressed) {
-            cubicPatch.resolution--;
-        }
-        if(input->isEPressed) {
-            cubicPatch.resolution++;
-        }
-        if(cubicPatch.resolution < 1)
-            cubicPatch.resolution = 1;
-
-        if(cubicPatch.resolution > 500)
-            cubicPatch.resolution = 100;
 
 //        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
 //        Hierarchy::updateTransformTree(objectTransform);

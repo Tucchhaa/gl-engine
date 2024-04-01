@@ -64,8 +64,6 @@ public:
     void setScene(Scene* scene) override;
     
     void render() override;
-
-    void cubicPatchRender();
     
     void setScreenSize(int width, int height) override;
     
