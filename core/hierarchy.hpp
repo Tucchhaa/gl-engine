@@ -12,22 +12,6 @@
 
 using namespace std;
 
-// ===
-// Forward declarations of object components
-// ===
-
-class Mesh;
-class Terrain;
-class CubicPatch;
-
-class Camera;
-
-class DirectLight;
-class PointLight;
-class SpotLight;
-
-// ===
-
 class Hierarchy {
 private:
     /**
@@ -59,46 +43,41 @@ public:
         Components();
         
         static T* get(int objectId);
-        
         static T* get(const GameObject* gameObject);
 
         static T* getRequired(int objectId);
-
         static T* getRequired(const GameObject* gameObject);
         
         static vector<T*> getAll(int objectId);
     };
 public:
     static Transform* getTransform(int objectId);
-    
     static Transform* getTransform(const ObjectComponent* component);
-    
     static Transform* getTransform(const GameObject* gameObject);
     
     // ===
     
     static GameObject* getGameObject(int objectId);
-    
     static GameObject* getGameObject(const ObjectComponent* component);
     
     static map<int, GameObject*>* getGameObjects();
     
     // ===
     
-    static void addGameObject(GameObject* gameObject);
+    static GameObject* createGameObject();
+
+    static GameObject* createRoot();
     
     static void addComponent(int objectId, ObjectComponent* component);
-    
     static void addComponent(GameObject* gameObject, ObjectComponent* component);
 
-    // ===
-    static GameObject* getParent(GameObject* gameObject);
+    // === Hierarchy tree operations ===
 
+    static GameObject* getParent(GameObject* gameObject);
     static GameObject* getParent(int objectId);
 
     static void setParent(GameObject* parent, GameObject* child);
 
     static void updateTransformTree();
-
     static void updateTransformTree(Transform* transform);
 };

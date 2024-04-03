@@ -1,19 +1,19 @@
 #include "terrain.hpp"
 
-Terrain::Terrain(Texture* terrainTexture, int patchResolution):
-    terrainTexture(terrainTexture), patchResolution(patchResolution)
+Terrain::Terrain(Texture* terrainTexture, int resolution):
+        terrainTexture(terrainTexture), resolution(resolution)
 { }
 
 vector<float> Terrain::calculatePatches() {
     auto width = (float)terrainTexture->width;
     auto height = (float)terrainTexture->height;
-    auto _resolution = (float)patchResolution;
+    auto _resolution = (float)resolution;
 
     vector<float> patches;
     
-    for(int i = 0; i < patchResolution; i++)
+    for(int i = 0; i < resolution; i++)
     {
-        for(int j = 0; j < patchResolution; j++)
+        for(int j = 0; j < resolution; j++)
         {
             patches.push_back(-width / 2.0f + width * i / _resolution); // v.x
             patches.push_back(0.0f); // v.y
@@ -44,8 +44,8 @@ vector<float> Terrain::calculatePatches() {
     return patches;
 }
 
-int Terrain::getPatchesNum() {
-    return 4 * patchResolution * patchResolution;
+int Terrain::getVerticesCount() const {
+    return VERTICES_PER_PATCH * resolution * resolution;
 }
 
 Texture* Terrain::getTexture() {

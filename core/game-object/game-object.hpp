@@ -2,6 +2,8 @@
 
 #include <set>
 
+#include "./components/transform.hpp"
+
 using namespace std;
 
 class GameObject {
@@ -19,6 +21,8 @@ public:
 
     set<int> children;
 
+    Transform* transform;
+
 public:
-    GameObject();
+    explicit GameObject(Transform* transform);
 };

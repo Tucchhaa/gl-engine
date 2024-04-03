@@ -14,9 +14,7 @@ Loader::~Loader() {
     }
 }
 
-// ===
-// Loader functions
-// ===
+// === Loader functions ===
 
 Texture* Loader::loadTexture(const char* path) {
     return loadTexture(path, TEXTURE_2D_OPTIONS);
@@ -102,9 +100,7 @@ GameObject *Loader::loadModel(const char *path) {
     return result;
 }
 
-// ===
-// Model Loader
-// ===
+// === Model Loader ===
 Loader::ModelParser::ModelParser(Loader *loader, string directory):
         loader(loader), directory(std::move(directory))
     {}
@@ -124,7 +120,7 @@ GameObject* Loader::ModelParser::parse(const aiScene* scene) {
 }
 
 GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, aiNode* node) {
-    auto* result = new GameObject();
+    auto* result = Hierarchy::createGameObject();
 
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -138,8 +134,6 @@ GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, aiN
 
         Hierarchy::setParent(result, child);
     }
-
-    Hierarchy::addGameObject(result);
 
     return result;
 }

@@ -10,15 +10,14 @@
 #include <map>
 #include <utility>
 
+#include "../apis/base/iresource-manager.hpp"
 #include "hierarchy.hpp"
 
 #include "game-object/game-object.hpp"
-#include "structures/material.hpp"
 #include "game-object/components/mesh.hpp"
 
+#include "structures/material.hpp"
 #include "structures/texture.hpp"
-
-#include "../apis/base/iresource-manager.hpp"
 
 using namespace std;
 
@@ -27,14 +26,14 @@ private:
     IResourceManager* resourceManager;
 
 public:
-    Loader(IResourceManager* resourceManager);
+    explicit Loader(IResourceManager* resourceManager);
 
     ~Loader();
 
     GameObject* loadModel(const char* path);
 
     Texture* loadTexture(const char* path);
-    Texture* loadTexture(const char* path, const TextureOptions options);
+    Texture* loadTexture(const char* path, TextureOptions options);
 
     Texture* loadCubeMap(const char* path);
 

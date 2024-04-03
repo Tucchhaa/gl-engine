@@ -58,10 +58,9 @@ void Renderer::initScreenVAO() {
         1.0f, -1.0f,   1.0f, 0.0f,
         1.0f,  1.0f,   1.0f, 1.0f
     };
-    
-    glGenVertexArrays(1, &screenVAO);
-    
     unsigned int VBO;
+
+    glGenVertexArrays(1, &screenVAO);
     glGenBuffers(1, &VBO);
     
     glBindVertexArray(screenVAO);
@@ -135,6 +134,7 @@ void Renderer::render() {
 
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     cubicPatchShader.use();
+
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
     cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
     cubicPatchShader.setSpotLight(0, currentScene->getSpotLights()[0]);
@@ -163,8 +163,6 @@ void Renderer::render() {
 
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
     baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-
-//    baseShader.setPointLight(0, currentScene->getPointLights()[0]);
     baseShader.setSpotLight(0, currentScene->getSpotLights()[0]);
 
     for(auto &mesh : meshes) {
@@ -239,7 +237,6 @@ void Renderer::drawMesh(MeshData* meshData) {
     glDrawElements(GL_TRIANGLES, (int)static_cast<unsigned int>(meshData->mesh->indices.size()), GL_UNSIGNED_INT, 0);
     
     glBindVertexArray(0);
-    glActiveTexture(GL_TEXTURE0);
 }
 
 void Renderer::setupTerrain(Terrain* terrain) {
@@ -249,12 +246,11 @@ void Renderer::setupTerrain(Terrain* terrain) {
     terrainData.terrain = terrain;
 
     glGenVertexArrays(1, &terrainData.VAO);
-
     glGenBuffers(1, &terrainData.VBO);
 
     glBindVertexArray(terrainData.VAO);
-
     glBindBuffer(GL_ARRAY_BUFFER, terrainData.VBO);
+
     glBufferData(GL_ARRAY_BUFFER, (long)(patches.size() * sizeof(float)), &patches[0], GL_STATIC_DRAW);
 
     int stride = 5 * sizeof(float);
@@ -271,7 +267,8 @@ void Renderer::setupTerrain(Terrain* terrain) {
 }
 
 void Renderer::drawTerrain(TerrainData* terrainData) {
-    unsigned int heightMapTextureId = ResourceManager::getTextureId(terrainData->terrain->getTexture());
+    Terrain* terrain = terrainData->terrain;
+    unsigned int heightMapTextureId = ResourceManager::getTextureId(terrain->getTexture());
 
     glBindVertexArray(terrainData->VAO);
 
@@ -279,8 +276,8 @@ void Renderer::drawTerrain(TerrainData* terrainData) {
     glBindTexture(GL_TEXTURE_2D, heightMapTextureId);
     terrainShader.setInt("heightMap", 0);
 
-    glPatchParameteri(GL_PATCH_VERTICES, 4);
-    glDrawArrays(GL_PATCHES, 0, terrainData->terrain->getPatchesNum());
+    glPatchParameteri(GL_PATCH_VERTICES, terrain->VERTICES_PER_PATCH);
+    glDrawArrays(GL_PATCHES, 0, terrain->getVerticesCount());
 
     glBindVertexArray(0);
 }
@@ -289,10 +286,9 @@ void Renderer::setupCubicPatch(CubicPatch* cubicPatch) {
     CubicPatchData cubicPatchData;
     cubicPatchData.cubicPatch = cubicPatch;
 
-    const vector<float>* vertices = cubicPatch->getControlPoints();
+    const vector<float>* vertices = &cubicPatch->controlPoints;
 
     glGenVertexArrays(1, &cubicPatchData.VAO);
-
     glGenBuffers(1, &cubicPatchData.VBO);
 
     glBindVertexArray(cubicPatchData.VAO);
@@ -301,8 +297,8 @@ void Renderer::setupCubicPatch(CubicPatch* cubicPatch) {
     glBufferData(GL_ARRAY_BUFFER, (long)(vertices->size() * sizeof(float)), vertices->data(), GL_STATIC_DRAW);
 
     int stride = 3 * sizeof(float);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
@@ -312,18 +308,20 @@ void Renderer::setupCubicPatch(CubicPatch* cubicPatch) {
 
 void Renderer::drawCubicPatch(CubicPatchData* cubicPatchData) {
     Transform* transform = Hierarchy::getTransform(cubicPatchData->cubicPatch);
-    mat4 matrix = transform->getTransformMatrix();
+    CubicPatch* patch = cubicPatchData->cubicPatch;
+
     cubicPatchShader.setMat4("transform", transform->getTransformMatrix());
     cubicPatchShader.setMat3("normalTransform", transform->getNormalMatrix());
-    cubicPatchShader.setMaterial(&cubicPatchData->cubicPatch->material);
-    cubicPatchShader.setFloat("tesselationLevel", cubicPatchData->cubicPatch->resolution);
+
+    cubicPatchShader.setFloat("tessOuterLevel", patch->tessOuterLevel);
+    cubicPatchShader.setFloat("tessInnerLevel", patch->tessInnerLevel);
+
+    cubicPatchShader.setMaterial(&patch->material);
 
     glBindVertexArray(cubicPatchData->VAO);
 
-    const int VERTICES_PER_PATCH = 16;
-
-    glPatchParameteri(GL_PATCH_VERTICES, VERTICES_PER_PATCH);
-    glDrawArrays(GL_PATCHES, 0, VERTICES_PER_PATCH * cubicPatchData->cubicPatch->getPatchesNum());
+    glPatchParameteri(GL_PATCH_VERTICES, patch->VERTICES_PER_PATCH);
+    glDrawArrays(GL_PATCHES, 0, patch->getVerticesCount());
 
     glBindVertexArray(0);
 }

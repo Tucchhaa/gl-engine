@@ -10,18 +10,16 @@ using namespace glm;
 
 class Transform : public ObjectComponent {
 public:
-    static const Transform* World;
+    static const Transform World;
 
 private:
-    mat4 transformMatrix;
-
-    mat3 normalMatrix;
-
     vec3 parentAbsolutePosition = vec3(0, 0, 0);
 
     vec3 parentAbsoluteScale = vec3(1, 1, 1);
 
     quat parentAbsoluteRotation = quat(vec3(0, 0, 0));
+
+    // ===
 
     vec3 position;
 
@@ -29,9 +27,16 @@ private:
 
     quat rotation;
 
-public:
+    // ===
 
-    Transform(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
+    mat4 transformMatrix = mat4(1.0f);
+
+    mat3 normalMatrix = mat3(1.0f);
+
+    vec3 direction = vec3(0, 0, 1);
+
+public:
+    explicit Transform(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
 
 public:
     void setValues(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
@@ -48,11 +53,13 @@ public:
 public:
     void updateAbsoluteValues(Transform* parentTransform);
 
-    void calculateMatrices();
+    void recalculate();
 
-    mat4 calculateTransformMatrix();
+    mat4 calculateTransformMatrix() const;
 
-    mat3 calculateNormalMatrix();
+    mat3 calculateNormalMatrix() const;
+
+    vec3 calculateDirection() const;
 
 // ===
 // Getters

@@ -11,14 +11,16 @@ class Terrain : public ObjectComponent {
 private:
     Texture* terrainTexture;
 
-    int patchResolution;
+    int resolution;
 
 public:
-    Terrain(Texture* terrainTexture, int patchResolution);
+    const int VERTICES_PER_PATCH = 4;
+
+    Terrain(Texture* terrainTexture, int resolution);
 
     vector<float> calculatePatches();
 
-    int getPatchesNum();
+    int getVerticesCount() const;
 
     Texture* getTexture();
 };

@@ -1,6 +1,7 @@
 #version 330 core
 
-uniform float tesselationLevel;
+uniform float tessInnerLevel;
+uniform float tessOuterLevel;
 
 layout (vertices=16) out;
 
@@ -14,13 +15,13 @@ void main()
 
     if(gl_InvocationID == 0)
     {
-        gl_TessLevelOuter[0] = tesselationLevel;
-        gl_TessLevelOuter[1] = tesselationLevel;
-        gl_TessLevelOuter[2] = tesselationLevel;
-        gl_TessLevelOuter[3] = tesselationLevel;
+        gl_TessLevelOuter[0] = tessOuterLevel;
+        gl_TessLevelOuter[1] = tessOuterLevel;
+        gl_TessLevelOuter[2] = tessOuterLevel;
+        gl_TessLevelOuter[3] = tessOuterLevel;
 
-        gl_TessLevelInner[0] = tesselationLevel;
-        gl_TessLevelInner[1] = tesselationLevel;
+        gl_TessLevelInner[0] = tessInnerLevel;
+        gl_TessLevelInner[1] = tessInnerLevel;
 
         // TODO: use gl_InvocationID to set the control points of the output patch
         for(int i = 0; i < 4; i++)

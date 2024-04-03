@@ -17,15 +17,7 @@ map<int, GameObject*> Hierarchy::gameObjects;
 GameObject* Hierarchy::root;
 
 void Hierarchy::initialize() {
-    root = new GameObject();
-
-    root->ID = 0;
-
-    Hierarchy::gameObjects[root->ID] = root;
-
-    auto* transform = new Transform();
-
-    addComponent(root, transform);
+    root = createRoot();
 }
 
 // ===
@@ -99,7 +91,7 @@ Transform* Hierarchy::getTransform(const GameObject* gameObject) {
 }
 
 Transform* Hierarchy::getTransform(const ObjectComponent* component) {
-    return getTransform(getGameObject(component->GameObjectID));
+    return getTransform(component->GameObjectID);
 }
 
 // ===
@@ -118,13 +110,29 @@ map<int, GameObject*>* Hierarchy::getGameObjects() {
 
 // ===
 
-void Hierarchy::addGameObject(GameObject* gameObject) {
+GameObject* Hierarchy::createGameObject() {
+    auto* transform = new Transform();
+    auto* gameObject = new GameObject(transform);
+
     Hierarchy::gameObjects[gameObject->ID] = gameObject;
 
+    addComponent(gameObject, transform);
+
+    setParent(root, gameObject);
+
+    return gameObject;
+}
+
+GameObject* Hierarchy::createRoot() {
     auto* transform = new Transform();
+    auto* gameObject = new GameObject(transform);
+    gameObject->ID = 0;
+
+    Hierarchy::gameObjects[gameObject->ID] = gameObject;
 
     addComponent(gameObject, transform);
-    setParent(root, gameObject);
+
+    return gameObject;
 }
 
 void Hierarchy::addComponent(int objectId, ObjectComponent* component) {
@@ -137,8 +145,7 @@ void Hierarchy::addComponent(GameObject* gameObject, ObjectComponent* component)
     addComponent(gameObject->ID, component);
 }
 
-// ===
-
+// === Hierarchy tree operations ===
 
 GameObject* Hierarchy::getParent(GameObject* gameObject) {
     return getGameObject(gameObject->parentID);
@@ -149,27 +156,29 @@ GameObject* Hierarchy::getParent(int objectId) {
 }
 
 void Hierarchy::setParent(GameObject* parent, GameObject* child) {
+    getGameObject(child->parentID)->children.erase(child->ID);
+
     parent->children.insert(child->ID);
-
-    if(child->parentID != 0) {
-        getGameObject(child->parentID)->children.erase(child->ID);
-    }
-
     child->parentID = parent->ID;
 }
 
 void Hierarchy::updateTransformTree() {
-    updateTransformTree(getTransform(root));
+    updateTransformTree(root->transform);
 }
 
 void Hierarchy::updateTransformTree(Transform* transform) {
-    transform->updateAbsoluteValues(getTransform(getParent(transform->GameObjectID)));
+    Transform* parentTransform;
+
+    if(transform->GameObjectID != root->ID) {
+        parentTransform = getParent(transform->GameObjectID)->transform;
+        transform->updateAbsoluteValues(parentTransform);
+    }
 
     queue<Transform*> q;
     q.push(transform);
 
     while(!q.empty()) {
-        Transform* parentTransform = q.front();
+        parentTransform = q.front();
 
         q.pop();
 

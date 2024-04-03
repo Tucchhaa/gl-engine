@@ -8,6 +8,32 @@ using namespace std;
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 
+vector<float> controlPoints = {
+        // row 1
+        -1.5f, rand() % 3 - 1.0f, -1.5f,
+        -0.5f, rand() % 3 - 1.0f, -1.5f,
+        0.5f, rand() % 3 - 1.0f, -1.5f,
+        1.5f, rand() % 3 - 1.0f, -1.5f,
+
+        // row 2
+        -1.5f, rand() % 3 - 1.0f, -0.5f,
+        -0.5f, rand() % 3 - 1.0f, -0.5f,
+        0.5f, rand() % 3 - 1.0f, -0.5f,
+        1.5f, rand() % 3 - 1.0f, -0.5f,
+
+        // row 3
+        -1.5f, rand() % 3 - 1.0f, 0.5f,
+        -0.5f, rand() % 3 - 1.0f, 0.5f,
+        0.5f, rand() % 3 - 1.0f, 0.5f,
+        1.5f, rand() % 3 - 1.0f, 0.5f,
+
+        // row 4
+        -1.5f, rand() % 3 - 1.0f, 1.5f,
+        -0.5f, rand() % 3 - 1.0f, 1.5f,
+        0.5f, rand() % 3 - 1.0f, 1.5f,
+        1.5f, rand() % 3 - 1.0f, 1.5f,
+};
+
 int main() {
     IWindow* window = new Window();
     window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -21,8 +47,7 @@ int main() {
     Hierarchy::initialize();
 
     // = terrain =
-    auto* terrainObject = new GameObject();
-    Hierarchy::addGameObject(terrainObject);
+    GameObject* terrainObject = Hierarchy::createGameObject();
 
     Texture* terrainTexture = loader.loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
     Terrain terrain(terrainTexture, 20);
@@ -30,30 +55,25 @@ int main() {
     Hierarchy::addComponent(terrainObject, &terrain);
 
     // = cubic patch =
-    auto* cubicPatchObject = new GameObject();
-    Hierarchy::addGameObject(cubicPatchObject);
+    GameObject* cubicPatchObject = Hierarchy::createGameObject();
     Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
 
     Texture* patchDiffuseTexture = loader.loadTexture("textures/metal_art_diffuse.jpg");
     Texture* patchSpecularTexture = loader.loadTexture("textures/metal_art_specular.jpg");
     Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
 
-    CubicPatch cubicPatch(patchMaterial);
+    CubicPatch cubicPatch(controlPoints, patchMaterial);
     Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
-//    Hierarchy::updateTransformTree(patchTransform);
 
     // = backpack model =
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
-    Hierarchy::addGameObject(object);
     Transform* objectTransform = Hierarchy::getTransform(object);
     objectTransform->translate(vec3(0, 25, 10));
     objectTransform->scaleBy(vec3(5, 5, 5));
-//    Hierarchy::updateTransformTree(objectTransform);
 
     // = camera =
-    auto* cameraObject = new GameObject();
-    Hierarchy::addGameObject(cameraObject);
+    auto* cameraObject = Hierarchy::createGameObject();
     Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
@@ -63,8 +83,7 @@ int main() {
     camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);
 
     // = light source =
-    auto* lightSource = new GameObject();
-    Hierarchy::addGameObject(lightSource);
+    auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = Hierarchy::getTransform(lightSource);
     lightTransform->setValues(vec3(-10, 20, -50), quat(vec3(0, radians(180.0), 0)));
@@ -76,14 +95,12 @@ int main() {
     Hierarchy::addComponent(lightSource, pointLight0);
 
     // = Flashlight =
-    auto* flashlight = new GameObject();
-    Hierarchy::addGameObject(flashlight);
+    auto* flashlight = Hierarchy::createGameObject();
 
     auto* spotLight0 = SpotLight::D3250(radians(10.0));
     Hierarchy::addComponent(flashlight, spotLight0);
 
     Hierarchy::setParent(cameraObject, flashlight);
-//    Hierarchy::updateTransformTree(cameraTransform);
 
     // ===
     Hierarchy::updateTransformTree();
@@ -103,7 +120,7 @@ int main() {
             quat horizontalRotation = quat(vec3(0, -input->axisHorizontal() * rotationSpeed * input->getDeltaTime(), 0));
             quat verticalRotation   = quat(vec3(-input->axisVertical() * rotationSpeed * input->getDeltaTime(), 0, 0));
 
-            cameraTransform->rotate(horizontalRotation, Transform::World);
+            cameraTransform->rotate(horizontalRotation, &Transform::World);
             cameraTransform->rotate(verticalRotation);
         }
         else {

@@ -20,7 +20,7 @@
 
 class Scene {
 private:
-    Camera* camera;
+    Camera* camera = nullptr;
 
     vector<Mesh*> meshes;
 
