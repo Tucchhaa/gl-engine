@@ -7,7 +7,7 @@ Renderer::Renderer() :
     screenShader("screen-vertex.vert", "screen-fragment.frag"),
     skyboxShader("skybox-vertex.vert", "skybox-fragment.frag"),
     terrainShader("terrain-vertex.vert", "terrain-fragment.frag", "terrain-tess-control.tesc", "terrain-tess-eval.tese"),
-    cubicPatchShader("cubic-vertex.vert", "cubic-fragment.frag", "cubic-tess-control.tesc", "cubic-tess-eval.tese")
+    cubicPatchShader("cubic-vertex.vert", "fragment.frag", "cubic-tess-control.tesc", "cubic-tess-eval.tese")
 {
     initFrameBuffer();
     initScreenVAO();
@@ -136,6 +136,8 @@ void Renderer::render() {
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     cubicPatchShader.use();
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
+    cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
+    cubicPatchShader.setSpotLight(0, currentScene->getSpotLights()[0]);
 
     for(auto &cubicPatch : cubicPatches) {
         drawCubicPatch(&cubicPatch);
@@ -160,7 +162,7 @@ void Renderer::render() {
     baseShader.use();
 
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
-    baseShader.setVec3("cameraPos", Hierarchy::getTransform(currentScene->getCamera())->getAbsolutePosition());
+    baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
 
 //    baseShader.setPointLight(0, currentScene->getPointLights()[0]);
     baseShader.setSpotLight(0, currentScene->getSpotLights()[0]);
@@ -227,7 +229,7 @@ void Renderer::setupMesh(Mesh* mesh) {
 void Renderer::drawMesh(MeshData* meshData) {
     Transform* transform = Hierarchy::getTransform(meshData->mesh);
     
-    baseShader.setMat4("transform", transform->getModelMatrix());
+    baseShader.setMat4("transform", transform->getTransformMatrix());
     baseShader.setMat3("normalTransform", transform->getNormalMatrix());
     
     baseShader.setMaterial(&meshData->mesh->material);
@@ -309,6 +311,11 @@ void Renderer::setupCubicPatch(CubicPatch* cubicPatch) {
 }
 
 void Renderer::drawCubicPatch(CubicPatchData* cubicPatchData) {
+    Transform* transform = Hierarchy::getTransform(cubicPatchData->cubicPatch);
+    mat4 matrix = transform->getTransformMatrix();
+    cubicPatchShader.setMat4("transform", transform->getTransformMatrix());
+    cubicPatchShader.setMat3("normalTransform", transform->getNormalMatrix());
+    cubicPatchShader.setMaterial(&cubicPatchData->cubicPatch->material);
     cubicPatchShader.setFloat("tesselationLevel", cubicPatchData->cubicPatch->resolution);
 
     glBindVertexArray(cubicPatchData->VAO);

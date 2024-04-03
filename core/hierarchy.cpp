@@ -14,6 +14,20 @@ map<int, vector<ObjectComponent*>> Hierarchy::components;
 
 map<int, GameObject*> Hierarchy::gameObjects;
 
+GameObject* Hierarchy::root;
+
+void Hierarchy::initialize() {
+    root = new GameObject();
+
+    root->ID = 0;
+
+    Hierarchy::gameObjects[root->ID] = root;
+
+    auto* transform = new Transform();
+
+    addComponent(root, transform);
+}
+
 // ===
 // Components Getters
 // ===
@@ -110,6 +124,7 @@ void Hierarchy::addGameObject(GameObject* gameObject) {
     auto* transform = new Transform();
 
     addComponent(gameObject, transform);
+    setParent(root, gameObject);
 }
 
 void Hierarchy::addComponent(int objectId, ObjectComponent* component) {
@@ -124,6 +139,15 @@ void Hierarchy::addComponent(GameObject* gameObject, ObjectComponent* component)
 
 // ===
 
+
+GameObject* Hierarchy::getParent(GameObject* gameObject) {
+    return getGameObject(gameObject->parentID);
+}
+
+GameObject* Hierarchy::getParent(int objectId) {
+    return getGameObject(getGameObject(objectId)->parentID);
+}
+
 void Hierarchy::setParent(GameObject* parent, GameObject* child) {
     parent->children.insert(child->ID);
 
@@ -134,7 +158,13 @@ void Hierarchy::setParent(GameObject* parent, GameObject* child) {
     child->parentID = parent->ID;
 }
 
+void Hierarchy::updateTransformTree() {
+    updateTransformTree(getTransform(root));
+}
+
 void Hierarchy::updateTransformTree(Transform* transform) {
+    transform->updateAbsoluteValues(getTransform(getParent(transform->GameObjectID)));
+
     queue<Transform*> q;
     q.push(transform);
 

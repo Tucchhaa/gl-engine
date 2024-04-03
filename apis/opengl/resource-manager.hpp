@@ -9,8 +9,6 @@
 
 #include "../base/iresource-manager.hpp"
 
-#include "../../core/game-object/components/material.hpp"
-
 using namespace std;
 
 enum glApiTextureTypes {

@@ -45,7 +45,7 @@ void Transform::scaleBy(vec3 scale) {
 // Getters
 // ===
 
-mat4 Transform::getModelMatrix() const {
+mat4 Transform::getTransformMatrix() const {
     return transformMatrix;
 }
 
@@ -100,11 +100,11 @@ void Transform::updateAbsoluteValues(Transform* parentTransform) {
 }
 
 void Transform::calculateMatrices() {
-    transformMatrix = calculateModelMatrix();
+    transformMatrix = calculateTransformMatrix();
     normalMatrix = calculateNormalMatrix();
 }
 
-mat4 Transform::calculateModelMatrix() {
+mat4 Transform::calculateTransformMatrix() {
     mat4 matrix = mat4(1.0f);
 
     matrix = glm::translate(matrix, parentAbsolutePosition + position);

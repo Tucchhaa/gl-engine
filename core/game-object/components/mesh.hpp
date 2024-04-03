@@ -8,7 +8,7 @@
 #include "../../structures/vectors.hpp"
 
 #include "component.hpp"
-#include "material.hpp"
+#include "../../structures/material.hpp"
 
 using namespace std;
 
@@ -26,6 +26,6 @@ public:
     
     Mesh();
     
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material materials);
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material);
 };
 

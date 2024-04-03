@@ -12,10 +12,10 @@
 
 using namespace std;
 
-
 // ===
 // Forward declarations of object components
 // ===
+
 class Mesh;
 class Terrain;
 class CubicPatch;
@@ -39,7 +39,12 @@ private:
      * Key - gameObjectID, value - gameObject
      */
     static map<int, GameObject*> gameObjects;
-    
+
+    static GameObject* root;
+
+public:
+    static void initialize();
+
 public:
     // TODO: limit T type to ObjectComponent
     template<typename T>
@@ -87,8 +92,13 @@ public:
     static void addComponent(GameObject* gameObject, ObjectComponent* component);
 
     // ===
+    static GameObject* getParent(GameObject* gameObject);
+
+    static GameObject* getParent(int objectId);
 
     static void setParent(GameObject* parent, GameObject* child);
+
+    static void updateTransformTree();
 
     static void updateTransformTree(Transform* transform);
 };

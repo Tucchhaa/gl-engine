@@ -22,6 +22,7 @@ void main()
         gl_TessLevelInner[0] = tesselationLevel;
         gl_TessLevelInner[1] = tesselationLevel;
 
+        // TODO: use gl_InvocationID to set the control points of the output patch
         for(int i = 0; i < 4; i++)
         {
             for(int j=0; j < 4; j++) {

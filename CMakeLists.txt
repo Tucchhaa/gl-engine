@@ -71,8 +71,8 @@ add_executable(gl_engine
         core/game-object/components/component.cpp
         core/game-object/components/component.hpp
 
-        core/game-object/components/material.cpp
-        core/game-object/components/material.hpp
+        core/structures/material.cpp
+        core/structures/material.hpp
 
         core/game-object/components/mesh.cpp
         core/game-object/components/mesh.hpp

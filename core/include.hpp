@@ -8,7 +8,7 @@
 
 #include "game-object/components/transform.hpp"
 #include "game-object/components/camera.hpp"
-#include "game-object/components/material.hpp"
+#include "structures/material.hpp"
 
 #include "game-object/components/mesh.hpp"
 #include "game-object/components/terrain.hpp"

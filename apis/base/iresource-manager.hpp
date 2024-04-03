@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../../core/game-object/components/material.hpp"
+#include "../../core/structures/material.hpp"
 
 enum ResourceType {
     RESOURCE_TEXTURE,

@@ -50,7 +50,7 @@ public:
 
     void calculateMatrices();
 
-    mat4 calculateModelMatrix();
+    mat4 calculateTransformMatrix();
 
     mat3 calculateNormalMatrix();
 
@@ -58,7 +58,7 @@ public:
 // Getters
 // ===
 public:
-    mat4 getModelMatrix() const;
+    mat4 getTransformMatrix() const;
     
     mat3 getNormalMatrix() const;
     

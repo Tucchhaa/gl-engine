@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "component.hpp"
-#include "material.hpp"
+#include "../../structures/material.hpp"
 
 using namespace std;
 

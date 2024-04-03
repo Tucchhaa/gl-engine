@@ -13,7 +13,7 @@
 #include "hierarchy.hpp"
 
 #include "game-object/game-object.hpp"
-#include "game-object/components/material.hpp"
+#include "structures/material.hpp"
 #include "game-object/components/mesh.hpp"
 
 #include "structures/texture.hpp"

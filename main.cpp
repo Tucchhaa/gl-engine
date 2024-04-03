@@ -18,6 +18,7 @@ int main() {
 
     Loader loader(resourceManager);
     Scene scene;
+    Hierarchy::initialize();
 
     // = terrain =
     auto* terrainObject = new GameObject();
@@ -31,9 +32,15 @@ int main() {
     // = cubic patch =
     auto* cubicPatchObject = new GameObject();
     Hierarchy::addGameObject(cubicPatchObject);
+    Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
 
-    CubicPatch cubicPatch;
+    Texture* patchDiffuseTexture = loader.loadTexture("textures/metal_art_diffuse.jpg");
+    Texture* patchSpecularTexture = loader.loadTexture("textures/metal_art_specular.jpg");
+    Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
+
+    CubicPatch cubicPatch(patchMaterial);
     Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
+//    Hierarchy::updateTransformTree(patchTransform);
 
     // = backpack model =
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
@@ -42,7 +49,7 @@ int main() {
     Transform* objectTransform = Hierarchy::getTransform(object);
     objectTransform->translate(vec3(0, 25, 10));
     objectTransform->scaleBy(vec3(5, 5, 5));
-    Hierarchy::updateTransformTree(objectTransform);
+//    Hierarchy::updateTransformTree(objectTransform);
 
     // = camera =
     auto* cameraObject = new GameObject();
@@ -76,15 +83,15 @@ int main() {
     Hierarchy::addComponent(flashlight, spotLight0);
 
     Hierarchy::setParent(cameraObject, flashlight);
-    Hierarchy::updateTransformTree(cameraTransform);
+//    Hierarchy::updateTransformTree(cameraTransform);
 
     // ===
-
+    Hierarchy::updateTransformTree();
     scene.setCamera(camera);
     scene.processHierarchy();
     renderer->setScene(&scene);
 
-    float speed = 150.0f;
+    float speed = 15.0f;
     float rotationSpeed = 1.0f;
 
     while (window->isOpen())
@@ -103,8 +110,8 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
-//        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
-//        Hierarchy::updateTransformTree(objectTransform);
+        patchTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
+        Hierarchy::updateTransformTree(patchTransform);
 
         Hierarchy::updateTransformTree(cameraTransform);
 

@@ -4,6 +4,8 @@
 
 #include "component.hpp"
 
+#include "../../structures/material.hpp"
+
 using namespace std;
 
 class CubicPatch : public ObjectComponent {
@@ -14,10 +16,12 @@ private:
 public:
     float resolution;
 
-public:
-    CubicPatch();
+    Material material;
 
-    CubicPatch(float resolution, vector<float> controlPoints);
+public:
+    CubicPatch(Material material);
+
+    CubicPatch(float resolution, vector<float> controlPoints, Material material);
 
     int getPatchesNum();
 
