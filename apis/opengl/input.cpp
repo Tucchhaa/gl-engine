@@ -22,6 +22,19 @@ void Input::process() {
     _isShiftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 
     calculateDeltaTime();
+
+    // === TEMP ===
+    bool isEPressedThisFrame = glfwGetKey(glfwWindow, GLFW_KEY_E) == GLFW_PRESS;
+    isEPressed = isEPressedThisFrame && !wasEPressedLastFrame;
+    wasEPressedLastFrame = isEPressedThisFrame;
+
+    bool isQPressedThisFrame = glfwGetKey(glfwWindow, GLFW_KEY_Q) == GLFW_PRESS;
+    isQPressed = isQPressedThisFrame && !wasQPressedLastFrame;
+    wasQPressedLastFrame = isQPressedThisFrame;
+
+    bool isSpacePressedThisFrame = glfwGetKey(glfwWindow, GLFW_KEY_SPACE) == GLFW_PRESS;
+    isSpacePressed = isSpacePressedThisFrame && !wasSpacePressedLastFrame;
+    wasSpacePressedLastFrame = isSpacePressedThisFrame;
 }
 
 

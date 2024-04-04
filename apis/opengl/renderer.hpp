@@ -66,7 +66,10 @@ public:
     void render() override;
     
     void setScreenSize(int width, int height) override;
-    
+
+    // === TEMP
+    bool isPolygonLineMode = false;
+
 private:
     Shader baseShader;
     
@@ -83,7 +86,7 @@ private:
     unsigned int textureColorBuffer;
     
     unsigned int screenVAO;
-    
+
 private:
     void initFrameBuffer();
     
@@ -102,5 +105,6 @@ private:
     void setupCubicPatch(CubicPatch* cubicPatch);
 
     void drawCubicPatch(CubicPatchData* cubicPatchData);
+
 };
 

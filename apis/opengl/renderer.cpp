@@ -105,13 +105,18 @@ void Renderer::setScreenSize(int width, int height) {
 void Renderer::render() {
     Camera* camera = currentScene->getCamera();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+//    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glCheckError();
+
+    if(isPolygonLineMode)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // ===
     CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
@@ -132,7 +137,6 @@ void Renderer::render() {
     }
     glCheckError();
 
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     cubicPatchShader.use();
 
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
@@ -172,26 +176,26 @@ void Renderer::render() {
     }
 
     // ===
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
+//    glDisable(GL_DEPTH_TEST);
+//    glDisable(GL_CULL_FACE);
+//
+//    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // ===
-
-    screenShader.use();
-
-    glBindVertexArray(screenVAO);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-    screenShader.setInt("screenTexture", 0);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glCheckError();
+//
+//    screenShader.use();
+//
+//    glBindVertexArray(screenVAO);
+//
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+//    screenShader.setInt("screenTexture", 0);
+//
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
+//    glCheckError();
 }
 
 void Renderer::setLights(Shader* shader) {

@@ -1,4 +1,14 @@
+/**
+ * Author: Eldar Iusupzhanov
+ * Student ID: 112550085
+ * GitHub repo: https://github.com/Tucchhaa/gl-engine
+ * Demo branch: https://github.com/Tucchhaa/gl-engine/tree/curved_surface_demo
+ */
 #include <iostream>
+
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
@@ -8,51 +18,45 @@ using namespace std;
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 
-vector<float> controlPoints = {
-        // row 1
-        -1.5f, rand() % 3 - 1.0f, -1.5f,
-        -0.5f, rand() % 3 - 1.0f, -1.5f,
-        0.5f, rand() % 3 - 1.0f, -1.5f,
-        1.5f, rand() % 3 - 1.0f, -1.5f,
-
-        // row 2
-        -1.5f, rand() % 3 - 1.0f, -0.5f,
-        -0.5f, rand() % 3 - 1.0f, -0.5f,
-        0.5f, rand() % 3 - 1.0f, -0.5f,
-        1.5f, rand() % 3 - 1.0f, -0.5f,
-
-        // row 3
-        -1.5f, rand() % 3 - 1.0f, 0.5f,
-        -0.5f, rand() % 3 - 1.0f, 0.5f,
-        0.5f, rand() % 3 - 1.0f, 0.5f,
-        1.5f, rand() % 3 - 1.0f, 0.5f,
-
-        // row 4
-        -1.5f, rand() % 3 - 1.0f, 1.5f,
-        -0.5f, rand() % 3 - 1.0f, 1.5f,
-        0.5f, rand() % 3 - 1.0f, 1.5f,
-        1.5f, rand() % 3 - 1.0f, 1.5f,
-};
-
 int main() {
+    srand(time(0));
+
+    vector<float> controlPoints = {
+            // row 1
+            -1.5f, rand() % 3 - 1.0f, -1.5f,
+            -0.5f, rand() % 3 - 1.0f, -1.5f,
+            0.5f, rand() % 3 - 1.0f, -1.5f,
+            1.5f, rand() % 3 - 1.0f, -1.5f,
+
+            // row 2
+            -1.5f, rand() % 3 - 1.0f, -0.5f,
+            -0.5f, rand() % 3 - 1.0f, -0.5f,
+            0.5f, rand() % 3 - 1.0f, -0.5f,
+            1.5f, rand() % 3 - 1.0f, -0.5f,
+
+            // row 3
+            -1.5f, rand() % 3 - 1.0f, 0.5f,
+            -0.5f, rand() % 3 - 1.0f, 0.5f,
+            0.5f, rand() % 3 - 1.0f, 0.5f,
+            1.5f, rand() % 3 - 1.0f, 0.5f,
+
+            // row 4
+            -1.5f, rand() % 3 - 1.0f, 1.5f,
+            -0.5f, rand() % 3 - 1.0f, 1.5f,
+            0.5f, rand() % 3 - 1.0f, 1.5f,
+            1.5f, rand() % 3 - 1.0f, 1.5f,
+    };
+
     IWindow* window = new Window();
     window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     auto* input = new Input(window);
     IResourceManager* resourceManager = &ResourceManager::getInstance();
-    IRenderer* renderer = new Renderer();
+    auto* renderer = new Renderer();
 
     Loader loader(resourceManager);
     Scene scene;
     Hierarchy::initialize();
-
-    // = terrain =
-    GameObject* terrainObject = Hierarchy::createGameObject();
-
-    Texture* terrainTexture = loader.loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
-    Terrain terrain(terrainTexture, 20);
-
-    Hierarchy::addComponent(terrainObject, &terrain);
 
     // = cubic patch =
     GameObject* cubicPatchObject = Hierarchy::createGameObject();
@@ -65,16 +69,12 @@ int main() {
     CubicPatch cubicPatch(controlPoints, patchMaterial);
     Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
 
-    // = backpack model =
-    GameObject* object = loader.loadModel("models/backpack/backpack.obj");
-
-    Transform* objectTransform = Hierarchy::getTransform(object);
-    objectTransform->translate(vec3(0, 25, 10));
-    objectTransform->scaleBy(vec3(5, 5, 5));
-
     // = camera =
     auto* cameraObject = Hierarchy::createGameObject();
+
     Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
+    cameraTransform->translate(vec3(0, 4, -7));
+    cameraTransform->rotate(quat(vec3(-0.45f, 0, 0)));
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = loader.loadCubeMap("textures/skybox");
@@ -86,21 +86,13 @@ int main() {
     auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = Hierarchy::getTransform(lightSource);
-    lightTransform->setValues(vec3(-10, 20, -50), quat(vec3(0, radians(180.0), 0)));
+    lightTransform->setValues(vec3(0, 5, 0), quat(vec3(0, radians(180.0), 0)));
 
-    auto* directLight0 = new DirectLight();
-    PointLight* pointLight0 = PointLight::D3250();
+//    auto* directLight0 = new DirectLight();
+    PointLight* pointLight0 = PointLight::D100();
 
-    Hierarchy::addComponent(lightSource, directLight0);
+//    Hierarchy::addComponent(lightSource, directLight0);
     Hierarchy::addComponent(lightSource, pointLight0);
-
-    // = Flashlight =
-    auto* flashlight = Hierarchy::createGameObject();
-
-    auto* spotLight0 = SpotLight::D3250(radians(10.0));
-    Hierarchy::addComponent(flashlight, spotLight0);
-
-    Hierarchy::setParent(cameraObject, flashlight);
 
     // ===
     Hierarchy::updateTransformTree();
@@ -127,9 +119,30 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
-        patchTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
-        Hierarchy::updateTransformTree(patchTransform);
+        if(input->isSpacePressed) {
+            renderer->isPolygonLineMode = !renderer->isPolygonLineMode;
+        }
 
+        if(input->isQPressed) {
+            if(input->isShiftPressed()) {
+                cubicPatch.tessOuterLevel = std::max(1.0f, cubicPatch.tessOuterLevel - 3.0f);
+            }
+            else {
+                cubicPatch.tessInnerLevel = std::max(1.0f, cubicPatch.tessInnerLevel - 3.0f);
+            }
+        }
+        if(input->isEPressed) {
+            if(input->isShiftPressed()) {
+                cubicPatch.tessOuterLevel = std::min(60.0f, cubicPatch.tessOuterLevel + 3.0f);
+            }
+            else {
+                cubicPatch.tessInnerLevel = std::min(60.0f, cubicPatch.tessInnerLevel + 3.0f);
+            }
+        }
+
+        patchTransform->rotate(quat(vec3(0, radians(0.05f), 0)));
+
+        Hierarchy::updateTransformTree(patchTransform);
         Hierarchy::updateTransformTree(cameraTransform);
 
         renderer->render();
