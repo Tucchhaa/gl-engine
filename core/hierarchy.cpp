@@ -29,10 +29,10 @@ vector<T*> Hierarchy::Components<T>::_get(int objectId, bool all, bool required)
     vector<T*> result;
     
     for(ObjectComponent* component : Hierarchy::components[objectId]) {
-        T* castedComponent = dynamic_cast<T*>(component);
+        bool isSameType = typeid(*component) == typeid(T);
         
-        if(castedComponent != nullptr) {
-            result.push_back(castedComponent);
+        if(isSameType) {
+            result.push_back(static_cast<T*>(component));
             
             if(!all)
                 return result;

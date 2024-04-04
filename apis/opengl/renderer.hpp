@@ -88,7 +88,9 @@ private:
     void initFrameBuffer();
     
     void initScreenVAO();
-    
+
+    void setLights(Shader* shader);
+
     void setupMesh(Mesh* mesh);
     
     void drawMesh(MeshData* meshData);

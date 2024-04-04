@@ -137,7 +137,8 @@ void Renderer::render() {
 
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
     cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    cubicPatchShader.setSpotLight(0, currentScene->getSpotLights()[0]);
+
+    setLights(&cubicPatchShader);
 
     for(auto &cubicPatch : cubicPatches) {
         drawCubicPatch(&cubicPatch);
@@ -163,7 +164,8 @@ void Renderer::render() {
 
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
     baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    baseShader.setSpotLight(0, currentScene->getSpotLights()[0]);
+
+    setLights(&baseShader);
 
     for(auto &mesh : meshes) {
         drawMesh(&mesh);
@@ -190,6 +192,22 @@ void Renderer::render() {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glCheckError();
+}
+
+void Renderer::setLights(Shader* shader) {
+    // TODO: size of lights exceed 5 then shader will not work
+
+    for(int i=0; i < currentScene->getSpotLights().size(); i++) {
+        shader->setSpotLight(i, currentScene->getSpotLights()[i]);
+    }
+
+    for(int i=0; i < currentScene->getPointLights().size(); i++) {
+        shader->setPointLight(i, currentScene->getPointLights()[i]);
+    }
+
+    for(int i=0; i < currentScene->getDirectLights().size(); i++) {
+        shader->setDirectLight(i, currentScene->getDirectLights()[i]);
+    }
 }
 
 void Renderer::setupMesh(Mesh* mesh) {
