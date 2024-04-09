@@ -80,27 +80,30 @@ int main() {
     camera->cubeMap = loader.loadCubeMap("textures/skybox");
     Hierarchy::addComponent(cameraObject, camera);
 
+    cameraTransform->translate(vec3(-10, 25, -30));
+    cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
+
     camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);
 
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = Hierarchy::getTransform(lightSource);
-    lightTransform->setValues(vec3(-10, 20, -50), quat(vec3(0, radians(180.0), 0)));
+    lightTransform->setValues(vec3(-10, 20, -50), quat(vec3(radians(20.0), radians(180.0), 0)));
 
     auto* directLight0 = new DirectLight();
     PointLight* pointLight0 = PointLight::D3250();
 
     Hierarchy::addComponent(lightSource, directLight0);
-    Hierarchy::addComponent(lightSource, pointLight0);
+//    Hierarchy::addComponent(lightSource, pointLight0);
 
     // = Flashlight =
-    auto* flashlight = Hierarchy::createGameObject();
-
-    auto* spotLight0 = SpotLight::D3250(radians(10.0));
-    Hierarchy::addComponent(flashlight, spotLight0);
-
-    Hierarchy::setParent(cameraObject, flashlight);
+//    auto* flashlight = Hierarchy::createGameObject();
+//
+//    auto* spotLight0 = SpotLight::D3250(radians(10.0));
+//    Hierarchy::addComponent(flashlight, spotLight0);
+//
+//    Hierarchy::setParent(cameraObject, flashlight);
 
     // ===
     Hierarchy::updateTransformTree();

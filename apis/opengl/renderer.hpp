@@ -78,14 +78,14 @@ private:
 
     Shader cubicPatchShader;
     
-    unsigned int frameBuffer;
+    unsigned int screenFrameBuffer;
     
     unsigned int textureColorBuffer;
     
     unsigned int screenVAO;
     
 private:
-    void initFrameBuffer();
+    void initScreenFrameBuffer();
     
     void initScreenVAO();
 

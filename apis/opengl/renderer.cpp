@@ -9,7 +9,7 @@ Renderer::Renderer() :
     terrainShader("terrain-vertex.vert", "terrain-fragment.frag", "terrain-tess-control.tesc", "terrain-tess-eval.tese"),
     cubicPatchShader("cubic-vertex.vert", "fragment.frag", "cubic-tess-control.tesc", "cubic-tess-eval.tese")
 {
-    initFrameBuffer();
+    initScreenFrameBuffer();
     initScreenVAO();
 }
 
@@ -17,11 +17,13 @@ Renderer::~Renderer() {
     baseShader.deleteShader();
     screenShader.deleteShader();
     skyboxShader.deleteShader();
+    terrainShader.deleteShader();
+    cubicPatchShader.deleteShader();
 }
 
-void Renderer::initFrameBuffer() {
-    glGenFramebuffers(1, &frameBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+void Renderer::initScreenFrameBuffer() {
+    glGenFramebuffers(1, &screenFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
     
     glGenTextures(1, &textureColorBuffer);
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
@@ -29,13 +31,11 @@ void Renderer::initFrameBuffer() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
     
     unsigned int RBO;
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
     
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
@@ -43,7 +43,9 @@ void Renderer::initFrameBuffer() {
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         throw std::runtime_error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
     }
-        
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -105,7 +107,7 @@ void Renderer::setScreenSize(int width, int height) {
 void Renderer::render() {
     Camera* camera = currentScene->getCamera();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 

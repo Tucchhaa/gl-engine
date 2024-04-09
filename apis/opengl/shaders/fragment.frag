@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 #define DIRECT_LIGHTS_LENGTH 5
 #define POINT_LIGHTS_LENGTH 5

@@ -3,14 +3,18 @@ project(gl_engine)
 
 set(CMAKE_CXX_STANDARD 17)
 
-link_libraries("-framework OpenGL")
+set(DEPENDENCIES ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 
-link_libraries(/opt/homebrew/Cellar/glfw/3.3.9/lib/libglfw.3.3.dylib)
-link_libraries(/opt/homebrew/Cellar/assimp/5.3.1/lib/libassimp.5.3.0.dylib)
+if(APPLE)
+    link_libraries("-framework OpenGL")
 
-include_directories(/opt/homebrew/Cellar/glfw/3.3.9/include)
-include_directories(/opt/homebrew/Cellar/assimp/5.3.1/include)
-include_directories(/Users/tucha/C-libs)
+    link_libraries(${DEPENDENCIES}/glfw_3.3.9/lib/libglfw.3.3.dylib)
+    link_libraries(${DEPENDENCIES}/assimp_5.3.1/lib/libassimp.5.3.0.dylib)
+
+    include_directories(${DEPENDENCIES}/glfw_3.3.9/include)
+    include_directories(${DEPENDENCIES}/assimp_5.3.1/include)
+    include_directories(${DEPENDENCIES}/headers)
+endif ()
 
 add_executable(gl_engine
         # base
@@ -102,4 +106,3 @@ add_executable(gl_engine
         # other
         main.cpp
 )
-
