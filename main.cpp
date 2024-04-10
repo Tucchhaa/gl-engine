@@ -47,16 +47,17 @@ int main() {
     Hierarchy::initialize();
 
     // = terrain =
-    GameObject* terrainObject = Hierarchy::createGameObject();
-
-    Texture* terrainTexture = loader.loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
-    Terrain terrain(terrainTexture, 20);
-
-    Hierarchy::addComponent(terrainObject, &terrain);
+    // GameObject* terrainObject = Hierarchy::createGameObject();
+    //
+    // Texture* terrainTexture = loader.loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
+    // Terrain terrain(terrainTexture, 20);
+    //
+    // Hierarchy::addComponent(terrainObject, &terrain);
 
     // = cubic patch =
     GameObject* cubicPatchObject = Hierarchy::createGameObject();
     Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
+    patchTransform->scaleBy(vec3(10, 10, 10));
 
     Texture* patchDiffuseTexture = loader.loadTexture("textures/metal_art_diffuse.jpg");
     Texture* patchSpecularTexture = loader.loadTexture("textures/metal_art_specular.jpg");
@@ -69,8 +70,8 @@ int main() {
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
     Transform* objectTransform = Hierarchy::getTransform(object);
-    objectTransform->translate(vec3(0, 25, 10));
-    objectTransform->scaleBy(vec3(5, 5, 5));
+    objectTransform->translate(vec3(0, 3, -3));
+    // objectTransform->scaleBy(vec3(5, 5, 5));
 
     // = camera =
     auto* cameraObject = Hierarchy::createGameObject();
@@ -130,8 +131,8 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
-        patchTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
-        Hierarchy::updateTransformTree(patchTransform);
+        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
+        Hierarchy::updateTransformTree(objectTransform);
 
         Hierarchy::updateTransformTree(cameraTransform);
 

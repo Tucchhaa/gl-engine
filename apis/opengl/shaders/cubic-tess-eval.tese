@@ -12,6 +12,7 @@ const mat4 B = mat4(
 const mat4 BT = transpose(B);
 
 uniform mat4 perspective;
+uniform mat4 lightPerspective;
 uniform mat4 transform;
 uniform mat3 normalTransform;
 
@@ -22,6 +23,7 @@ in mat4 Pz[];
 out vec2 texCoord;
 out vec3 normal;
 out vec3 fragPos;
+out vec4 fragPosLightSpace;
 
 void main()
 {
@@ -49,6 +51,7 @@ void main()
 
     gl_Position = perspective * worldPos;
     fragPos = worldPos.xyz;
+    fragPosLightSpace = lightPerspective * worldPos;
     texCoord = gl_TessCoord.xy;
     normal = normalTransform * cross(dPdv, dPdu);
 }

@@ -49,8 +49,8 @@ private:
 
     vector<CubicPatchData> cubicPatches;
     
-    int width = 2000;
-    int height = 1600;
+    int screenWidth = 2000;
+    int screenHeight = 1600;
 
 public:
     Renderer();
@@ -69,6 +69,8 @@ public:
     
 private:
     Shader baseShader;
+
+    Shader depthShader;
     
     Shader screenShader;
     
@@ -77,14 +79,33 @@ private:
     Shader terrainShader;
 
     Shader cubicPatchShader;
-    
+
     unsigned int screenFrameBuffer;
     
     unsigned int textureColorBuffer;
     
     unsigned int screenVAO;
-    
+
 private:
+    void renderMeshes();
+
+    void renderCubeMap();
+
+private:
+    // == TEMP ===
+    const int SHADOW_WIDTH = 1024;
+    const int SHADOW_HEIGHT = 1024;
+
+    unsigned int shadowMapFBO;
+
+    unsigned int shadowMap;
+
+    void initShadowFrameBuffer();
+
+    void renderShadowMap();
+
+    // ===
+
     void initScreenFrameBuffer();
     
     void initScreenVAO();

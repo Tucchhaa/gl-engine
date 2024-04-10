@@ -7,8 +7,10 @@ layout(location = 2) in vec2 _texCoord;
 uniform mat4 transform;
 uniform mat3 normalTransform;
 uniform mat4 perspective;
+uniform mat4 lightPerspective;
 
 out vec3 fragPos;
+out vec4 fragPosLightSpace;
 out vec3 normal;
 out vec2 texCoord;
 
@@ -18,6 +20,7 @@ void main() {
     gl_Position = perspective * worldPos;
     
     fragPos = worldPos.xyz;
+    fragPosLightSpace = lightPerspective * worldPos;
     normal = normalTransform * _normal;
     texCoord = _texCoord;
 }

@@ -49,10 +49,12 @@ uniform PointLight pointLights[POINT_LIGHTS_LENGTH];
 uniform SpotLight spotLights[SPOT_LIGHTS_LENGTH];
 
 uniform Material material;
+uniform sampler2D shadowMap;
 
 uniform vec3 cameraPos;
 
 in vec3 fragPos;
+in vec4 fragPosLightSpace;
 in vec3 normal;
 in vec2 texCoord;
 
@@ -70,22 +72,39 @@ void main() {
     vec3 cameraDir = normalize(cameraPos - fragPos);
     
     vec3 result = vec3(0, 0, 0);
-    
-    for(int i=0; i < DIRECT_LIGHTS_LENGTH; i++) {
-        result += calculateDirectLight(directLights[i], _normal, cameraDir);
-    }
-    
-    for(int i=0; i < POINT_LIGHTS_LENGTH; i++) {
-        result += calculatePointLight(pointLights[i], _normal, fragPos, cameraDir);
-    }
 
-    for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
-        result += calculateSpotLight(spotLights[i], _normal, fragPos, cameraDir);
-    }
+    result += calculateDirectLight(directLights[0], _normal, cameraDir);
+
+//    for(int i=0; i < DIRECT_LIGHTS_LENGTH; i++) {
+//        result += calculateDirectLight(directLights[i], _normal, cameraDir);
+//    }
+//
+//    for(int i=0; i < POINT_LIGHTS_LENGTH; i++) {
+//        result += calculatePointLight(pointLights[i], _normal, fragPos, cameraDir);
+//    }
+//
+//    for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
+//        result += calculateSpotLight(spotLights[i], _normal, fragPos, cameraDir);
+//    }
     
     color = vec4(result, 1);
 //    color = texture(material.diffuse, texCoord);
 //    color = vec4(_normal, 1);
+}
+
+float isLit() {
+    vec3 coords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    coords = coords * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMap, coords.xy).r;
+    float currentDepth = coords.z;
+
+    if(closestDepth == 1.0)
+        return 1.0;
+
+    float lit = currentDepth < closestDepth ? 0.0 : 1.0;
+
+    return lit;
 }
 
 vec3 calculateDirectLight(DirectLight light, vec3 _normal, vec3 cameraDir) {
@@ -93,11 +112,10 @@ vec3 calculateDirectLight(DirectLight light, vec3 _normal, vec3 cameraDir) {
     
     float diffuse  = max(dot(_normal, -light.direction), 0.0);
     float specular = calculateBlinnSpecularCoefficient(cameraDir, -light.direction, _normal);
-    
-    return  
-             colors.specular * specular +
-             colors.diffuse  * diffuse +
-             colors.ambient;
+
+    vec3 lit = isLit() * (colors.specular * specular + colors.diffuse * diffuse);
+
+    return lit + colors.ambient;
 }
 
 vec3 calculatePointLight(PointLight light, vec3 _normal, vec3 position, vec3 cameraDir) {
@@ -111,11 +129,10 @@ vec3 calculatePointLight(PointLight light, vec3 _normal, vec3 position, vec3 cam
     float diffuse  = max(dot(_normal, lightDir), 0.0);
     float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
+
+    vec3 lit = isLit() * (colors.specular * specular + colors.diffuse * diffuse);
     
-    return  (
-             colors.specular * specular +
-             colors.diffuse  * diffuse +
-             colors.ambient) * attenuation;
+    return  (lit + colors.ambient) * attenuation;
 }
 
 vec3 calculateSpotLight(SpotLight light, vec3 _normal, vec3 position, vec3 cameraDir) {
@@ -133,10 +150,9 @@ vec3 calculateSpotLight(SpotLight light, vec3 _normal, vec3 position, vec3 camer
     float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
 
-    return  (
-        colors.specular * specular +
-        colors.diffuse  * diffuse) * attenuation * intensity +
-        colors.ambient * attenuation;
+    vec3 lit = isLit() * (colors.specular * specular + colors.diffuse * diffuse) * intensity;
+
+    return (lit + colors.ambient) * attenuation;
 }
 
 LightColors getLightingColors(LightColors lightColors) {

@@ -29,6 +29,7 @@ using uint = unsigned int;
 class Shader {
 public:
     uint ID;
+
     Shader(
             const string& vertexShaderFile, const string& fragmentShaderFile,
             const string& tessControlShaderFile = "", const string& tessEvalShaderFile = "");
@@ -37,10 +38,14 @@ public:
 // Basic methods
 // ===
 public:
-    void use() const;
+    void use();
+
     void deleteShader() const;
+
     int getLocation(const string& name) const;
 
+private:
+    int texturesCount = 0;
 
 // ==
 // Primitive setters
@@ -60,7 +65,10 @@ public:
     // Material
     // ===
 
-    void setMaterial(const Material* material) const;
+    void setTexture(const string& name, unsigned int textureId);
+    void setTexture(const string& name, unsigned int textureId, int slot);
+
+    void setMaterial(const Material* material);
 
     // ==
     // Light components

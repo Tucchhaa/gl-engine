@@ -4,6 +4,7 @@
 
 Renderer::Renderer() :
     baseShader("vertex.vert", "fragment.frag"),
+    depthShader("depth-vertex.vert", "depth-fragment.frag"),
     screenShader("screen-vertex.vert", "screen-fragment.frag"),
     skyboxShader("skybox-vertex.vert", "skybox-fragment.frag"),
     terrainShader("terrain-vertex.vert", "terrain-fragment.frag", "terrain-tess-control.tesc", "terrain-tess-eval.tese"),
@@ -11,6 +12,8 @@ Renderer::Renderer() :
 {
     initScreenFrameBuffer();
     initScreenVAO();
+
+    initShadowFrameBuffer();
 }
 
 Renderer::~Renderer() {
@@ -21,6 +24,31 @@ Renderer::~Renderer() {
     cubicPatchShader.deleteShader();
 }
 
+void Renderer::initShadowFrameBuffer() {
+    glGenFramebuffers(1, &shadowMapFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+
+    glGenTextures(1, &shadowMap);
+    glBindTexture(GL_TEXTURE_2D, shadowMap);
+
+    glGenTextures(1, &shadowMap);
+    glBindTexture(GL_TEXTURE_2D, shadowMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void Renderer::initScreenFrameBuffer() {
     glGenFramebuffers(1, &screenFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
@@ -28,14 +56,14 @@ void Renderer::initScreenFrameBuffer() {
     glGenTextures(1, &textureColorBuffer);
     glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     unsigned int RBO;
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
     
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
@@ -99,46 +127,53 @@ void Renderer::setScene(Scene *scene) {
     }
 }
 
-void Renderer::setScreenSize(int width, int height) {
-    this->width = width;
-    this->height = height;
+void Renderer::setScreenSize(const int width, const int height) {
+    screenWidth = width;
+    screenHeight = height;
 }
 
-void Renderer::render() {
+void Renderer::renderShadowMap() {
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glEnable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    DirectLight* light = currentScene->getDirectLights()[0];
+    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 5000.0f);
+    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
+    mat4 perspective = lightProjection * viewMatrix;
+
+    depthShader.use();
+    depthShader.setMat4("perspective", perspective);
+
+    for(auto &meshData : meshes) {
+        Transform* transform = Hierarchy::getTransform(meshData.mesh);
+
+        depthShader.setMat4("transform", transform->getTransformMatrix());
+
+        glBindVertexArray(meshData.VAO);
+
+        glDrawElements(GL_TRIANGLES, (int)static_cast<unsigned int>(meshData.mesh->indices.size()), GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::renderMeshes() {
+    DirectLight* light = currentScene->getDirectLights()[0];
+    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 100.0f);
+    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
+    mat4 lightPerspective = lightProjection * viewMatrix;
+
     Camera* camera = currentScene->getCamera();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glCheckError();
-
-    // ===
-    CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
-    if(cubeMap != nullptr) {
-        skyboxShader.use();
-
-        skyboxShader.setMat4("rotationMatrix", camera->getViewProjectionMatrix(false));
-
-        glDepthMask(GL_FALSE);
-
-        glBindVertexArray(cubeMap->VAO);
-
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->textureId);
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        glDepthMask(GL_TRUE);
-    }
-    glCheckError();
-
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     cubicPatchShader.use();
-
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
     cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
+    cubicPatchShader.setMat4("lightPerspective", lightPerspective);
+    cubicPatchShader.setTexture("shadowMap", shadowMap);
 
     setLights(&cubicPatchShader);
 
@@ -146,11 +181,8 @@ void Renderer::render() {
         drawCubicPatch(&cubicPatch);
     }
 
-    glCheckError();
-
     // draw terrain
     terrainShader.use();
-
     terrainShader.setMat4("perspective", camera->getViewProjectionMatrix());
     terrainShader.setMat4("rotationMatrix", camera->getViewMatrix());
 
@@ -163,17 +195,56 @@ void Renderer::render() {
     // ===
 
     baseShader.use();
-
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
     baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
+    baseShader.setMat4("lightPerspective", lightPerspective);
+    baseShader.setTexture("shadowMap", shadowMap);
 
     setLights(&baseShader);
 
     for(auto &mesh : meshes) {
         drawMesh(&mesh);
     }
+}
+
+void Renderer::renderCubeMap() {
+    Camera* camera = currentScene->getCamera();
+
+    CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
+
+    if(cubeMap != nullptr) {
+        skyboxShader.use();
+        skyboxShader.setMat4("rotationMatrix", camera->getViewProjectionMatrix(false));
+
+        glDepthMask(GL_FALSE);
+
+        glBindVertexArray(cubeMap->VAO);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->textureId);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glDepthMask(GL_TRUE);
+    }
+}
+
+void Renderer::render() {
+    renderShadowMap();
+
+    glViewport(0, 0, screenWidth, screenHeight);
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // ===
+
+    renderCubeMap();
+    renderMeshes();
 
     // ===
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST);
@@ -185,12 +256,9 @@ void Renderer::render() {
     // ===
 
     screenShader.use();
+    screenShader.setTexture("screenTexture", textureColorBuffer);
 
     glBindVertexArray(screenVAO);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-    screenShader.setInt("screenTexture", 0);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glCheckError();
@@ -335,12 +403,12 @@ void Renderer::drawCubicPatch(CubicPatchData* cubicPatchData) {
 
     cubicPatchShader.setFloat("tessOuterLevel", patch->tessOuterLevel);
     cubicPatchShader.setFloat("tessInnerLevel", patch->tessInnerLevel);
-
     cubicPatchShader.setMaterial(&patch->material);
 
     glBindVertexArray(cubicPatchData->VAO);
 
     glPatchParameteri(GL_PATCH_VERTICES, patch->VERTICES_PER_PATCH);
+
     glDrawArrays(GL_PATCHES, 0, patch->getVerticesCount());
 
     glBindVertexArray(0);
