@@ -55,22 +55,29 @@ int main() {
     // Hierarchy::addComponent(terrainObject, &terrain);
 
     // = cubic patch =
-    GameObject* cubicPatchObject = Hierarchy::createGameObject();
-    Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
-    patchTransform->scaleBy(vec3(10, 10, 10));
+    // GameObject* cubicPatchObject = Hierarchy::createGameObject();
+    // Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
+    // patchTransform->scaleBy(vec3(10, 10, 10));
+    // patchTransform->translate(vec3(0, -3, 0));
+    //
+    // Texture* patchDiffuseTexture = loader.loadTexture("textures/metal_art_diffuse.jpg");
+    // Texture* patchSpecularTexture = loader.loadTexture("textures/metal_art_specular.jpg");
+    // Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
+    //
+    // CubicPatch cubicPatch(controlPoints, patchMaterial);
+    // Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
 
-    Texture* patchDiffuseTexture = loader.loadTexture("textures/metal_art_diffuse.jpg");
-    Texture* patchSpecularTexture = loader.loadTexture("textures/metal_art_specular.jpg");
-    Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
-
-    CubicPatch cubicPatch(controlPoints, patchMaterial);
-    Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
+    // = cube model =
+    GameObject* cubeObject = loader.loadModel("models/cube/cube.obj");
+    Transform* cubeTransform = Hierarchy::getTransform(cubeObject);
+    cubeTransform->translate(vec3(0, -3, 0));
+    cubeTransform->scaleBy(vec3(100, 1, 100));
 
     // = backpack model =
     GameObject* object = loader.loadModel("models/backpack/backpack.obj");
 
     Transform* objectTransform = Hierarchy::getTransform(object);
-    objectTransform->translate(vec3(0, 3, -3));
+    objectTransform->translate(vec3(0, 0, -5));
     // objectTransform->scaleBy(vec3(5, 5, 5));
 
     // = camera =
@@ -90,7 +97,9 @@ int main() {
     auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = Hierarchy::getTransform(lightSource);
-    lightTransform->setValues(vec3(-10, 20, -50), quat(vec3(radians(20.0), radians(180.0), 0)));
+    lightTransform->translate(vec3(-10, 20, -50));
+    lightTransform->rotate(vec3(0, radians(180.0), 0));
+    lightTransform->rotate(vec3(radians(-20.0), 0, 0));
 
     auto* directLight0 = new DirectLight();
     PointLight* pointLight0 = PointLight::D3250();

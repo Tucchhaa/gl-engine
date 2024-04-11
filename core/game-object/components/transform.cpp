@@ -120,5 +120,5 @@ mat3 Transform::calculateNormalMatrix() const {
 }
 
 vec3 Transform::calculateDirection() const {
-    return getAbsoluteRotation() * vec3(0, 0, 1);
+    return getAbsoluteRotation() * vec3(0, 0, -1);
 }

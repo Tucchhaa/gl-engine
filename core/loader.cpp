@@ -183,6 +183,14 @@ Material Loader::ModelParser::processMaterial(aiMaterial* material) {
     result.diffuseTextures = loadTexturesByType(material, aiTextureType_DIFFUSE);
     result.specularTextures = loadTexturesByType(material, aiTextureType_SPECULAR);
 
+    // TODO: refactor
+    if(result.isEmpty()) {
+        result = Material(
+            *loader->loadTexture("textures/default_specular.jpeg", TEXTURE_2D_OPTIONS_REPEAT),
+            *loader->loadTexture("textures/default_diffuse.jpeg", TEXTURE_2D_OPTIONS_REPEAT)
+        );
+    }
+
     return result;
 }
 
@@ -211,7 +219,7 @@ vector<Texture> Loader::ModelParser::loadTexturesByType(aiMaterial* material, ai
 TextureFormat Loader::getTextureFormat(int nrChannels) {
     if (nrChannels == 1)
         return TEXTURE_FORMAT_R;
-    else if (nrChannels == 3)
+    if (nrChannels == 3)
         return TEXTURE_FORMAT_RGB;
 
     return TEXTURE_FORMAT_RGBA;

@@ -31,14 +31,15 @@ void Renderer::initShadowFrameBuffer() {
     glGenTextures(1, &shadowMap);
     glBindTexture(GL_TEXTURE_2D, shadowMap);
 
-    glGenTextures(1, &shadowMap);
-    glBindTexture(GL_TEXTURE_2D, shadowMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
                  SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
@@ -133,13 +134,26 @@ void Renderer::setScreenSize(const int width, const int height) {
 }
 
 void Renderer::renderShadowMap() {
+    // glViewport(0, 0, screenWidth, screenHeight);
+    // glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT);
+    //
+    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
     glClear(GL_DEPTH_BUFFER_BIT);
 
     DirectLight* light = currentScene->getDirectLights()[0];
-    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 5000.0f);
+    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 20.0f);
     mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
     mat4 perspective = lightProjection * viewMatrix;
 
@@ -153,7 +167,7 @@ void Renderer::renderShadowMap() {
 
         glBindVertexArray(meshData.VAO);
 
-        glDrawElements(GL_TRIANGLES, (int)static_cast<unsigned int>(meshData.mesh->indices.size()), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(meshData.mesh->indices.size()), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
     }
@@ -163,7 +177,7 @@ void Renderer::renderShadowMap() {
 
 void Renderer::renderMeshes() {
     DirectLight* light = currentScene->getDirectLights()[0];
-    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 100.0f);
+    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 20.0f);
     mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
     mat4 lightPerspective = lightProjection * viewMatrix;
 
@@ -191,6 +205,7 @@ void Renderer::renderMeshes() {
     }
 
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // ===
 

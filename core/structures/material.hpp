@@ -12,4 +12,6 @@ public:
     Material();
 
     Material(Texture specularTexture, Texture diffuseTexture);
+
+    bool isEmpty() const;
 };

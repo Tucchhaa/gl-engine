@@ -44,6 +44,14 @@ const TextureOptions TEXTURE_2D_OPTIONS = TextureOptions(
         TEXTURE_FILTER_LINEAR
 );
 
+const TextureOptions TEXTURE_2D_OPTIONS_REPEAT = TextureOptions(
+        TEXTURE_WRAP_REPEAT,
+        TEXTURE_WRAP_REPEAT,
+        TEXTURE_WRAP_REPEAT,
+        TEXTURE_FILTER_NEAREST,
+        TEXTURE_FILTER_NEAREST
+);
+
 const TextureOptions TERRAIN_OPTIONS = TextureOptions(
         TEXTURE_WRAP_REPEAT,
         TEXTURE_WRAP_REPEAT,

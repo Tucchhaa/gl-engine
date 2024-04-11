@@ -6,3 +6,7 @@ Material::Material(Texture specularTexture, Texture diffuseTexture) {
     specularTextures = { specularTexture };
     diffuseTextures = { diffuseTexture };
 }
+
+bool Material::isEmpty() const {
+    return specularTextures.empty() && diffuseTextures.empty();
+}

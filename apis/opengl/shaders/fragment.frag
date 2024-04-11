@@ -92,17 +92,19 @@ void main() {
 //    color = vec4(_normal, 1);
 }
 
-float isLit() {
+float isFragLit(vec3 _normal, vec3 lightDir) {
     vec3 coords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     coords = coords * 0.5 + 0.5;
 
     float closestDepth = texture(shadowMap, coords.xy).r;
     float currentDepth = coords.z;
 
+    // TODO: remove this if statement
     if(closestDepth == 1.0)
         return 1.0;
 
-    float lit = currentDepth < closestDepth ? 0.0 : 1.0;
+    float bias =  max(0.05 * (1.0 - dot(_normal, lightDir)), 0.005);
+    float lit = currentDepth - bias <= closestDepth  ? 1.0 : 0.0;
 
     return lit;
 }
@@ -113,7 +115,7 @@ vec3 calculateDirectLight(DirectLight light, vec3 _normal, vec3 cameraDir) {
     float diffuse  = max(dot(_normal, -light.direction), 0.0);
     float specular = calculateBlinnSpecularCoefficient(cameraDir, -light.direction, _normal);
 
-    vec3 lit = isLit() * (colors.specular * specular + colors.diffuse * diffuse);
+    vec3 lit = isFragLit(_normal, -light.direction) * (colors.specular * specular + colors.diffuse * diffuse);
 
     return lit + colors.ambient;
 }
@@ -130,7 +132,7 @@ vec3 calculatePointLight(PointLight light, vec3 _normal, vec3 position, vec3 cam
     float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
 
-    vec3 lit = isLit() * (colors.specular * specular + colors.diffuse * diffuse);
+    vec3 lit = isFragLit(_normal, lightDir) * (colors.specular * specular + colors.diffuse * diffuse);
     
     return  (lit + colors.ambient) * attenuation;
 }
@@ -150,7 +152,7 @@ vec3 calculateSpotLight(SpotLight light, vec3 _normal, vec3 position, vec3 camer
     float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
 
-    vec3 lit = isLit() * (colors.specular * specular + colors.diffuse * diffuse) * intensity;
+    vec3 lit = isFragLit(_normal, lightDir) * (colors.specular * specular + colors.diffuse * diffuse) * intensity;
 
     return (lit + colors.ambient) * attenuation;
 }

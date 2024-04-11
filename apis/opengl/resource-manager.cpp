@@ -15,7 +15,6 @@ unsigned int ResourceManager::getTextureId(Texture* texture) {
     return 0;
 }
 
-
 unsigned int ResourceManager::getTextureId(const Material* material, glApiTextureTypes textureType) {
     const vector<Texture>* textures;
 
