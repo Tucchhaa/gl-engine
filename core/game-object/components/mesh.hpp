@@ -8,6 +8,7 @@
 #include "../../structures/vectors.hpp"
 
 #include "component.hpp"
+#include "../../imesh.hpp"
 #include "../../structures/material.hpp"
 
 using namespace std;
@@ -18,7 +19,7 @@ struct Vertex {
     Vec2 texCoords;
 };
 
-class Mesh : public ObjectComponent {
+class Mesh : public ObjectComponent, public IMesh {
 public:
     vector<Vertex> vertices;
     vector<unsigned int> indices;
@@ -27,5 +28,19 @@ public:
     Mesh();
     
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material);
+
+// === IMesh implementation ===
+public:
+    void* data() override;
+
+    int dataSize() override;
+
+    vector<int> shaderAttributes() override;
+
+    bool usesIndices() override;
+
+    void* indicesData() override;
+
+    int indicesDataSize() override;
 };
 

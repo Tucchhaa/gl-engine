@@ -100,7 +100,7 @@ float isFragLit(vec3 _normal, vec3 lightDir) {
     float currentDepth = coords.z;
 
     // TODO: remove this if statement
-    if(closestDepth == 1.0)
+    if(closestDepth >= 1.0)
         return 1.0;
 
     float bias =  max(0.05 * (1.0 - dot(_normal, lightDir)), 0.005);

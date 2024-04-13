@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(DEPENDENCIES ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 
+#include_directories(.)
+
 if(APPLE)
     link_libraries("-framework OpenGL")
 
@@ -43,6 +45,9 @@ add_executable(gl_engine
 
         apis/opengl/resource-manager.cpp
         apis/opengl/resource-manager.hpp
+
+        apis/opengl/render-object.cpp
+        apis/opengl/render-object.hpp
 
         # core
         core/include.hpp
@@ -105,4 +110,5 @@ add_executable(gl_engine
 
         # other
         main.cpp
+        core/imesh.hpp
 )

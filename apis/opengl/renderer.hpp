@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include "render-object.hpp"
 #include "../../core/game-object/components/mesh.hpp"
 #include "../../core/game-object/components/terrain.hpp"
 #include "../../core/game-object/components/cubic-patch.hpp"
@@ -17,37 +18,15 @@
 
 using namespace std;
 
-struct MeshData {
-    unsigned int VAO;
-    unsigned int VBO;
-    unsigned int EBO;
-    
-    Mesh* mesh;
-};
-
-struct TerrainData {
-    unsigned int VAO;
-    unsigned int VBO;
-
-    Terrain* terrain;
-};
-
-struct CubicPatchData {
-    unsigned int VAO;
-    unsigned int VBO;
-
-    CubicPatch* cubicPatch;
-};
-
 class Renderer : public IRenderer {
 private:
     Scene* currentScene;
-    
-    vector<MeshData> meshes;
 
-    vector<TerrainData> terrains;
+    vector<RenderObject> meshes;
 
-    vector<CubicPatchData> cubicPatches;
+    vector<RenderObject> terrains;
+
+    vector<RenderObject> cubicPatches;
     
     int screenWidth = 2000;
     int screenHeight = 1600;
@@ -93,8 +72,8 @@ private:
 
 private:
     // == TEMP ===
-    const int SHADOW_WIDTH = 1024;
-    const int SHADOW_HEIGHT = 1024;
+    const int SHADOW_WIDTH = 2048;
+    const int SHADOW_HEIGHT = 2048;
 
     unsigned int shadowMapFBO;
 
@@ -112,16 +91,10 @@ private:
 
     void setLights(Shader* shader);
 
-    void setupMesh(Mesh* mesh);
-    
-    void drawMesh(MeshData* meshData);
+    void drawMesh(RenderObject* object);
 
-    void setupTerrain(Terrain* terrain);
+    void drawTerrain(RenderObject* object);
 
-    void drawTerrain(TerrainData* terrainData);
-
-    void setupCubicPatch(CubicPatch* cubicPatch);
-
-    void drawCubicPatch(CubicPatchData* cubicPatchData);
+    void drawCubicPatch(RenderObject* object);
 };
 
