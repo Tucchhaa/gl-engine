@@ -30,7 +30,7 @@ vector<T*> Hierarchy::Components<T>::_get(int objectId, bool all, bool required)
     
     for(ObjectComponent* component : Hierarchy::components[objectId]) {
         bool isSameType = typeid(*component) == typeid(T);
-        
+
         if(isSameType) {
             result.push_back(static_cast<T*>(component));
             
@@ -114,7 +114,7 @@ GameObject* Hierarchy::createGameObject() {
     auto* transform = new Transform();
     auto* gameObject = new GameObject(transform);
 
-    Hierarchy::gameObjects[gameObject->ID] = gameObject;
+    gameObjects[gameObject->ID] = gameObject;
 
     addComponent(gameObject, transform);
 

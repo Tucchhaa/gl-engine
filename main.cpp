@@ -8,31 +8,11 @@ using namespace std;
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 
-vector<float> controlPoints = {
-        // row 1
-        -1.5f, rand() % 3 - 1.0f, -1.5f,
-        -0.5f, rand() % 3 - 1.0f, -1.5f,
-        0.5f, rand() % 3 - 1.0f, -1.5f,
-        1.5f, rand() % 3 - 1.0f, -1.5f,
-
-        // row 2
-        -1.5f, rand() % 3 - 1.0f, -0.5f,
-        -0.5f, rand() % 3 - 1.0f, -0.5f,
-        0.5f, rand() % 3 - 1.0f, -0.5f,
-        1.5f, rand() % 3 - 1.0f, -0.5f,
-
-        // row 3
-        -1.5f, rand() % 3 - 1.0f, 0.5f,
-        -0.5f, rand() % 3 - 1.0f, 0.5f,
-        0.5f, rand() % 3 - 1.0f, 0.5f,
-        1.5f, rand() % 3 - 1.0f, 0.5f,
-
-        // row 4
-        -1.5f, rand() % 3 - 1.0f, 1.5f,
-        -0.5f, rand() % 3 - 1.0f, 1.5f,
-        0.5f, rand() % 3 - 1.0f, 1.5f,
-        1.5f, rand() % 3 - 1.0f, 1.5f,
-};
+GameObject* createCurvedSurface(Loader* loader);
+GameObject* createTerrain(Loader* loader);
+GameObject* createBackpack(Loader* loader);
+GameObject* createCube(Loader* loader);
+GameObject* createCamera(Loader* loader);
 
 int main() {
     IWindow* window = new Window();
@@ -46,52 +26,16 @@ int main() {
     Scene scene;
     Hierarchy::initialize();
 
-    // = terrain =
-    GameObject* terrainObject = Hierarchy::createGameObject();
+    GameObject* terrainObject = createTerrain(&loader);
+    GameObject* cubicPatchObject = createCurvedSurface(&loader);
+    GameObject* backpackObject = createBackpack(&loader);
+    GameObject* cubeObject = createCube(&loader);
+    GameObject* cameraObject = createCamera(&loader);
 
-    Texture* terrainTexture = loader.loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
-    Terrain terrain(terrainTexture, 20);
+    Camera* camera = Hierarchy::Components<Camera>::get(cameraObject);
 
-    Hierarchy::addComponent(terrainObject, &terrain);
-
-    // = cubic patch =
-    GameObject* cubicPatchObject = Hierarchy::createGameObject();
-    Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
-    patchTransform->scaleBy(vec3(10, 10, 10));
-    patchTransform->translate(vec3(0, -3, 0));
-
-    Texture* patchDiffuseTexture = loader.loadTexture("textures/metal_art_diffuse.jpg");
-    Texture* patchSpecularTexture = loader.loadTexture("textures/metal_art_specular.jpg");
-    Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
-
-    CubicPatch cubicPatch(controlPoints, patchMaterial);
-    Hierarchy::addComponent(cubicPatchObject, &cubicPatch);
-
-    // = cube model =
-    // GameObject* cubeObject = loader.loadModel("models/cube/cube.obj");
-    // Transform* cubeTransform = Hierarchy::getTransform(cubeObject);
-    // cubeTransform->translate(vec3(0, -3, 0));
-    // cubeTransform->scaleBy(vec3(100, 1, 100));
-
-    // = backpack model =
-    GameObject* object = loader.loadModel("models/backpack/backpack.obj");
-
-    Transform* objectTransform = Hierarchy::getTransform(object);
-    objectTransform->translate(vec3(0, 0, -5));
-    // objectTransform->scaleBy(vec3(5, 5, 5));
-
-    // = camera =
-    auto* cameraObject = Hierarchy::createGameObject();
-    Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
-
-    auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
-    camera->cubeMap = loader.loadCubeMap("textures/skybox");
-    Hierarchy::addComponent(cameraObject, camera);
-
-    cameraTransform->translate(vec3(-10, 25, -30));
-    cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
-
-    camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);
+    Transform* backpackTransform = backpackObject->transform;
+    Transform* cameraTransform = cameraObject->transform;
 
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
@@ -140,8 +84,8 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
-        objectTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
-        Hierarchy::updateTransformTree(objectTransform);
+        backpackTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
+        Hierarchy::updateTransformTree(backpackTransform);
 
         Hierarchy::updateTransformTree(cameraTransform);
 
@@ -153,4 +97,93 @@ int main() {
     window->terminate();
 
     return 0;
+}
+
+GameObject* createCurvedSurface(Loader* loader) {
+    const vector<float> controlPoints = {
+        // row 1
+        -1.5f, rand() % 3 - 1.0f, -1.5f,
+        -0.5f, rand() % 3 - 1.0f, -1.5f,
+        0.5f, rand() % 3 - 1.0f, -1.5f,
+        1.5f, rand() % 3 - 1.0f, -1.5f,
+
+        // row 2
+        -1.5f, rand() % 3 - 1.0f, -0.5f,
+        -0.5f, rand() % 3 - 1.0f, -0.5f,
+        0.5f, rand() % 3 - 1.0f, -0.5f,
+        1.5f, rand() % 3 - 1.0f, -0.5f,
+
+        // row 3
+        -1.5f, rand() % 3 - 1.0f, 0.5f,
+        -0.5f, rand() % 3 - 1.0f, 0.5f,
+        0.5f, rand() % 3 - 1.0f, 0.5f,
+        1.5f, rand() % 3 - 1.0f, 0.5f,
+
+        // row 4
+        -1.5f, rand() % 3 - 1.0f, 1.5f,
+        -0.5f, rand() % 3 - 1.0f, 1.5f,
+        0.5f, rand() % 3 - 1.0f, 1.5f,
+        1.5f, rand() % 3 - 1.0f, 1.5f,
+    };
+
+    GameObject* cubicPatchObject = Hierarchy::createGameObject();
+    Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
+    patchTransform->scaleBy(vec3(10, 10, 10));
+    patchTransform->translate(vec3(0, -3, 0));
+
+    const Texture* patchDiffuseTexture = loader->loadTexture("textures/metal_art_diffuse.jpg");
+    const Texture* patchSpecularTexture = loader->loadTexture("textures/metal_art_specular.jpg");
+    const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
+
+    auto* cubicPatch = new CubicPatch(controlPoints, patchMaterial);
+    Hierarchy::addComponent(cubicPatchObject, cubicPatch);
+
+    return cubicPatchObject;
+}
+
+GameObject* createTerrain(Loader* loader) {
+    GameObject* terrainObject = Hierarchy::createGameObject();
+
+    Texture* terrainTexture = loader->loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
+    auto* terrain = new Terrain(terrainTexture, 20);
+
+    Hierarchy::addComponent(terrainObject, terrain);
+
+    return terrainObject;
+}
+
+GameObject* createBackpack(Loader* loader) {
+    GameObject* object = loader->loadModel("models/backpack/backpack.obj");
+
+    Transform* objectTransform = Hierarchy::getTransform(object);
+    objectTransform->translate(vec3(0, 0, -5));
+    // objectTransform->scaleBy(vec3(5, 5, 5));
+
+    return object;
+}
+
+GameObject* createCube(Loader* loader) {
+    GameObject* cubeObject = loader->loadModel("models/cube/cube.obj");
+    Transform* cubeTransform = Hierarchy::getTransform(cubeObject);
+
+    cubeTransform->translate(vec3(0, -3, 0));
+    cubeTransform->scaleBy(vec3(100, 1, 100));
+
+    return cubeObject;
+}
+
+GameObject* createCamera(Loader* loader) {
+    auto* cameraObject = Hierarchy::createGameObject();
+    Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
+
+    auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
+    camera->cubeMap = loader->loadCubeMap("textures/skybox");
+    Hierarchy::addComponent(cameraObject, camera);
+
+    cameraTransform->translate(vec3(-10, 25, -30));
+    cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
+
+    camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);
+
+    return cameraObject;
 }

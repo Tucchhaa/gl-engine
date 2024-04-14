@@ -115,7 +115,7 @@ void Renderer::setScene(Scene *scene) {
     vector<Mesh*> meshes = scene->getMeshes();
     vector<Terrain*> terrains = scene->getTerrains();
     vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
-    
+
     for(Mesh* mesh: meshes) {
         auto object = RenderObject(mesh);
         this->meshes.push_back(object);
