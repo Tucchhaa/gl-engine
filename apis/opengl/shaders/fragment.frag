@@ -41,6 +41,7 @@ struct SpotLight {
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D normal;
     float shininess;
 };
 
@@ -57,6 +58,7 @@ in vec3 fragPos;
 in vec4 fragPosLightSpace;
 in vec3 normal;
 in vec2 texCoord;
+in mat3 TBN;
 
 out vec4 color;
 
@@ -68,27 +70,32 @@ LightColors getLightingColors(LightColors lightColors);
 float calculateBlinnSpecularCoefficient(vec3 cameraDir, vec3 lightDir, vec3 normal);
 
 void main() {
-    vec3 _normal = normalize(normal);
+//    vec3 _normal = normalize(normal);
+
+    vec3 _normal = texture(material.normal, texCoord).rgb;
+    _normal = normalize(_normal * 2.0 - 1.0);
+    _normal = normalize(TBN * _normal);
+
     vec3 cameraDir = normalize(cameraPos - fragPos);
     
     vec3 result = vec3(0, 0, 0);
 
     result += calculateDirectLight(directLights[0], _normal, cameraDir);
 
-//    for(int i=0; i < DIRECT_LIGHTS_LENGTH; i++) {
-//        result += calculateDirectLight(directLights[i], _normal, cameraDir);
-//    }
-//
-//    for(int i=0; i < POINT_LIGHTS_LENGTH; i++) {
-//        result += calculatePointLight(pointLights[i], _normal, fragPos, cameraDir);
-//    }
-//
-//    for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
-//        result += calculateSpotLight(spotLights[i], _normal, fragPos, cameraDir);
-//    }
+    for(int i=1; i < DIRECT_LIGHTS_LENGTH; i++) {
+        result += calculateDirectLight(directLights[i], _normal, cameraDir);
+    }
+
+    for(int i=0; i < POINT_LIGHTS_LENGTH; i++) {
+        result += calculatePointLight(pointLights[i], _normal, fragPos, cameraDir);
+    }
+
+    for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
+        result += calculateSpotLight(spotLights[i], _normal, fragPos, cameraDir);
+    }
     
     color = vec4(result, 1);
-//    color = texture(material.diffuse, texCoord);
+//    color = texture(material.normal, texCoord);
 //    color = vec4(_normal, 1);
 }
 
@@ -103,7 +110,7 @@ float isFragLit(vec3 _normal, vec3 lightDir) {
     if(closestDepth >= 1.0)
         return 1.0;
 
-    float bias =  max(0.05 * (1.0 - dot(_normal, lightDir)), 0.005);
+    float bias =  max(0.035 * (1.0 - dot(_normal, lightDir)), 0.005);
     float lit = currentDepth - bias <= closestDepth  ? 1.0 : 0.0;
 
     return lit;
@@ -132,7 +139,7 @@ vec3 calculatePointLight(PointLight light, vec3 _normal, vec3 position, vec3 cam
     float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
 
-    vec3 lit = isFragLit(_normal, lightDir) * (colors.specular * specular + colors.diffuse * diffuse);
+    vec3 lit = (colors.specular * specular + colors.diffuse * diffuse);
     
     return  (lit + colors.ambient) * attenuation;
 }
@@ -145,14 +152,14 @@ vec3 calculateSpotLight(SpotLight light, vec3 _normal, vec3 position, vec3 camer
 
     vec3 lightDir = normalize(lightVec);
     // alpha is angle between light direction and direction to fragment
-    float cosTheta = dot(lightDir, light.direction);
+    float cosTheta = dot(lightDir, -light.direction);
     float intensity = clamp((cosTheta - light.edgeAngleCosine) / (light.coneAngleCosine - light.edgeAngleCosine), 0.0, 1.0);
 
     float diffuse  = max(dot(_normal, lightDir), 0.0);
     float specular = calculateBlinnSpecularCoefficient(cameraDir, lightDir, _normal);
     float attenuation = 1.0 / (1.0 + light.linear * _distance + light.quadratic * _distance * _distance);
 
-    vec3 lit = isFragLit(_normal, lightDir) * (colors.specular * specular + colors.diffuse * diffuse) * intensity;
+    vec3 lit = (colors.specular * specular + colors.diffuse * diffuse) * intensity;
 
     return (lit + colors.ambient) * attenuation;
 }

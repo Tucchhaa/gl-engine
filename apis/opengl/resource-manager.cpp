@@ -25,6 +25,11 @@ unsigned int ResourceManager::getTextureId(const Material* material, glApiTextur
         case glApi_SPECULAR_TEXTURE:
             textures = &material->specularTextures;
             break;
+        case glApi_NORMAL_TEXTURE:
+            textures = &material->normalTextures;
+            break;
+        default:
+            throw runtime_error("can not get texture");
     }
 
     return getInstance().textures[(*textures)[0].ID];

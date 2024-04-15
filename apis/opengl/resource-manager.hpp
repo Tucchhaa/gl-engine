@@ -13,7 +13,8 @@ using namespace std;
 
 enum glApiTextureTypes {
     glApi_DIFFUSE_TEXTURE,
-    glApi_SPECULAR_TEXTURE
+    glApi_SPECULAR_TEXTURE,
+    glApi_NORMAL_TEXTURE,
 };
 
 struct CubeMap {

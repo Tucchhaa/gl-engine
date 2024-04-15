@@ -87,7 +87,7 @@ GameObject *Loader::loadModel(const char *path) {
     string fullPath = RESOURCES_PATH + "/" + strPath;
 
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    const aiScene* scene = importer.ReadFile(fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
     if(!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
         throw std::runtime_error("Couldn't load model");
@@ -152,6 +152,7 @@ Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
 
         vertex.position = convertToVec3(mesh->mVertices[i]);
         vertex.normal = convertToVec3(mesh->mNormals[i]);
+        vertex.tangent = convertToVec3(mesh->mTangents[i]);
 
         if (mesh->mTextureCoords[0])
             vertex.texCoords = convertToVec2(mesh->mTextureCoords[0][i]);
@@ -182,12 +183,14 @@ Material Loader::ModelParser::processMaterial(aiMaterial* material) {
 
     result.diffuseTextures = loadTexturesByType(material, aiTextureType_DIFFUSE);
     result.specularTextures = loadTexturesByType(material, aiTextureType_SPECULAR);
+    result.normalTextures = loadTexturesByType(material, aiTextureType_HEIGHT);
 
     // TODO: refactor
     if(result.isEmpty()) {
         result = Material(
             *loader->loadTexture("textures/default_specular.jpeg", TEXTURE_2D_OPTIONS_REPEAT),
-            *loader->loadTexture("textures/default_diffuse.jpeg", TEXTURE_2D_OPTIONS_REPEAT)
+            *loader->loadTexture("textures/default_diffuse.jpeg", TEXTURE_2D_OPTIONS_REPEAT),
+            *loader->loadTexture("textures/default_normal.png", TEXTURE_2D_OPTIONS_REPEAT)
         );
     }
 

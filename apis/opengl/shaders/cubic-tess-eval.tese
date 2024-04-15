@@ -24,6 +24,7 @@ out vec2 texCoord;
 out vec3 normal;
 out vec3 fragPos;
 out vec4 fragPosLightSpace;
+out mat3 TBN;
 
 void main()
 {
@@ -54,4 +55,12 @@ void main()
     fragPosLightSpace = lightPerspective * worldPos;
     texCoord = gl_TessCoord.xy;
     normal = normalTransform * cross(dPdv, dPdu);
+
+    TBN = transpose(mat3(
+        normalize(vec3(transform * vec4(dPdu, 0.0f))),
+        normalize(vec3(transform * vec4(dPdv, 0.0f))),
+        normalize(vec3(transform * vec4(normal, 0.0f)))
+    ));
+
+
 }

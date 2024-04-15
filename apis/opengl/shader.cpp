@@ -26,7 +26,7 @@ Shader::Shader(
 void Shader::use() {
     glUseProgram(ID);
 
-    texturesCount = 2;
+    texturesCount = 3;
 }
 
 void Shader::deleteShader() const {
@@ -98,6 +98,7 @@ void Shader::setTexture(const string& name, unsigned int textureId, int slot) {
 void Shader::setMaterial(const Material* material) {
     setTexture("material.diffuse", ResourceManager::getTextureId(material, glApi_DIFFUSE_TEXTURE), 0);
     setTexture("material.specular", ResourceManager::getTextureId(material, glApi_SPECULAR_TEXTURE), 1);
+    setTexture("material.normal", ResourceManager::getTextureId(material, glApi_NORMAL_TEXTURE), 2);
     
     setFloat("material.shininess", 32);
 }

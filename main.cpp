@@ -26,10 +26,10 @@ int main() {
     Scene scene;
     Hierarchy::initialize();
 
-    GameObject* terrainObject = createTerrain(&loader);
-    GameObject* cubicPatchObject = createCurvedSurface(&loader);
+    // GameObject* terrainObject = createTerrain(&loader);
+    // GameObject* cubicPatchObject = createCurvedSurface(&loader);
     GameObject* backpackObject = createBackpack(&loader);
-    GameObject* cubeObject = createCube(&loader);
+    // GameObject* cubeObject = createCube(&loader);
     GameObject* cameraObject = createCamera(&loader);
 
     Camera* camera = Hierarchy::Components<Camera>::get(cameraObject);
@@ -52,12 +52,12 @@ int main() {
 //    Hierarchy::addComponent(lightSource, pointLight0);
 
     // = Flashlight =
-//    auto* flashlight = Hierarchy::createGameObject();
-//
-//    auto* spotLight0 = SpotLight::D3250(radians(10.0));
-//    Hierarchy::addComponent(flashlight, spotLight0);
-//
-//    Hierarchy::setParent(cameraObject, flashlight);
+    // auto* flashlight = Hierarchy::createGameObject();
+    //
+    // auto* spotLight0 = SpotLight::D3250(radians(10.0));
+    // Hierarchy::addComponent(flashlight, spotLight0);
+    //
+    // Hierarchy::setParent(cameraObject, flashlight);
 
     // ===
     Hierarchy::updateTransformTree();
@@ -84,7 +84,7 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
-        backpackTransform->rotate(quat(vec3(0, radians(0.15f), 0)));
+        backpackTransform->rotate(quat(vec3(0, radians(0.05f), 0)));
         Hierarchy::updateTransformTree(backpackTransform);
 
         Hierarchy::updateTransformTree(cameraTransform);
@@ -133,7 +133,8 @@ GameObject* createCurvedSurface(Loader* loader) {
 
     const Texture* patchDiffuseTexture = loader->loadTexture("textures/metal_art_diffuse.jpg");
     const Texture* patchSpecularTexture = loader->loadTexture("textures/metal_art_specular.jpg");
-    const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture);
+    const Texture* patchNormalTexture = loader->loadTexture("textures/metal_art_specular.jpg");
+    const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture, *patchNormalTexture);
 
     auto* cubicPatch = new CubicPatch(controlPoints, patchMaterial);
     Hierarchy::addComponent(cubicPatchObject, cubicPatch);

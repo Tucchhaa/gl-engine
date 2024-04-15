@@ -19,7 +19,7 @@ int Mesh::dataSize() {
 }
 
 vector<int> Mesh::shaderAttributes() {
-    return {3, 3, 2};
+    return {3, 3, 2, 3};
 }
 
 bool Mesh::usesIndices() {

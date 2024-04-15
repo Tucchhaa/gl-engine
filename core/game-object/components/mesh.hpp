@@ -17,6 +17,7 @@ struct Vertex {
     Vec3 position;
     Vec3 normal;
     Vec2 texCoords;
+    Vec3 tangent;
 };
 
 class Mesh : public ObjectComponent, public IMesh {
