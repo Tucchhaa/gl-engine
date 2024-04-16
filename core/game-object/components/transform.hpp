@@ -41,6 +41,8 @@ public:
 public:
     void setValues(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
 
+    void setPosition(vec3 position);
+
     void translate(vec3 vector, const Transform* transform = nullptr);
 
     void rotate(quat rotation, const Transform* transform = nullptr);

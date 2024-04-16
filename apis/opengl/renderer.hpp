@@ -61,7 +61,7 @@ private:
 
     unsigned int screenFrameBuffer;
     
-    unsigned int textureColorBuffer;
+    unsigned int colorBuffer;
     
     unsigned int screenVAO;
 

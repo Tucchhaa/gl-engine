@@ -6,6 +6,10 @@ in vec2 texCoords;
 
 out vec4 outputColor;
 
+vec3 reinhardToneMapping(vec3 color);
+vec3 exposureToneMapping(vec3 color, float exposure);
+vec3 gammaCorrection(vec3 color);
+
 vec4 blackAndWhite1(vec4 color);
 vec4 blackAndWhite2(vec4 color);
 vec4 negative(vec4 color);
@@ -20,8 +24,29 @@ void main() {
     
     vec4 color = texture(screenTexture, texCoords);
 
-    outputColor =  color;
+    outputColor = vec4(exposureToneMapping(color.rgb, 5.0), 1);
 }
+
+// === Tone mapping ===
+vec3 reinhardToneMapping(vec3 color) {
+    return color / (color + vec3(1));
+}
+
+vec3 exposureToneMapping(vec3 color, float exposure) {
+    return vec3(1) - exp(-color * exposure);
+}
+
+// === Gamma correction ===
+
+vec3 gammaCorrection(vec3 color) {
+    float gamma = 1.0f / 2.2f;
+
+    return pow(color, vec3(gamma));
+}
+
+// ===
+// Post-processing
+// ===
 
 vec4 blackAndWhite1(vec4 color) {
     float average = (color.r + color.b + color.g) / 3;

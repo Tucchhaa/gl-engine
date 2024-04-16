@@ -14,6 +14,10 @@ void Transform::setValues(vec3 position, quat rotation, vec3 scale) {
     this->scale = scale;
 }
 
+void Transform::setPosition(vec3 position) {
+    this->position = position;
+}
+
 void Transform::translate(vec3 vector, const Transform* transform) {
     quat rotation = this->rotation;
     

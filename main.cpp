@@ -14,6 +14,17 @@ GameObject* createBackpack(Loader* loader);
 GameObject* createCube(Loader* loader);
 GameObject* createCamera(Loader* loader);
 
+void setupDefaultScene(Loader* loader);
+
+void setupTunnelScene(Loader* loader);
+
+int backpackId;
+
+/*
+TODO: optimizations
+1) Skybox - no need to render it for pixel
+2) Normal mapping - use tangent space
+ */
 int main() {
     IWindow* window = new Window();
     window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -26,40 +37,22 @@ int main() {
     Scene scene;
     Hierarchy::initialize();
 
-    // GameObject* terrainObject = createTerrain(&loader);
-    // GameObject* cubicPatchObject = createCurvedSurface(&loader);
-    GameObject* backpackObject = createBackpack(&loader);
-    GameObject* cubeObject = createCube(&loader);
+    // ===
+
     GameObject* cameraObject = createCamera(&loader);
 
     Camera* camera = Hierarchy::Components<Camera>::get(cameraObject);
-
-    Transform* backpackTransform = backpackObject->transform;
     Transform* cameraTransform = cameraObject->transform;
 
-    // = light source =
-    auto* lightSource = Hierarchy::createGameObject();
+    // ===
 
-    Transform* lightTransform = Hierarchy::getTransform(lightSource);
-    lightTransform->translate(vec3(-10, 20, -50));
-    lightTransform->rotate(vec3(0, radians(180.0), 0));
-    lightTransform->rotate(vec3(radians(-30.0), 0, 0));
+    // setupDefaultScene(&loader);
+    setupTunnelScene(&loader);
 
-    auto* directLight0 = new DirectLight();
-    PointLight* pointLight0 = PointLight::D3250();
-
-    Hierarchy::addComponent(lightSource, directLight0);
-//    Hierarchy::addComponent(lightSource, pointLight0);
-
-    // = Flashlight =
-    // auto* flashlight = Hierarchy::createGameObject();
-    //
-    // auto* spotLight0 = SpotLight::D3250(radians(10.0));
-    // Hierarchy::addComponent(flashlight, spotLight0);
-    //
-    // Hierarchy::setParent(cameraObject, flashlight);
+    // Transform* backpackTransform = Hierarchy::getGameObject(backpackId)->transform;
 
     // ===
+
     Hierarchy::updateTransformTree();
     scene.setCamera(camera);
     scene.processHierarchy();
@@ -84,8 +77,8 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
-        backpackTransform->rotate(quat(vec3(0, radians(0.05f), 0)));
-        Hierarchy::updateTransformTree(backpackTransform);
+        // backpackTransform->rotate(quat(vec3(0, radians(0.05f), 0)));
+        // Hierarchy::updateTransformTree(backpackTransform);
 
         Hierarchy::updateTransformTree(cameraTransform);
 
@@ -98,6 +91,93 @@ int main() {
 
     return 0;
 }
+
+void setupDefaultScene(Loader* loader) {
+    // GameObject* terrainObject = createTerrain(&loader);
+    // GameObject* cubicPatchObject = createCurvedSurface(&loader);
+    GameObject* backpackObject = createBackpack(loader);
+    GameObject* cubeObject = createCube(loader);
+
+    backpackId = backpackObject->ID;
+
+    cubeObject->transform->scaleBy(vec3(100, 1, 100));
+
+    // = light source =
+    auto* lightSource = Hierarchy::createGameObject();
+
+    Transform* lightTransform = Hierarchy::getTransform(lightSource);
+    lightTransform->translate(vec3(-10, 20, -50));
+    lightTransform->rotate(vec3(0, radians(180.0), 0));
+    lightTransform->rotate(vec3(radians(-30.0), 0, 0));
+
+    auto* directLight0 = new DirectLight();
+    PointLight* pointLight0 = PointLight::D3250();
+
+    Hierarchy::addComponent(lightSource, directLight0);
+    //    Hierarchy::addComponent(lightSource, pointLight0);
+
+    // = Flashlight =
+    // auto* flashlight = Hierarchy::createGameObject();
+    //
+    // auto* spotLight0 = SpotLight::D3250(radians(10.0));
+    // Hierarchy::addComponent(flashlight, spotLight0);
+    //
+    // Hierarchy::setParent(cameraObject, flashlight);
+}
+
+void setupTunnelScene(Loader* loader) {
+    GameObject* topCube = createCube(loader);
+    GameObject* rightCube = createCube(loader);
+    GameObject* bottomCube = createCube(loader);
+    GameObject* leftCube = createCube(loader);
+    GameObject* backCube = createCube(loader);
+    GameObject* cube = createCube(loader);
+
+    topCube->transform->scaleBy(vec3(1, 1, 100));
+    rightCube->transform->scaleBy(vec3(1, 1, 100));
+    bottomCube->transform->scaleBy(vec3(1, 1, 100));
+    leftCube->transform->scaleBy(vec3(1, 1, 100));
+    cube->transform->scaleBy(vec3(0.1, 0.1, 0.1));
+
+    topCube->transform->translate(vec3(0, 1.9, 0));
+    rightCube->transform->translate(vec3(1.9, 0, 0));
+    bottomCube->transform->translate(vec3(0, -1.9, 0));
+    leftCube->transform->translate(vec3(-1.9, 0, 0));
+    backCube->transform->translate(vec3(0, 0, 5));
+
+    // TODO: rotate cubes because of the bug
+    leftCube->transform->rotate(vec3(0, 0, radians(180.0f)));
+    bottomCube->transform->rotate(vec3(0, 0, radians(180.0f)));
+
+    // = light source =
+    auto* lightSource = Hierarchy::createGameObject();
+    auto* pointLight = PointLight::D3250();
+    auto* pointLight3 = PointLight::D3250();
+    auto* pointLight4 = PointLight::D3250();
+    // pointLight->diffuse = vec3(4, 4, 4);
+    // pointLight->quadratic = 0.000007;
+    lightSource->transform->translate(vec3(0, -3, 0));
+    cube->transform->setPosition(lightSource->transform->getPosition());
+
+    auto* redLightSource = Hierarchy::createGameObject();
+    auto* pointLight1 = PointLight::D3250();
+    pointLight1->diffuse = vec3(0.3, 0, 0);
+    redLightSource->transform->translate(vec3(0, -3, -20));
+
+    auto* blueLightSource = Hierarchy::createGameObject();
+    auto* pointLight2 = PointLight::D6();
+    pointLight2->diffuse = vec3(0, 0, 0.3);
+    blueLightSource->transform->translate(vec3(0, -3.5, -25));
+
+    Hierarchy::addComponent(lightSource, pointLight);
+    Hierarchy::addComponent(lightSource, pointLight3);
+    Hierarchy::addComponent(lightSource, pointLight4);
+
+    Hierarchy::addComponent(redLightSource, pointLight1);
+    Hierarchy::addComponent(blueLightSource, pointLight2);
+}
+
+// ===
 
 GameObject* createCurvedSurface(Loader* loader) {
     const vector<float> controlPoints = {
@@ -133,7 +213,7 @@ GameObject* createCurvedSurface(Loader* loader) {
 
     const Texture* patchDiffuseTexture = loader->loadTexture("textures/metal_art_diffuse.jpg");
     const Texture* patchSpecularTexture = loader->loadTexture("textures/metal_art_specular.jpg");
-    const Texture* patchNormalTexture = loader->loadTexture("textures/metal_art_specular.jpg");
+    const Texture* patchNormalTexture = loader->loadTexture("textures/metal_art_normal.jpg");
     const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture, *patchNormalTexture);
 
     auto* cubicPatch = new CubicPatch(controlPoints, patchMaterial);
@@ -168,7 +248,6 @@ GameObject* createCube(Loader* loader) {
     Transform* cubeTransform = Hierarchy::getTransform(cubeObject);
 
     cubeTransform->translate(vec3(0, -3, 0));
-    cubeTransform->scaleBy(vec3(100, 1, 100));
 
     return cubeObject;
 }

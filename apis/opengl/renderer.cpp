@@ -55,10 +55,10 @@ void Renderer::initScreenFrameBuffer() {
     glGenFramebuffers(1, &screenFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
     
-    glGenTextures(1, &textureColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+    glGenTextures(1, &colorBuffer);
+    glBindTexture(GL_TEXTURE_2D, colorBuffer);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
@@ -67,7 +67,7 @@ void Renderer::initScreenFrameBuffer() {
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
     
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
     
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -181,17 +181,17 @@ void Renderer::renderShadowMap() {
 }
 
 void Renderer::renderMeshes() {
-    DirectLight* light = currentScene->getDirectLights()[0];
-    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
-    mat4 lightPerspective = lightProjection * viewMatrix;
+    // DirectLight* light = currentScene->getDirectLights()[0];
+    // mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
+    // mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
+    // mat4 lightPerspective = lightProjection * viewMatrix;
 
     Camera* camera = currentScene->getCamera();
 
     cubicPatchShader.use();
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
     cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    cubicPatchShader.setMat4("lightPerspective", lightPerspective);
+    // cubicPatchShader.setMat4("lightPerspective", lightPerspective);
     cubicPatchShader.setTexture("shadowMap", shadowMap);
 
     setLights(&cubicPatchShader);
@@ -217,7 +217,7 @@ void Renderer::renderMeshes() {
     baseShader.use();
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
     baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    baseShader.setMat4("lightPerspective", lightPerspective);
+    // baseShader.setMat4("lightPerspective", lightPerspective);
     baseShader.setTexture("shadowMap", shadowMap);
 
     setLights(&baseShader);
@@ -248,7 +248,7 @@ void Renderer::renderCubeMap() {
 }
 
 void Renderer::render() {
-    renderShadowMap();
+    // renderShadowMap();
 
     glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
@@ -276,7 +276,7 @@ void Renderer::render() {
     // ===
 
     screenShader.use();
-    screenShader.setTexture("screenTexture", textureColorBuffer);
+    screenShader.setTexture("screenTexture", colorBuffer);
 
     glBindVertexArray(screenVAO);
 

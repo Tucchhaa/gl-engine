@@ -79,8 +79,6 @@ void main() {
         normalize(data.normal)
     );
 
-    //    vec3 _normal = normalize(normal);
-
     vec3 _normal = texture(material.normal, data.texCoord).rgb;
     _normal = normalize(_normal * 2.0 - 1.0);
     _normal = normalize(TBN * _normal);
@@ -89,9 +87,7 @@ void main() {
     
     vec3 result = vec3(0, 0, 0);
 
-    result += calculateDirectLight(directLights[0], _normal, cameraDir);
-
-    for(int i=1; i < DIRECT_LIGHTS_LENGTH; i++) {
+    for(int i=0; i < DIRECT_LIGHTS_LENGTH; i++) {
         result += calculateDirectLight(directLights[i], _normal, cameraDir);
     }
 
@@ -106,7 +102,7 @@ void main() {
     color = vec4(result, 1);
 //    color = texture(material.normal, data.texCoord);
 //    color = vec4((_normal + 1.0f) * 0.5f, 1);
-//    color = vec4((normalize(normal)+1.0f) * 0.5f, 1);
+//    color = vec4((normalize(data.normal)+1.0f) * 0.5f, 1);
 }
 
 float isFragLit(vec3 _normal, vec3 lightDir) {

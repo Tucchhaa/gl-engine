@@ -123,7 +123,7 @@ void Shader::setPointLight(uint index, const PointLight* lightSource) const {
     string _index = to_string(index);
     
     Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
-    
+
     setVec3("pointLights[" + _index + "].position", transform->getAbsolutePosition());
     
     setFloat("pointLights[" + _index + "].linear", lightSource->linear);
