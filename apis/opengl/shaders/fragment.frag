@@ -54,11 +54,13 @@ uniform sampler2D shadowMap;
 
 uniform vec3 cameraPos;
 
-in vec3 fragPos;
-in vec4 fragPosLightSpace;
-in vec3 normal;
-in vec2 texCoord;
-in vec3 tangent;
+in struct OUTPUT {
+    vec3 fragPos;
+    vec4 fragPosLightSpace;
+    vec3 normal;
+    vec3 tangent;
+    vec2 texCoord;
+} data;
 
 out vec4 color;
 
@@ -70,20 +72,20 @@ LightColors getLightingColors(LightColors lightColors);
 float calculateBlinnSpecularCoefficient(vec3 cameraDir, vec3 lightDir, vec3 normal);
 
 void main() {
-    vec3 bitangent = cross(normal, tangent);
+    vec3 bitangent = cross(data.normal, data.tangent);
     mat3 TBN = mat3(
-        normalize(tangent),
+        normalize(data.tangent),
         normalize(bitangent),
-        normalize(normal)
+        normalize(data.normal)
     );
 
     //    vec3 _normal = normalize(normal);
 
-    vec3 _normal = texture(material.normal, texCoord).rgb;
+    vec3 _normal = texture(material.normal, data.texCoord).rgb;
     _normal = normalize(_normal * 2.0 - 1.0);
     _normal = normalize(TBN * _normal);
 
-    vec3 cameraDir = normalize(cameraPos - fragPos);
+    vec3 cameraDir = normalize(cameraPos - data.fragPos);
     
     vec3 result = vec3(0, 0, 0);
 
@@ -94,21 +96,21 @@ void main() {
     }
 
     for(int i=0; i < POINT_LIGHTS_LENGTH; i++) {
-        result += calculatePointLight(pointLights[i], _normal, fragPos, cameraDir);
+        result += calculatePointLight(pointLights[i], _normal, data.fragPos, cameraDir);
     }
 
     for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
-        result += calculateSpotLight(spotLights[i], _normal, fragPos, cameraDir);
+        result += calculateSpotLight(spotLights[i], _normal, data.fragPos, cameraDir);
     }
     
     color = vec4(result, 1);
-//    color = texture(material.normal, texCoord);
+//    color = texture(material.normal, data.texCoord);
 //    color = vec4((_normal + 1.0f) * 0.5f, 1);
 //    color = vec4((normalize(normal)+1.0f) * 0.5f, 1);
 }
 
 float isFragLit(vec3 _normal, vec3 lightDir) {
-    vec3 coords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    vec3 coords = data.fragPosLightSpace.xyz / data.fragPosLightSpace.w;
     coords = coords * 0.5 + 0.5;
 
     float closestDepth = texture(shadowMap, coords.xy).r;
@@ -175,8 +177,8 @@ vec3 calculateSpotLight(SpotLight light, vec3 _normal, vec3 position, vec3 camer
 LightColors getLightingColors(LightColors lightColors) {
     LightColors result;
     
-    result.specular = vec3(texture(material.specular, texCoord)) * lightColors.specular;
-    result.diffuse  = vec3(texture(material.diffuse,  texCoord)) * lightColors.diffuse;
+    result.specular = vec3(texture(material.specular, data.texCoord)) * lightColors.specular;
+    result.diffuse  = vec3(texture(material.diffuse,  data.texCoord)) * lightColors.diffuse;
     result.ambient  = result.diffuse * lightColors.ambient;
     
     return result;

@@ -20,11 +20,13 @@ in mat4 Px[];
 in mat4 Py[];
 in mat4 Pz[];
 
-out vec2 texCoord;
-out vec3 normal;
-out vec3 fragPos;
-out vec4 fragPosLightSpace;
-out vec3 tangent;
+out struct OUTPUT {
+    vec3 fragPos;
+    vec4 fragPosLightSpace;
+    vec3 normal;
+    vec3 tangent;
+    vec2 texCoord;
+} data;
 
 void main()
 {
@@ -50,10 +52,14 @@ void main()
     vec3 dPdu = vec3(dot(dU, BPxBT * V), dot(dU, BPyBT * V), dot(dU, BPzBT * V));
     vec3 dPdv = vec3(dot(U, BPxBT * dV), dot(U, BPyBT * dV), dot(U, BPzBT * dV));
 
+    // === Output ===
     gl_Position = perspective * worldPos;
-    fragPos = worldPos.xyz;
-    fragPosLightSpace = lightPerspective * worldPos;
-    texCoord = gl_TessCoord.xy;
-    normal = normalTransform * cross(dPdv, dPdu);
-    tangent = normalTransform * normalize(dPdu);
+
+    data.fragPos = worldPos.xyz;
+    data.fragPosLightSpace = lightPerspective * worldPos;
+
+    data.normal = normalTransform * cross(dPdv, dPdu);
+    data.tangent = normalTransform * normalize(dPdu);
+
+    data.texCoord = gl_TessCoord.xy;
 }
