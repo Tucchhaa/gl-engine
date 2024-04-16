@@ -119,7 +119,7 @@ GameObject* Loader::ModelParser::parse(const aiScene* scene) {
     return result;
 }
 
-GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, aiNode* node) {
+GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, const aiNode* node) {
     auto* result = Hierarchy::createGameObject();
 
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -144,7 +144,6 @@ Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
 
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    Material material;
 
     // Vertices
     for (int i = 0; i < mesh->mNumVertices; i++) {
@@ -164,40 +163,29 @@ Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
 
     // Indices
     for (int i = 0; i < mesh->mNumFaces; i++) {
-        aiFace face = mesh->mFaces[i];
+        const aiFace face = mesh->mFaces[i];
 
         for (int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
 
     // Material
-    if (mesh->mMaterialIndex >= 0) {
-        material = materials[(int)mesh->mMaterialIndex];
-    }
+    const Material material = materials[static_cast<int>(mesh->mMaterialIndex)];
 
     return new Mesh(vertices, indices, material);
 }
 
-Material Loader::ModelParser::processMaterial(aiMaterial* material) {
+Material Loader::ModelParser::processMaterial(const aiMaterial* material) const {
     Material result;
 
     result.diffuseTextures = loadTexturesByType(material, aiTextureType_DIFFUSE);
     result.specularTextures = loadTexturesByType(material, aiTextureType_SPECULAR);
     result.normalTextures = loadTexturesByType(material, aiTextureType_HEIGHT);
 
-    // TODO: refactor
-    if(result.isEmpty()) {
-        result = Material(
-            *loader->loadTexture("textures/default_specular.jpeg", TEXTURE_2D_OPTIONS_REPEAT),
-            *loader->loadTexture("textures/default_diffuse.jpeg", TEXTURE_2D_OPTIONS_REPEAT),
-            *loader->loadTexture("textures/default_normal.png", TEXTURE_2D_OPTIONS_REPEAT)
-        );
-    }
-
     return result;
 }
 
-vector<Texture> Loader::ModelParser::loadTexturesByType(aiMaterial* material, aiTextureType type) {
+vector<Texture> Loader::ModelParser::loadTexturesByType(const aiMaterial* material, const aiTextureType type) const {
     vector<Texture> textures;
 
     for(int i = 0; i < material->GetTextureCount(type); i++)
@@ -212,14 +200,34 @@ vector<Texture> Loader::ModelParser::loadTexturesByType(aiMaterial* material, ai
         textures.emplace_back(texture);
     }
 
+    if(textures.empty()) {
+        string path = getDefaultTexturePath(type);
+        Texture texture = *loader->loadTexture(path.c_str());
+
+        textures.emplace_back(texture);
+    }
+
     return textures;
+}
+
+string Loader::ModelParser::getDefaultTexturePath(const aiTextureType type) {
+    switch (type) {
+        case aiTextureType_DIFFUSE:
+            return "textures/default_diffuse.jpeg";
+        case aiTextureType_SPECULAR:
+            return "textures/default_specular.jpeg";
+        case aiTextureType_HEIGHT:
+            return "textures/default_normal.jpeg";
+        default:
+            throw runtime_error("Can not load default texture");
+    }
 }
 
 // ===
 // Loader private methods
 // ===
 
-TextureFormat Loader::getTextureFormat(int nrChannels) {
+TextureFormat Loader::getTextureFormat(const int nrChannels) {
     if (nrChannels == 1)
         return TEXTURE_FORMAT_R;
     if (nrChannels == 3)

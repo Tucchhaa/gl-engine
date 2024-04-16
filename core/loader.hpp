@@ -58,12 +58,14 @@ private:
         GameObject* parse(const aiScene* scene);
 
     private:
-        GameObject* parseNodeToGameObject(const aiScene* scene, aiNode* node);
+        GameObject* parseNodeToGameObject(const aiScene* scene, const aiNode* node);
 
         Mesh* processMesh(const aiScene* scene, aiMesh* mesh);
 
-        Material processMaterial(aiMaterial* material);
+        Material processMaterial(const aiMaterial* material) const;
 
-        vector<Texture> loadTexturesByType(aiMaterial* material, aiTextureType type);
+        vector<Texture> loadTexturesByType(const aiMaterial* material, aiTextureType type) const;
+
+        static string getDefaultTexturePath(aiTextureType type) ;
     };
 };

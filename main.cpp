@@ -29,7 +29,7 @@ int main() {
     // GameObject* terrainObject = createTerrain(&loader);
     // GameObject* cubicPatchObject = createCurvedSurface(&loader);
     GameObject* backpackObject = createBackpack(&loader);
-    // GameObject* cubeObject = createCube(&loader);
+    GameObject* cubeObject = createCube(&loader);
     GameObject* cameraObject = createCamera(&loader);
 
     Camera* camera = Hierarchy::Components<Camera>::get(cameraObject);

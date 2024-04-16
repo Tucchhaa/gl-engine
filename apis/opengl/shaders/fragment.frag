@@ -58,7 +58,7 @@ in vec3 fragPos;
 in vec4 fragPosLightSpace;
 in vec3 normal;
 in vec2 texCoord;
-in mat3 TBN;
+in vec3 tangent;
 
 out vec4 color;
 
@@ -70,7 +70,14 @@ LightColors getLightingColors(LightColors lightColors);
 float calculateBlinnSpecularCoefficient(vec3 cameraDir, vec3 lightDir, vec3 normal);
 
 void main() {
-//    vec3 _normal = normalize(normal);
+    vec3 bitangent = cross(normal, tangent);
+    mat3 TBN = mat3(
+        normalize(tangent),
+        normalize(bitangent),
+        normalize(normal)
+    );
+
+    //    vec3 _normal = normalize(normal);
 
     vec3 _normal = texture(material.normal, texCoord).rgb;
     _normal = normalize(_normal * 2.0 - 1.0);
@@ -96,7 +103,8 @@ void main() {
     
     color = vec4(result, 1);
 //    color = texture(material.normal, texCoord);
-//    color = vec4(_normal, 1);
+//    color = vec4((_normal + 1.0f) * 0.5f, 1);
+//    color = vec4((normalize(normal)+1.0f) * 0.5f, 1);
 }
 
 float isFragLit(vec3 _normal, vec3 lightDir) {

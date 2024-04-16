@@ -72,8 +72,8 @@ private:
 
 private:
     // == TEMP ===
-    const int SHADOW_WIDTH = 4096;
-    const int SHADOW_HEIGHT = 4096;
+    const int SHADOW_WIDTH = 2048;
+    const int SHADOW_HEIGHT = 2048;
 
     unsigned int shadowMapFBO;
 
