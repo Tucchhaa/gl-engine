@@ -6,28 +6,27 @@
 
 #include <OpenGL/gl3.h>
 
+#include "../base/irender-object.hpp"
+
 #include "../../core/game-object/components/mesh.hpp"
 #include "../../core/game-object/components/cubic-patch.hpp"
 #include "../../core/game-object/components/terrain.hpp"
 
 using namespace std;
 
-class RenderObject {
+class RenderObject : public IRenderObject {
 private:
+    unsigned int VAO = 0;
     unsigned int VBO = 0;
     unsigned int EBO = 0;
 
-    IMesh* mesh;
 public:
+    explicit RenderObject(IMesh* mesh);
 
-    unsigned int VAO = 0;
+    // template<typename T>
+    // T* getMesh();
 
-    RenderObject(IMesh* mesh);
-
-    template<typename T>
-    T* getMesh();
-
-    void render();
+    void render() override;
 
 private:
     void setup();

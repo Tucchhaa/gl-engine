@@ -1,15 +1,13 @@
 #include "render-object.hpp"
 
-RenderObject::RenderObject(IMesh* mesh) {
-    this->mesh = mesh;
-
+RenderObject::RenderObject(IMesh* mesh): IRenderObject(mesh) {
     setup();
 }
 
-template<typename T>
-T* RenderObject::getMesh() {
-    return dynamic_cast<T*>(mesh);
-}
+// template<typename T>
+// T* RenderObject::getMesh() {
+//     return dynamic_cast<T*>(mesh);
+// }
 
 void RenderObject::render() {
     glBindVertexArray(VAO);

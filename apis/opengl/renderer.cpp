@@ -61,7 +61,7 @@ void Renderer::initScreenFrameBuffer() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
+
     unsigned int RBO;
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
@@ -111,30 +111,26 @@ void Renderer::initScreenVAO() {
 }
 
 void Renderer::setScene(Scene *scene) {
-    currentScene = scene;
+    IRenderer::setScene(scene);
+
     vector<Mesh*> meshes = scene->getMeshes();
     vector<Terrain*> terrains = scene->getTerrains();
     vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
 
     for(Mesh* mesh: meshes) {
-        auto object = RenderObject(mesh);
+        auto* object = new RenderObject(mesh);
         this->meshes.push_back(object);
     }
 
     for(Terrain* terrain: terrains) {
-        auto object = RenderObject(terrain);
+        auto* object = new RenderObject(terrain);
         this->terrains.push_back(object);
     }
 
     for(CubicPatch* cubicPatch: cubicPatches) {
-        auto object = RenderObject(cubicPatch);
+        auto* object = new RenderObject(cubicPatch);
         this->cubicPatches.push_back(object);
     }
-}
-
-void Renderer::setScreenSize(const int width, const int height) {
-    screenWidth = width;
-    screenHeight = height;
 }
 
 void Renderer::renderShadowMap() {
@@ -165,16 +161,12 @@ void Renderer::renderShadowMap() {
     depthShader.setMat4("perspective", perspective);
 
     for(auto &meshData : meshes) {
-        Mesh* mesh = meshData.getMesh<Mesh>();
+        Mesh* mesh = meshData->getMesh<Mesh>();
         Transform* transform = Hierarchy::getTransform(mesh);
 
         depthShader.setMat4("transform", transform->getTransformMatrix());
 
-        glBindVertexArray(meshData.VAO);
-
-        glDrawElements(GL_TRIANGLES, static_cast<int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
+        meshData->render();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -196,8 +188,8 @@ void Renderer::renderMeshes() {
 
     setLights(&cubicPatchShader);
 
-    for(auto &cubicPatch : cubicPatches) {
-        drawCubicPatch(&cubicPatch);
+    for(auto* cubicPatch : cubicPatches) {
+        drawCubicPatch(cubicPatch);
     }
 
     // draw terrain
@@ -205,8 +197,8 @@ void Renderer::renderMeshes() {
     terrainShader.setMat4("perspective", camera->getViewProjectionMatrix());
     terrainShader.setMat4("rotationMatrix", camera->getViewMatrix());
 
-    for(auto &terrain: terrains) {
-        drawTerrain(&terrain);
+    for(auto* terrain: terrains) {
+        drawTerrain(terrain);
     }
 
     glEnable(GL_CULL_FACE);
@@ -222,8 +214,8 @@ void Renderer::renderMeshes() {
 
     setLights(&baseShader);
 
-    for(auto mesh : meshes) {
-        drawMesh(&mesh);
+    for(auto* mesh : meshes) {
+        drawMesh(mesh);
     }
 }
 
@@ -284,7 +276,7 @@ void Renderer::render() {
     glCheckError();
 }
 
-void Renderer::setLights(Shader* shader) {
+void Renderer::setLights(const Shader* shader) const {
     // TODO: size of lights exceed 5 then shader will not work
 
     for(int i=0; i < currentScene->getSpotLights().size(); i++) {
@@ -300,7 +292,7 @@ void Renderer::setLights(Shader* shader) {
     }
 }
 
-void Renderer::drawMesh(RenderObject* object) {
+void Renderer::drawMesh(IRenderObject* object) {
     const Mesh* mesh = object->getMesh<Mesh>();
     const Transform* transform = Hierarchy::getTransform(mesh);
 
@@ -312,18 +304,18 @@ void Renderer::drawMesh(RenderObject* object) {
     object->render();
 }
 
-void Renderer::drawTerrain(RenderObject* object) {
-    Terrain* terrain = object->getMesh<Terrain>();
-    unsigned int heightMapTextureId = ResourceManager::getTextureId(terrain->getTexture());
+void Renderer::drawTerrain(IRenderObject* object) {
+    auto* terrain = object->getMesh<Terrain>();
+    const unsigned int heightMapTextureId = ResourceManager::getTextureId(terrain->getTexture());
 
     terrainShader.setTexture("heightMap", heightMapTextureId);
 
     object->render();
 }
 
-void Renderer::drawCubicPatch(RenderObject* object) {
-    CubicPatch* patch = object->getMesh<CubicPatch>();
-    Transform* transform = Hierarchy::getTransform(patch);
+void Renderer::drawCubicPatch(IRenderObject* object) {
+    auto* patch = object->getMesh<CubicPatch>();
+    const Transform* transform = Hierarchy::getTransform(patch);
 
     cubicPatchShader.setMat4("transform", transform->getTransformMatrix());
     cubicPatchShader.setMat3("normalTransform", transform->getNormalMatrix());

@@ -19,18 +19,6 @@
 using namespace std;
 
 class Renderer : public IRenderer {
-private:
-    Scene* currentScene;
-
-    vector<RenderObject> meshes;
-
-    vector<RenderObject> terrains;
-
-    vector<RenderObject> cubicPatches;
-    
-    int screenWidth = 2000;
-    int screenHeight = 1600;
-
 public:
     Renderer();
     
@@ -43,8 +31,6 @@ public:
     void setScene(Scene* scene) override;
     
     void render() override;
-    
-    void setScreenSize(int width, int height) override;
     
 private:
     Shader baseShader;
@@ -89,12 +75,12 @@ private:
     
     void initScreenVAO();
 
-    void setLights(Shader* shader);
+    void setLights(const Shader* shader) const;
 
-    void drawMesh(RenderObject* object);
+    void drawMesh(IRenderObject* object);
 
-    void drawTerrain(RenderObject* object);
+    void drawTerrain(IRenderObject* object);
 
-    void drawCubicPatch(RenderObject* object);
+    void drawCubicPatch(IRenderObject* object);
 };
 

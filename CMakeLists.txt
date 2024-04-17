@@ -20,10 +20,13 @@ endif ()
 
 add_executable(gl_engine
         # base
-        apis/base/iwindow.hpp
         apis/base/irenderer.hpp
+        apis/base/irenderer.cpp
+
+        apis/base/iwindow.hpp
         apis/base/iresource-manager.hpp
         apis/base/iinput.hpp
+        apis/base/irender-object.hpp
 
         # apis/opengl
         apis/opengl/include.hpp
@@ -49,6 +52,9 @@ add_executable(gl_engine
         apis/opengl/render-object.cpp
         apis/opengl/render-object.hpp
 
+        apis/opengl/deferred-renderer.cpp
+        apis/opengl/deferred-renderer.hpp
+
         # core
         core/include.hpp
 
@@ -60,6 +66,8 @@ add_executable(gl_engine
 
         core/loader.cpp
         core/loader.hpp
+
+        core/imesh.hpp
 
         # core/game-object
         core/game-object/components/lights/light.cpp
@@ -110,5 +118,4 @@ add_executable(gl_engine
 
         # other
         main.cpp
-        core/imesh.hpp
 )
