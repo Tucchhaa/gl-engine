@@ -24,7 +24,8 @@ void main() {
     
     vec4 color = texture(screenTexture, texCoords);
 
-    outputColor = vec4(exposureToneMapping(color.rgb, 5.0), 1);
+//    outputColor = vec4(exposureToneMapping(color.rgb, 5.0), 1);
+    outputColor = color;
 }
 
 // === Tone mapping ===

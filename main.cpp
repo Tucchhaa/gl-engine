@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
@@ -24,6 +25,10 @@ int backpackId;
 TODO: optimizations
 1) Skybox - no need to render it for pixel
 2) Normal mapping - use tangent space
+
+Features:
+1) Bloom
+
  */
 int main() {
     IWindow* window = new Window();
@@ -46,8 +51,8 @@ int main() {
 
     // ===
 
-    // setupDefaultScene(&loader);
-    setupTunnelScene(&loader);
+    setupDefaultScene(&loader);
+    // setupTunnelScene(&loader);
 
     // Transform* backpackTransform = Hierarchy::getGameObject(backpackId)->transform;
 
@@ -60,9 +65,21 @@ int main() {
 
     float speed = 15.0f;
     float rotationSpeed = 1.0f;
+    int frameCnt = 0;
+    time_t lastTime = time(nullptr);
 
     while (window->isOpen())
     {
+        frameCnt++;
+
+        time_t now = time(nullptr);
+        time_t diff = difftime(now, lastTime);
+        if(diff >= 1) {
+            cout << "FPS: " << frameCnt << endl;
+            frameCnt = 0;
+            lastTime = now;
+        }
+
         // = Input =
         input->process();
 

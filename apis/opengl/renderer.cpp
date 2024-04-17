@@ -181,17 +181,17 @@ void Renderer::renderShadowMap() {
 }
 
 void Renderer::renderMeshes() {
-    // DirectLight* light = currentScene->getDirectLights()[0];
-    // mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-    // mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
-    // mat4 lightPerspective = lightProjection * viewMatrix;
+    DirectLight* light = currentScene->getDirectLights()[0];
+    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
+    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
+    mat4 lightPerspective = lightProjection * viewMatrix;
 
     Camera* camera = currentScene->getCamera();
 
     cubicPatchShader.use();
     cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
     cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    // cubicPatchShader.setMat4("lightPerspective", lightPerspective);
+    cubicPatchShader.setMat4("lightPerspective", lightPerspective);
     cubicPatchShader.setTexture("shadowMap", shadowMap);
 
     setLights(&cubicPatchShader);
@@ -217,7 +217,7 @@ void Renderer::renderMeshes() {
     baseShader.use();
     baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
     baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    // baseShader.setMat4("lightPerspective", lightPerspective);
+    baseShader.setMat4("lightPerspective", lightPerspective);
     baseShader.setTexture("shadowMap", shadowMap);
 
     setLights(&baseShader);
@@ -248,7 +248,7 @@ void Renderer::renderCubeMap() {
 }
 
 void Renderer::render() {
-    // renderShadowMap();
+    renderShadowMap();
 
     glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
