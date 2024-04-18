@@ -23,8 +23,9 @@ void main() {
 
     data.fragPos = worldPos.xyz;
 
-    data.normal = normalTransform * _normal;
-    data.tangent = normalTransform * _tangent;
+    // Don't need to multiply by transform matrix, because normal matrix has rotation and scale
+    data.normal  = vec3(normalTransform * _normal);
+    data.tangent = vec3(normalTransform * _tangent);
 
     data.texCoord = _texCoord;
 }

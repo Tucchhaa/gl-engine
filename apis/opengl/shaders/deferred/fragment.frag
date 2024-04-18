@@ -18,9 +18,27 @@ in struct OUTPUT {
     vec2 texCoord;
 } data;
 
+vec3 calculateNormal();
+
 void main() {
     gPosition = data.fragPos;
-    gNormal = normalize(data.normal);
+    gNormal = calculateNormal();
+
     gAlbedoSpec.rgb = texture(material.diffuse, data.texCoord).rgb;
     gAlbedoSpec.a = texture(material.specular, data.texCoord).r;
+}
+
+vec3 calculateNormal() {
+    vec3 normal = normalize(data.normal);
+    vec3 tangent = normalize(data.tangent);
+    vec3 bitangent = cross(normal, tangent);
+
+    mat3 TBN = mat3(tangent, bitangent, normal);
+    vec3 normalMap = texture(material.normal, data.texCoord).rgb;
+
+    normalMap = normalize(normalMap * 2.0 - 1.0);
+
+    vec3 result = normalize(TBN * normalMap);
+
+    return result;
 }
