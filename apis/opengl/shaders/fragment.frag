@@ -1,7 +1,7 @@
 #version 410 core
 
 #define DIRECT_LIGHTS_LENGTH 5
-#define POINT_LIGHTS_LENGTH 5
+#define POINT_LIGHTS_LENGTH 105
 #define SPOT_LIGHTS_LENGTH 5
 
 struct LightColors {
@@ -87,17 +87,17 @@ void main() {
     
     vec3 result = vec3(0, 0, 0);
 
-    for(int i=0; i < DIRECT_LIGHTS_LENGTH; i++) {
-        result += calculateDirectLight(directLights[i], _normal, cameraDir);
-    }
+//    for(int i=0; i < DIRECT_LIGHTS_LENGTH; i++) {
+//        result += calculateDirectLight(directLights[i], _normal, cameraDir);
+//    }
 
     for(int i=0; i < POINT_LIGHTS_LENGTH; i++) {
         result += calculatePointLight(pointLights[i], _normal, data.fragPos, cameraDir);
     }
 
-    for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
-        result += calculateSpotLight(spotLights[i], _normal, data.fragPos, cameraDir);
-    }
+//    for(int i=0; i < SPOT_LIGHTS_LENGTH; i++) {
+//        result += calculateSpotLight(spotLights[i], _normal, data.fragPos, cameraDir);
+//    }
     
     color = vec4(result, 1);
 //    color = texture(material.normal, data.texCoord);

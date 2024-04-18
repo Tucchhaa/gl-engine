@@ -6,8 +6,8 @@
 
 class IRenderer {
 protected:
-    int screenWidth = 2000;
-    int screenHeight = 1600;
+    int screenWidth = 2560;
+    int screenHeight = 1440;
 
     Scene* currentScene = nullptr;
 

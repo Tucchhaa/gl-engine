@@ -42,10 +42,13 @@ public:
 
     void deleteShader() const;
 
-    int getLocation(const string& name) const;
-
 private:
     int texturesCount = 0;
+
+    /**
+     * First: Slot, second: texutreId
+     */
+    vector<pair<unsigned int, unsigned int>> reservedTextureSlots;
 
 // ==
 // Primitive setters
@@ -62,11 +65,19 @@ public:
 
 public:
     // ===
-    // Material
+    // Textures
     // ===
 
     void setTexture(const string& name, unsigned int textureId);
-    void setTexture(const string& name, unsigned int textureId, int slot);
+    void setTexture(const string& name, unsigned int textureId, int slot) const;
+
+    int addFrameTexture(unsigned int textureId);
+
+    void activateFrameTextures() const;
+
+    // ===
+    // Material
+    // ===
 
     void setMaterial(const Material* material);
 
@@ -85,4 +96,10 @@ private:
     string readShader(const string& filepath);
     uint compileShader(uint type, string& code);
     uint createShaderProgram(vector<const string*> shaderFiles);
+
+// ===
+// Private methods
+// ===
+private:
+    int getLocation(const string& name) const;
 };

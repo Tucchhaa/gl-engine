@@ -6,8 +6,8 @@
 
 using namespace std;
 
-constexpr int SCREEN_WIDTH = 1000;
-constexpr int SCREEN_HEIGHT = 800;
+constexpr int SCREEN_WIDTH = 1280;
+constexpr int SCREEN_HEIGHT = 720;
 
 GameObject* createCurvedSurface(Loader* loader);
 GameObject* createTerrain(Loader* loader);
@@ -16,10 +16,11 @@ GameObject* createCube(Loader* loader);
 GameObject* createCamera(Loader* loader);
 
 void setupDefaultScene(Loader* loader);
-
 void setupTunnelScene(Loader* loader);
+void setupManyLightsScene(Loader* loader);
 
 int backpackId;
+vector<pair<GameObject*, vec3>> lightTranslate;
 
 /*
 TODO: optimizations
@@ -36,7 +37,8 @@ int main() {
 
     auto* input = new Input(window);
     IResourceManager* resourceManager = &ResourceManager::getInstance();
-    IRenderer* renderer = new Renderer();
+    // IRenderer* renderer = new Renderer();
+    IRenderer* renderer = new DeferredRenderer();
 
     Loader loader(resourceManager);
     Scene scene;
@@ -51,8 +53,9 @@ int main() {
 
     // ===
 
-    setupDefaultScene(&loader);
+    // setupDefaultScene(&loader);
     // setupTunnelScene(&loader);
+    setupManyLightsScene(&loader);
 
     // Transform* backpackTransform = Hierarchy::getGameObject(backpackId)->transform;
 
@@ -97,7 +100,20 @@ int main() {
         // backpackTransform->rotate(quat(vec3(0, radians(0.05f), 0)));
         // Hierarchy::updateTransformTree(backpackTransform);
 
-        Hierarchy::updateTransformTree(cameraTransform);
+        for(int i=0; i < lightTranslate.size(); i++) {
+            GameObject* lightSource = lightTranslate[i].first;
+            vec3 direction = lightTranslate[i].second;
+
+            Transform* lightTransform = lightSource->transform;
+            lightTransform->translate(direction * 10.0f * input->getDeltaTime());
+
+            if(lightTransform->getPosition().x > 80 || lightTransform->getPosition().x < -80 ||
+               lightTransform->getPosition().z > 80 || lightTransform->getPosition().z < -80) {
+                lightTranslate[i].second = -lightTranslate[i].second;
+            }
+        }
+
+        Hierarchy::updateTransformTree();
 
         renderer->render();
 
@@ -123,7 +139,7 @@ void setupDefaultScene(Loader* loader) {
     auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = Hierarchy::getTransform(lightSource);
-    lightTransform->translate(vec3(-10, 20, -50));
+    lightTransform->translate(vec3(0, 20, 0));
     lightTransform->rotate(vec3(0, radians(180.0), 0));
     lightTransform->rotate(vec3(radians(-30.0), 0, 0));
 
@@ -131,7 +147,7 @@ void setupDefaultScene(Loader* loader) {
     PointLight* pointLight0 = PointLight::D3250();
 
     Hierarchy::addComponent(lightSource, directLight0);
-    //    Hierarchy::addComponent(lightSource, pointLight0);
+    Hierarchy::addComponent(lightSource, pointLight0);
 
     // = Flashlight =
     // auto* flashlight = Hierarchy::createGameObject();
@@ -163,8 +179,8 @@ void setupTunnelScene(Loader* loader) {
     backCube->transform->translate(vec3(0, 0, 5));
 
     // TODO: rotate cubes because of the bug
-    leftCube->transform->rotate(vec3(0, 0, radians(180.0f)));
-    bottomCube->transform->rotate(vec3(0, 0, radians(180.0f)));
+    // leftCube->transform->rotate(vec3(0, 0, radians(180.0f)));
+    // bottomCube->transform->rotate(vec3(0, 0, radians(180.0f)));
 
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
@@ -192,6 +208,51 @@ void setupTunnelScene(Loader* loader) {
 
     Hierarchy::addComponent(redLightSource, pointLight1);
     Hierarchy::addComponent(blueLightSource, pointLight2);
+}
+
+void setupManyLightsScene(Loader* loader) {
+    srand(time(nullptr));
+
+    const int N = 20;
+    const int LIGHTS_NUM = 100;
+
+    float distance = 4.0f;
+
+    for(int i=-N; i < N; i++) {
+        for(int j=-N; j < N; j++) {
+            GameObject* cube = createCube(loader);
+
+            cube->transform->setPosition(vec3(distance * i, 0, distance * j));
+        }
+    }
+
+    GameObject* lights = Hierarchy::createGameObject();
+
+    // Hierarchy::addComponent(lights, PointLight::D3250());
+
+    for(int i=0; i < LIGHTS_NUM; i++) {
+        GameObject* lightSource = Hierarchy::createGameObject();
+        PointLight* pointLight = PointLight::D100();
+
+        float x = N * distance * ((float)rand()/RAND_MAX * 2 - 1);
+        float z = N * distance * ((float)rand()/RAND_MAX * 2 - 1);
+
+        float r = (float)rand()/RAND_MAX;
+        float b = (float)rand()/RAND_MAX;
+        float g = (float)rand()/RAND_MAX;
+
+        // cout << x << " " << z << endl;
+
+        pointLight->diffuse = vec3(r, g, b);
+        pointLight->ambient = vec3(0, 0, 0);
+
+        lightSource->transform->setPosition(vec3(x, 2.5, z));
+
+        lightTranslate.emplace_back(lightSource, vec3(r, 0, b));
+
+        Hierarchy::addComponent(lightSource, pointLight);
+        Hierarchy::setParent(lights, lightSource);
+    }
 }
 
 // ===
