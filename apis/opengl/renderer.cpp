@@ -2,13 +2,15 @@
 
 #include "gl-check-error.hpp"
 
+const string shaderDir = "forward/";
+
 Renderer::Renderer() :
-    baseShader("vertex.vert", "fragment.frag"),
-    depthShader("depth-vertex.vert", "depth-fragment.frag"),
-    screenShader("screen-vertex.vert", "screen-fragment.frag"),
-    skyboxShader("skybox-vertex.vert", "skybox-fragment.frag"),
-    terrainShader("terrain-vertex.vert", "terrain-fragment.frag", "terrain-tess-control.tesc", "terrain-tess-eval.tese"),
-    cubicPatchShader("cubic-vertex.vert", "fragment.frag", "cubic-tess-control.tesc", "cubic-tess-eval.tese")
+    baseShader(shaderDir+"vertex.vert", shaderDir+"fragment.frag"),
+    depthShader(shaderDir+"depth-vertex.vert", shaderDir+"depth-fragment.frag"),
+    screenShader(shaderDir+"screen-vertex.vert", shaderDir+"screen-fragment.frag"),
+    skyboxShader(shaderDir+"skybox-vertex.vert", shaderDir+"skybox-fragment.frag"),
+    terrainShader(shaderDir+"terrain-vertex.vert", shaderDir+"terrain-fragment.frag", shaderDir+"terrain-tess-control.tesc", shaderDir+"terrain-tess-eval.tese"),
+    cubicPatchShader(shaderDir+"cubic-vertex.vert", shaderDir+"fragment.frag", shaderDir+"cubic-tess-control.tesc", shaderDir+"cubic-tess-eval.tese")
 {
     initScreenFrameBuffer();
     initScreenVAO();
