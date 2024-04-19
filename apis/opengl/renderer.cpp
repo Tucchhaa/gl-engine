@@ -1,3 +1,5 @@
+// WARNING: Obsolote file
+
 #include "renderer.hpp"
 
 #include "gl-check-error.hpp"

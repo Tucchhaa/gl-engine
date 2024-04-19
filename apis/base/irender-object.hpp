@@ -2,6 +2,10 @@
 
 #include "../../core/imesh.hpp"
 
+#include "../../core/game-object/components/mesh.hpp"
+#include "../../core/game-object/components/cubic-patch.hpp"
+#include "../../core/game-object/components/terrain.hpp"
+
 class IRenderObject {
 protected:
     IMesh* mesh;
@@ -18,3 +22,7 @@ public:
         return dynamic_cast<T*>(mesh);
     }
 };
+
+template Mesh* IRenderObject::getMesh<Mesh>();
+template CubicPatch* IRenderObject::getMesh<CubicPatch>();
+template Terrain* IRenderObject::getMesh<Terrain>();

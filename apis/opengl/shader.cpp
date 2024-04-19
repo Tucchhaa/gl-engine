@@ -124,20 +124,17 @@ void Shader::setDirectLight(uint index, const DirectLight* lightSource) const {
     setVec3("directLights[" + _index + "].colors.specular", lightSource->specular);
 }
 
-void Shader::setPointLight(uint index, const PointLight* lightSource) const {
-    string _index = to_string(index);
-    
-    Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
-    vec3 pos = transform->getAbsolutePosition();
+void Shader::setPointLight(const string& name, const PointLight* lightSource) const {
+    const Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
 
-    setVec3("pointLights[" + _index + "].position", transform->getAbsolutePosition());
-    
-    setFloat("pointLights[" + _index + "].linear", lightSource->linear);
-    setFloat("pointLights[" + _index + "].quadratic", lightSource->quadratic);
-    
-    setVec3("pointLights[" + _index + "].colors.ambient",  lightSource->ambient);
-    setVec3("pointLights[" + _index + "].colors.diffuse",  lightSource->diffuse);
-    setVec3("pointLights[" + _index + "].colors.specular", lightSource->specular);
+    setVec3(name + ".position", transform->getAbsolutePosition());
+
+    setFloat(name + ".linear", lightSource->linear);
+    setFloat(name + ".quadratic", lightSource->quadratic);
+
+    setVec3(name + ".colors.ambient",  lightSource->ambient);
+    setVec3(name + ".colors.diffuse",  lightSource->diffuse);
+    setVec3(name + ".colors.specular", lightSource->specular);
 }
 
 void Shader::setSpotLight(uint index, const SpotLight* lightSource) const {

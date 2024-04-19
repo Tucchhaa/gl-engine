@@ -29,9 +29,9 @@ public:
     Camera(float fov, float near, float far);
     
 public:
-    mat4 getViewMatrix(bool needTranslation = true);
+    mat4 getViewMatrix(bool needTranslation = true) const;
 
-    mat4 getViewProjectionMatrix(bool needTranslation = true);
+    mat4 getViewProjectionMatrix(bool needTranslation = true) const;
     
-    void setScreenSizes(float screenWidth, float screenHeight);
+    void setScreenSizes(int screenWidth, int screenHeight);
 };

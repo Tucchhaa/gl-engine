@@ -162,7 +162,7 @@ void ResourceManager::handleCubeMap(const Texture* texture) {
 }
 
 void ResourceManager::handleModel(const string &path) {
-
+    // TODO: maybe call this method when load model? Initialize render object here
 }
 
 // ===

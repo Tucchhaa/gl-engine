@@ -8,10 +8,6 @@
 
 #include "../base/irender-object.hpp"
 
-#include "../../core/game-object/components/mesh.hpp"
-#include "../../core/game-object/components/cubic-patch.hpp"
-#include "../../core/game-object/components/terrain.hpp"
-
 using namespace std;
 
 class RenderObject : public IRenderObject {
@@ -22,9 +18,6 @@ private:
 
 public:
     explicit RenderObject(IMesh* mesh);
-
-    // template<typename T>
-    // T* getMesh();
 
     void render() override;
 

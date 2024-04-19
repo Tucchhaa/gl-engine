@@ -40,8 +40,8 @@ add_executable(gl_engine
         apis/opengl/input.cpp
         apis/opengl/input.hpp
 
-        apis/opengl/renderer.cpp
-        apis/opengl/renderer.hpp
+#        apis/opengl/renderer.cpp
+#        apis/opengl/renderer.hpp
 
         apis/opengl/shader.cpp
         apis/opengl/shader.hpp

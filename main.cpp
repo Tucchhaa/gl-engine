@@ -26,10 +26,20 @@ vector<pair<GameObject*, vec3>> lightTranslate;
 TODO: optimizations
 1) Skybox - no need to render it for pixel
 2) Normal mapping - use tangent space
+3) Light volumes
+4) reconstruct position from depth
+5) do not unbind textures in different shaders
 
 Features:
 1) Bloom
+2) Scene events
+3) Deferred + Forward renderings for transparency
 
+Other:
+rename shaders: fragment.frag -> scene.frag, screen-fragment.frag -> screen.frag
+check for memory leaks
+move game-object to /core
+move #include to cpp files if possible
  */
 int main() {
     IWindow* window = new Window();
@@ -57,7 +67,7 @@ int main() {
     // setupTunnelScene(&loader);
     setupManyLightsScene(&loader);
 
-    // Transform* backpackTransform = Hierarchy::getGameObject(backpackId)->transform;
+    Transform* backpackTransform = Hierarchy::getGameObject(backpackId)->transform;
 
     // ===
 
@@ -107,9 +117,11 @@ int main() {
             Transform* lightTransform = lightSource->transform;
             lightTransform->translate(direction * 10.0f * input->getDeltaTime());
 
-            if(lightTransform->getPosition().x > 80 || lightTransform->getPosition().x < -80 ||
-               lightTransform->getPosition().z > 80 || lightTransform->getPosition().z < -80) {
-                lightTranslate[i].second = -lightTranslate[i].second;
+            if(lightTransform->getPosition().x > 80 || lightTransform->getPosition().x < -80) {
+                lightTranslate[i].second.x *= -1;
+            }
+            if(lightTransform->getPosition().z > 80 || lightTransform->getPosition().z < -80) {
+                lightTranslate[i].second.z *= -1;
             }
         }
 
@@ -214,7 +226,7 @@ void setupManyLightsScene(Loader* loader) {
     srand(time(nullptr));
 
     const int N = 20;
-    const int LIGHTS_NUM = 100;
+    const int LIGHTS_NUM = 200;
 
     float distance = 4.0f;
 
@@ -232,10 +244,10 @@ void setupManyLightsScene(Loader* loader) {
 
     for(int i=0; i < LIGHTS_NUM; i++) {
         GameObject* lightSource = Hierarchy::createGameObject();
-        PointLight* pointLight = PointLight::D100();
+        PointLight* pointLight = PointLight::D50();
 
-        float x = N * distance * ((float)rand()/RAND_MAX * 2 - 1);
-        float z = N * distance * ((float)rand()/RAND_MAX * 2 - 1);
+        float x = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);
+        float z = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);
 
         float r = (float)rand()/RAND_MAX;
         float b = (float)rand()/RAND_MAX;
@@ -248,7 +260,7 @@ void setupManyLightsScene(Loader* loader) {
 
         lightSource->transform->setPosition(vec3(x, 2.5, z));
 
-        lightTranslate.emplace_back(lightSource, vec3(r, 0, b));
+        lightTranslate.emplace_back(lightSource, vec3(r, 0, 1-b));
 
         Hierarchy::addComponent(lightSource, pointLight);
         Hierarchy::setParent(lights, lightSource);

@@ -4,11 +4,6 @@ RenderObject::RenderObject(IMesh* mesh): IRenderObject(mesh) {
     setup();
 }
 
-// template<typename T>
-// T* RenderObject::getMesh() {
-//     return dynamic_cast<T*>(mesh);
-// }
-
 void RenderObject::render() {
     glBindVertexArray(VAO);
 
@@ -33,7 +28,6 @@ void RenderObject::setup() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, mesh->dataSize(), mesh->data(), GL_STATIC_DRAW);
 
-    // const Mesh* mesh = dynamic_cast<Mesh*>(this->mesh);
     if(mesh->usesIndices()) {
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -72,8 +66,3 @@ int RenderObject::calculateStride(const vector<int>& shaderAttributes) {
 
     return stride;
 }
-
-
-template Mesh* RenderObject::getMesh<Mesh>();
-template CubicPatch* RenderObject::getMesh<CubicPatch>();
-template Terrain* RenderObject::getMesh<Terrain>();

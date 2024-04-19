@@ -9,7 +9,7 @@ layout(location = 1) in vec3 _normal;
 layout(location = 2) in vec3 _tangent;
 layout(location = 3) in vec2 _texCoord;
 
-out struct OUTPUT {
+out struct Vertex {
     vec3 fragPos;
     vec3 normal;
     vec3 tangent;

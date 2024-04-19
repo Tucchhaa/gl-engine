@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
@@ -11,7 +11,7 @@ uniform struct Material {
     float shininess;
 } material;
 
-in struct OUTPUT {
+in struct Vertex {
     vec3 fragPos;
     vec3 normal;
     vec3 tangent;

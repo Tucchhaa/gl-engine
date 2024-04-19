@@ -71,10 +71,6 @@ public:
     void setTexture(const string& name, unsigned int textureId);
     void setTexture(const string& name, unsigned int textureId, int slot) const;
 
-    int addFrameTexture(unsigned int textureId);
-
-    void activateFrameTextures() const;
-
     // ===
     // Material
     // ===
@@ -86,7 +82,9 @@ public:
     // ===
 
     void setDirectLight(uint index, const DirectLight* lightSource) const;
-    void setPointLight(uint index, const PointLight* lightSource) const;
+
+    void setPointLight(const string& name, const PointLight* lightSource) const;
+
     void setSpotLight(uint index, const SpotLight* lightSource) const;
 
 // ===

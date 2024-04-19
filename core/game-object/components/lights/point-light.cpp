@@ -9,3 +9,8 @@ PointLight::PointLight(float linear, float quadratic)
 PointLight::PointLight(float linear, float quadratic, vec3 ambient, vec3 diffuse, vec3 specular)
     :  linear(linear), quadratic(quadratic), Light(ambient, diffuse, specular)
     {}
+
+float PointLight::getRadius() const {
+    // TODO - calculate radius
+    return 20.0f;
+}

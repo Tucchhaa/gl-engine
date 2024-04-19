@@ -12,7 +12,10 @@ public:
     PointLight(float linear, float quadratic);
     
     PointLight(float linear, float quadratic, vec3 ambient, vec3 diffuse, vec3 specular);
-    
+
+public:
+    float getRadius() const;
+
 public:
     static PointLight* D6() {
         return new PointLight(0.7, 1.8);
