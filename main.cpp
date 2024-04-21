@@ -38,7 +38,6 @@ Other:
 Class with pre-defined meshes: cube, sphere, plane, etc.
 check for memory leaks
 move game-object to /core
-move #include to cpp files if possible
  */
 int main() {
     IWindow* window = new Window();
