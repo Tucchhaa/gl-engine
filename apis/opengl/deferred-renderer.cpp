@@ -217,12 +217,10 @@ void DeferredRenderer::setScene(Scene *scene) {
 }
 
 void DeferredRenderer::render() {
-    glCheckError();
     renderGBuffer();
-    glCheckError();
     renderLighting();
-    glCheckError();
     renderScreen();
+
     glCheckError();
 }
 
@@ -259,7 +257,6 @@ void DeferredRenderer::renderLighting() {
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // TODO check what does it do
     glBlendFunc(GL_ONE, GL_ONE);
 
     const Camera* camera = currentScene->getCamera();
@@ -281,7 +278,7 @@ void DeferredRenderer::renderLighting() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
-    // === Set to default
+    // === Reset to default
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
@@ -326,8 +323,6 @@ void DeferredRenderer::renderMeshes() {
 // ===
 
 void DeferredRenderer::setLights(const Shader* shader) const {
-    // TODO: size of lights exceed 5 then shader will not work
-
     for(int i=0; i < currentScene->getSpotLights().size(); i++) {
         shader->setSpotLight(i, currentScene->getSpotLights()[i]);
     }
