@@ -7,9 +7,9 @@
 #include "gl-check-error.hpp"
 
 DeferredRenderer::DeferredRenderer():
-    sceneShader("deferred/vertex.vert", "deferred/fragment.frag"),
+    sceneShader("deferred/scene.vert", "deferred/scene.frag"),
     lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
-    screenShader("deferred/screen-vertex.vert", "deferred/screen-fragment.frag")
+    screenShader("deferred/screen.vert", "deferred/screen.frag")
 {
     initGBuffer();
     initLightingBuffer();
