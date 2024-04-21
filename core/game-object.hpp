@@ -17,11 +17,11 @@ private:
 public:
     int ID;
 
-    int parentID;
+    GameObject* parent = nullptr;
 
-    set<int> children;
+    set<GameObject*> children;
 
-    Transform* transform;
+    Transform* transform = nullptr;
 
 public:
     explicit GameObject(Transform* transform);

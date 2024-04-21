@@ -264,7 +264,7 @@ void DeferredRenderer::renderLighting() {
     lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
 
     lightingShader.setMat4("perspective", camera->getViewProjectionMatrix());
-    lightingShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getPosition());
+    lightingShader.setVec3("cameraPos", camera->transform->getPosition());
 
     for(const auto* pointLight: currentScene->getPointLights()) {
         glBindVertexArray(sphereVAO);
@@ -304,7 +304,7 @@ void DeferredRenderer::renderScreen() {
 void DeferredRenderer::renderMeshes() {
     for(auto* object: meshes) {
         const Mesh* mesh = object->getMesh<Mesh>();
-        const Transform* transform = Hierarchy::getTransform(mesh);
+        const Transform* transform = mesh->transform;
 
         sceneShader.setMat4("transform", transform->getTransformMatrix());
         sceneShader.setMat3("normalTransform", transform->getNormalMatrix());
@@ -336,7 +336,7 @@ void DeferredRenderer::setLights(const Shader* shader) const {
 mat4 DeferredRenderer::calculateLightVolumeMatrix(const PointLight* light) {
     auto lightVolumeMatrix = mat4(1.0f);
 
-    lightVolumeMatrix = translate(lightVolumeMatrix, Hierarchy::getTransform(light)->getPosition());
+    lightVolumeMatrix = translate(lightVolumeMatrix, light->transform->getPosition());
     lightVolumeMatrix = scale(lightVolumeMatrix, vec3(light->getRadius()));
 
     return lightVolumeMatrix;

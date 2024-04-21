@@ -37,7 +37,6 @@ Features:
 Other:
 Class with pre-defined meshes: cube, sphere, plane, etc.
 check for memory leaks
-move game-object to /core
  */
 int main() {
     IWindow* window = new Window();
@@ -148,7 +147,7 @@ void setupDefaultScene(Loader* loader) {
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
 
-    Transform* lightTransform = Hierarchy::getTransform(lightSource);
+    Transform* lightTransform = lightSource->transform;
     lightTransform->translate(vec3(0, 20, 0));
     lightTransform->rotate(vec3(0, radians(180.0), 0));
     lightTransform->rotate(vec3(radians(-30.0), 0, 0));
@@ -295,7 +294,7 @@ GameObject* createCurvedSurface(Loader* loader) {
     };
 
     GameObject* cubicPatchObject = Hierarchy::createGameObject();
-    Transform* patchTransform = Hierarchy::getTransform(cubicPatchObject);
+    Transform* patchTransform = cubicPatchObject->transform;
     patchTransform->scaleBy(vec3(10, 10, 10));
     patchTransform->translate(vec3(0, -3, 0));
 
@@ -324,7 +323,7 @@ GameObject* createTerrain(Loader* loader) {
 GameObject* createBackpack(Loader* loader) {
     GameObject* object = loader->loadModel("models/backpack/backpack.obj");
 
-    Transform* objectTransform = Hierarchy::getTransform(object);
+    Transform* objectTransform = object->transform;
     objectTransform->translate(vec3(0, 0, -5));
     // objectTransform->scaleBy(vec3(5, 5, 5));
 
@@ -333,7 +332,7 @@ GameObject* createBackpack(Loader* loader) {
 
 GameObject* createCube(Loader* loader) {
     GameObject* cubeObject = loader->loadModel("models/cube/cube.obj");
-    Transform* cubeTransform = Hierarchy::getTransform(cubeObject);
+    Transform* cubeTransform = cubeObject->transform;
 
     cubeTransform->translate(vec3(0, -3, 0));
 
@@ -342,7 +341,7 @@ GameObject* createCube(Loader* loader) {
 
 GameObject* createCamera(Loader* loader) {
     auto* cameraObject = Hierarchy::createGameObject();
-    Transform* cameraTransform = Hierarchy::getTransform(cameraObject);
+    Transform* cameraTransform = cameraObject->transform;
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = loader->loadCubeMap("textures/skybox");

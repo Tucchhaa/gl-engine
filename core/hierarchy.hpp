@@ -6,7 +6,6 @@
 #include "./game-object.hpp"
 
 #include "./components/component.hpp"
-#include "./components/transform.hpp"
 
 using namespace std;
 
@@ -77,5 +76,5 @@ public:
     static void setParent(GameObject* parent, GameObject* child);
 
     static void updateTransformTree();
-    static void updateTransformTree(Transform* transform);
+    static void updateTransformTree(GameObject* transform);
 };

@@ -120,9 +120,7 @@ void Shader::setMaterial(const Material* material) {
 void Shader::setDirectLight(uint index, const DirectLight* lightSource) const {
     string _index = to_string(index);
     
-    Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
-    
-    setVec3("directLights[" + _index + "].direction", transform->getDirectionVector());
+    setVec3("directLights[" + _index + "].direction", lightSource->transform->getDirectionVector());
     
     setVec3("directLights[" + _index + "].colors.ambient",  lightSource->ambient);
     setVec3("directLights[" + _index + "].colors.diffuse",  lightSource->diffuse);
@@ -130,9 +128,7 @@ void Shader::setDirectLight(uint index, const DirectLight* lightSource) const {
 }
 
 void Shader::setPointLight(const string& name, const PointLight* lightSource) const {
-    const Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
-
-    setVec3(name + ".position", transform->getAbsolutePosition());
+    setVec3(name + ".position", lightSource->transform->getAbsolutePosition());
 
     setFloat(name + ".linear", lightSource->linear);
     setFloat(name + ".quadratic", lightSource->quadratic);
@@ -145,7 +141,7 @@ void Shader::setPointLight(const string& name, const PointLight* lightSource) co
 void Shader::setSpotLight(uint index, const SpotLight* lightSource) const {
     string _index = to_string(index);
 
-    Transform* transform = Hierarchy::getTransform(lightSource->GameObjectID);
+    Transform* transform = lightSource->transform;
 
     setVec3("spotLights[" + _index + "].position", transform->getAbsolutePosition());
     setVec3("spotLights[" + _index + "].direction", transform->getDirectionVector());

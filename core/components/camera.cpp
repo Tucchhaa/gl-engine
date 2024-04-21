@@ -13,8 +13,6 @@ void Camera::setScreenSizes(const int screenWidth, const int screenHeight) {
 }
 
 mat4 Camera::getViewMatrix(const bool needTranslation) const {
-    const Transform* transform = Hierarchy::getTransform(GameObjectID);
-
     auto result = mat4(1.0f);
     
     result = result * mat4_cast(conjugate(transform->getAbsoluteRotation()));
