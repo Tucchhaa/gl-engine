@@ -2,7 +2,6 @@
 
 #include "../base/irenderer.hpp"
 
-#include "render-object.hpp"
 #include "shader.hpp"
 
 class DeferredRenderer : public IRenderer {

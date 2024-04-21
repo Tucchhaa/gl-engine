@@ -1,5 +1,7 @@
 #include "gl-check-error.hpp"
 
+#include <string>
+
 GLenum glCheckError_(const char *file, int line) {
     GLenum errorCode;
     while ((errorCode = glGetError()) != GL_NO_ERROR)

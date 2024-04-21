@@ -1,5 +1,8 @@
 #include "scene.hpp"
 
+#include "./hierarchy.hpp"
+#include "./game-object/game-object.hpp"
+
 Scene::Scene() = default;
 
 Camera* Scene::getCamera() {

@@ -1,5 +1,8 @@
 #include "render-object.hpp"
 
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl3.h>
+
 RenderObject::RenderObject(IMesh* mesh): IRenderObject(mesh) {
     setup();
 }
@@ -44,7 +47,7 @@ void RenderObject::setup() {
 void RenderObject::setupShaderAttributes() const {
     const vector<int> shaderAttributes = mesh->shaderAttributes();
 
-    const int stride = calculateStride(shaderAttributes) * sizeof(float);
+    const int stride = calculateStride(shaderAttributes) * static_cast<int>(sizeof(float));
     int offset = 0;
 
     for(int i=0; i < shaderAttributes.size(); i++) {

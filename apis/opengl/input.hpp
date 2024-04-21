@@ -9,8 +9,6 @@
 #include "../base/iwindow.hpp"
 #include "../base/iinput.hpp"
 
-#include "window.hpp"
-
 using namespace glm;
 
 class Input : public IInput {

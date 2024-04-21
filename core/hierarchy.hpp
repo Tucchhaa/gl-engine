@@ -1,9 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <vector>
 #include <map>
-#include <queue>
 
 #include "./game-object/game-object.hpp"
 

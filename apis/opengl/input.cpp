@@ -1,5 +1,7 @@
 #include "input.hpp"
 
+#include "window.hpp"
+
 Input::Input(IWindow* window) {
     lastFrameTime = (float)glfwGetTime();
     deltaTime = 0;

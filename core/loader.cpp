@@ -3,6 +3,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <assimp/postprocess.h>
+
+#include "hierarchy.hpp"
+
 const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/resources";
 
 Loader::Loader(IResourceManager* resourceManager) : resourceManager(resourceManager)

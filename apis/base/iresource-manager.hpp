@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "../../core/structures/material.hpp"
 
 enum ResourceType {

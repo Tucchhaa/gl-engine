@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 class IWindow {
 public:
     virtual ~IWindow() = default;

@@ -1,7 +1,12 @@
-#include "shader.hpp"
+#define GL_SILENCE_DEPRECATION
 
+#include "shader.hpp"
 #include "gl-check-error.hpp"
+
 #include <iostream>
+#include <OpenGL/gl3.h>
+
+#include "resource-manager.hpp"
 
 Shader::Shader(
         const string& vertexShaderFile,

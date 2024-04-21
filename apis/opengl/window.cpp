@@ -1,4 +1,9 @@
+#define GL_SILENCE_DEPRECATION
+
 #include "window.hpp"
+
+#include <iostream>
+#include <OpenGL/gl3.h>
 
 Window::Window() = default;
 

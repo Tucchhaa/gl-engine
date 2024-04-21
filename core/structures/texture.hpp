@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <utility>
 
 #include "texture-options.hpp"
 

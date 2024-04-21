@@ -3,8 +3,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../../hierarchy.hpp"
-
 #include "transform.hpp"
 #include "component.hpp"
 

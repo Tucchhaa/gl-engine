@@ -1,7 +1,5 @@
 #include "mesh.hpp"
 
-#include <utility>
-
 Mesh::Mesh() = default;
 
 Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material) :

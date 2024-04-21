@@ -2,16 +2,13 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #include <queue>
 #include <vector>
 #include <string>
 #include <map>
-#include <utility>
 
 #include "../apis/base/iresource-manager.hpp"
-#include "hierarchy.hpp"
 
 #include "game-object/game-object.hpp"
 #include "game-object/components/mesh.hpp"

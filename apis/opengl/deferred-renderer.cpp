@@ -1,10 +1,7 @@
-//
-// Created by Eldar Iusupzhanov on 2024/4/17.
-//
-
 #include "deferred-renderer.hpp"
-
 #include "gl-check-error.hpp"
+
+#include "render-object.hpp"
 
 DeferredRenderer::DeferredRenderer():
     sceneShader("deferred/scene.vert", "deferred/scene.frag"),

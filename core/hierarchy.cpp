@@ -1,5 +1,7 @@
 #include "hierarchy.hpp"
 
+#include <queue>
+
 #include "./game-object/components/mesh.hpp"
 #include "./game-object/components/terrain.hpp"
 #include "./game-object/components/cubic-patch.hpp"

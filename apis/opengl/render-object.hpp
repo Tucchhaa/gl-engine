@@ -1,10 +1,6 @@
 #pragma once
 
-#define GL_SILENCE_DEPRECATION
-
 #include <vector>
-
-#include <OpenGL/gl3.h>
 
 #include "../base/irender-object.hpp"
 

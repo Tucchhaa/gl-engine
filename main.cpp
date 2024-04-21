@@ -26,9 +26,8 @@ vector<pair<GameObject*, vec3>> lightTranslate;
 TODO: optimizations
 1) Skybox - no need to render it for pixel
 2) Normal mapping - use tangent space
-3) Light volumes
-4) reconstruct position from depth
-5) do not unbind textures in different shaders
+3) reconstruct position from depth
+4) do not unbind textures in different shaders
 
 Features:
 1) Bloom
@@ -36,7 +35,7 @@ Features:
 3) Deferred + Forward renderings for transparency
 
 Other:
-rename shaders: fragment.frag -> scene.frag, screen-fragment.frag -> screen.frag
+Class with pre-defined meshes: cube, sphere, plane, etc.
 check for memory leaks
 move game-object to /core
 move #include to cpp files if possible
