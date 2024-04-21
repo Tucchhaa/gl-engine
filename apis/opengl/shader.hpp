@@ -8,10 +8,10 @@
 
 #include "../../core/hierarchy.hpp"
 
-#include "../../core/game-object/components/mesh.hpp"
-#include "../../core/game-object/components/lights/direct-light.hpp"
-#include "../../core/game-object/components/lights/point-light.hpp"
-#include "../../core/game-object/components/lights/spot-light.hpp"
+#include "../../core/components/mesh.hpp"
+#include "../../core/components/lights/direct-light.hpp"
+#include "../../core/components/lights/point-light.hpp"
+#include "../../core/components/lights/spot-light.hpp"
 
 using namespace std;
 using namespace glm;

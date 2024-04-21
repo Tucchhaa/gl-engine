@@ -2,15 +2,15 @@
 
 #include <queue>
 
-#include "./game-object/components/mesh.hpp"
-#include "./game-object/components/terrain.hpp"
-#include "./game-object/components/cubic-patch.hpp"
+#include "./components/mesh.hpp"
+#include "./components/terrain.hpp"
+#include "./components/cubic-patch.hpp"
 
-#include "./game-object/components/camera.hpp"
+#include "./components/camera.hpp"
 
-#include "./game-object/components/lights/direct-light.hpp"
-#include "./game-object/components/lights/point-light.hpp"
-#include "./game-object/components/lights/spot-light.hpp"
+#include "./components/lights/direct-light.hpp"
+#include "./components/lights/point-light.hpp"
+#include "./components/lights/spot-light.hpp"
 
 map<int, vector<ObjectComponent*>> Hierarchy::components;
 

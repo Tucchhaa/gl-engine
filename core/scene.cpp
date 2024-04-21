@@ -1,7 +1,7 @@
 #include "scene.hpp"
 
 #include "./hierarchy.hpp"
-#include "./game-object/game-object.hpp"
+#include "./game-object.hpp"
 
 Scene::Scene() = default;
 

@@ -6,7 +6,7 @@
 #include "transform.hpp"
 #include "component.hpp"
 
-#include "../../structures/texture.hpp"
+#include "../structures/texture.hpp"
 
 using namespace glm;
 

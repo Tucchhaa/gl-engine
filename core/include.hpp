@@ -4,16 +4,17 @@
 #include "hierarchy.hpp"
 #include "loader.hpp"
 
-#include "game-object/game-object.hpp"
+#include "game-object.hpp"
 
-#include "game-object/components/transform.hpp"
-#include "game-object/components/camera.hpp"
+#include "components/transform.hpp"
+#include "components/camera.hpp"
+
+#include "components/mesh.hpp"
+#include "components/terrain.hpp"
+#include "components/cubic-patch.hpp"
+
+#include "components/lights/direct-light.hpp"
+#include "components/lights/point-light.hpp"
+#include "components/lights/spot-light.hpp"
+
 #include "structures/material.hpp"
-
-#include "game-object/components/mesh.hpp"
-#include "game-object/components/terrain.hpp"
-#include "game-object/components/cubic-patch.hpp"
-
-#include "game-object/components/lights/direct-light.hpp"
-#include "game-object/components/lights/point-light.hpp"
-#include "game-object/components/lights/spot-light.hpp"

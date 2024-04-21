@@ -10,8 +10,8 @@
 
 #include "../apis/base/iresource-manager.hpp"
 
-#include "game-object/game-object.hpp"
-#include "game-object/components/mesh.hpp"
+#include "game-object.hpp"
+#include "components/mesh.hpp"
 
 #include "structures/material.hpp"
 #include "structures/texture.hpp"

@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "component.hpp"
-#include "../../imesh.hpp"
-#include "../../structures/material.hpp"
+#include "../imesh.hpp"
+#include "../structures/material.hpp"
 
 using namespace std;
 

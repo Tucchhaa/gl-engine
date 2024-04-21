@@ -1,6 +1,6 @@
 #include "camera.hpp"
 
-#include "../../hierarchy.hpp"
+#include "../hierarchy.hpp"
 
 Camera::Camera(float fov, float near, float far)
     : fov(fov), near(near), far(far) {}

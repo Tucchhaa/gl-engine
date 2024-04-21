@@ -3,10 +3,10 @@
 #include <vector>
 #include <map>
 
-#include "./game-object/game-object.hpp"
+#include "./game-object.hpp"
 
-#include "./game-object/components/component.hpp"
-#include "./game-object/components/transform.hpp"
+#include "./components/component.hpp"
+#include "./components/transform.hpp"
 
 using namespace std;
 

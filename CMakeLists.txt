@@ -69,42 +69,42 @@ add_executable(gl_engine
 
         core/imesh.hpp
 
-        # core/game-object
-        core/game-object/components/lights/light.cpp
-        core/game-object/components/lights/light.hpp
+        # core/components
+        core/components/lights/light.cpp
+        core/components/lights/light.hpp
 
-        core/game-object/components/lights/direct-light.cpp
-        core/game-object/components/lights/direct-light.hpp
+        core/components/lights/direct-light.cpp
+        core/components/lights/direct-light.hpp
 
-        core/game-object/components/lights/point-light.cpp
-        core/game-object/components/lights/point-light.hpp
+        core/components/lights/point-light.cpp
+        core/components/lights/point-light.hpp
 
-        core/game-object/components/lights/spot-light.cpp
-        core/game-object/components/lights/spot-light.hpp
+        core/components/lights/spot-light.cpp
+        core/components/lights/spot-light.hpp
 
-        core/game-object/components/camera.cpp
-        core/game-object/components/camera.hpp
+        core/components/camera.cpp
+        core/components/camera.hpp
 
-        core/game-object/components/component.cpp
-        core/game-object/components/component.hpp
+        core/components/component.cpp
+        core/components/component.hpp
 
         core/structures/material.cpp
         core/structures/material.hpp
 
-        core/game-object/components/mesh.cpp
-        core/game-object/components/mesh.hpp
+        core/components/mesh.cpp
+        core/components/mesh.hpp
 
-        core/game-object/components/terrain.cpp
-        core/game-object/components/terrain.hpp
+        core/components/terrain.cpp
+        core/components/terrain.hpp
 
-        core/game-object/components/cubic-patch.cpp
-        core/game-object/components/cubic-patch.hpp
+        core/components/cubic-patch.cpp
+        core/components/cubic-patch.hpp
 
-        core/game-object/components/transform.cpp
-        core/game-object/components/transform.hpp
+        core/components/transform.cpp
+        core/components/transform.hpp
 
-        core/game-object/game-object.cpp
-        core/game-object/game-object.hpp
+        core/game-object.cpp
+        core/game-object.hpp
 
         # core/structures
         core/structures/vectors.cpp

@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 
-#include "../../structures/vectors.hpp"
+#include "../structures/vectors.hpp"
 
 #include "component.hpp"
-#include "../../imesh.hpp"
-#include "../../structures/material.hpp"
+#include "../imesh.hpp"
+#include "../structures/material.hpp"
 
 using namespace std;
 
