@@ -12,6 +12,9 @@ void Camera::setScreenSizes(const int screenWidth, const int screenHeight) {
     this->screenHeight = screenHeight;
 }
 
+/**
+ * Returns the view matrix calculated using camera's position and rotation
+ */
 mat4 Camera::getViewMatrix(const bool needTranslation) const {
     auto result = mat4(1.0f);
     

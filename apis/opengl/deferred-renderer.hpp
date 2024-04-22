@@ -39,15 +39,17 @@ private:
      */
     Shader lightingShader;
 
+    Shader skyboxShader;
+
     /**
      * Combines lighting buffers and outputs them the screen
      */
     Shader screenShader;
 
     unsigned int gBuffer = 0;
-    unsigned int gPosition = 0, gNormal = 0, gAlbedoSpec = 0;
+    unsigned int gDepth = 0, gNormal = 0, gAlbedoSpec = 0;
 
-    unsigned int lightingBuffer;
+    unsigned int lightingBuffer = 0;
     unsigned int lightDiffuse = 0, lightSpecular = 0;
     unsigned int lightedColor = 0;
 

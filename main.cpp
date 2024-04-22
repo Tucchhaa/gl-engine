@@ -29,11 +29,13 @@ TODO: optimizations
 3) reconstruct position from depth
 4) do not unbind textures in different shaders
 5) render objects with same material in one batch
+6) instancing
 
 Features:
 1) Bloom
 2) Scene events
 3) Deferred + Forward renderings for transparency
+4) PBR
 
 Other:
 Class with pre-defined meshes: cube, sphere, plane, etc.
@@ -116,10 +118,10 @@ int main() {
             Transform* lightTransform = lightSource->transform;
             lightTransform->translate(direction * 10.0f * input->getDeltaTime());
 
-            if(lightTransform->getPosition().x > 160 || lightTransform->getPosition().x < -160) {
+            if(lightTransform->getPosition().x > 80 || lightTransform->getPosition().x < -80) {
                 lightTranslate[i].second.x *= -1;
             }
-            if(lightTransform->getPosition().z > 160 || lightTransform->getPosition().z < -160) {
+            if(lightTransform->getPosition().z > 80 || lightTransform->getPosition().z < -80) {
                 lightTranslate[i].second.z *= -1;
             }
         }
@@ -224,8 +226,8 @@ void setupTunnelScene(Loader* loader) {
 void setupManyLightsScene(Loader* loader) {
     srand(time(nullptr));
 
-    const int N = 40;
-    const int LIGHTS_NUM = 2000;
+    const int N = 20;
+    const int LIGHTS_NUM = 1000;
 
     float distance = 4.0f;
 

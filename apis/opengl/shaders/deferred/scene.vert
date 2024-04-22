@@ -10,7 +10,6 @@ layout(location = 2) in vec3 _tangent;
 layout(location = 3) in vec2 _texCoord;
 
 out struct Vertex {
-    vec3 fragPos;
     vec3 normal;
     vec3 tangent;
     vec2 texCoord;
@@ -20,8 +19,6 @@ void main() {
     vec4 worldPos = transform * vec4(_position, 1.0f);
 
     gl_Position = perspective * worldPos;
-
-    data.fragPos = worldPos.xyz;
 
     // Don't need to multiply by transform matrix, because normal matrix has rotation and scale
     data.normal  = vec3(normalTransform * _normal);

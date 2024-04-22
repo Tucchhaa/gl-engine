@@ -1,8 +1,7 @@
 #version 410 core
 
-layout (location = 0) out vec3 gPosition;
-layout (location = 1) out vec3 gNormal;
-layout (location = 2) out vec4 gAlbedoSpec;
+layout (location = 0) out vec3 gNormal;
+layout (location = 1) out vec4 gAlbedoSpec;
 
 uniform struct Material {
     sampler2D diffuse;
@@ -12,7 +11,6 @@ uniform struct Material {
 } material;
 
 in struct Vertex {
-    vec3 fragPos;
     vec3 normal;
     vec3 tangent;
     vec2 texCoord;
@@ -21,7 +19,6 @@ in struct Vertex {
 vec3 calculateNormal();
 
 void main() {
-    gPosition = data.fragPos;
     gNormal = calculateNormal();
 
     gAlbedoSpec.rgb = texture(material.diffuse, data.texCoord).rgb;
