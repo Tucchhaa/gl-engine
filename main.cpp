@@ -28,6 +28,7 @@ TODO: optimizations
 2) Normal mapping - use tangent space
 3) reconstruct position from depth
 4) do not unbind textures in different shaders
+5) render objects with same material in one batch
 
 Features:
 1) Bloom
@@ -42,7 +43,6 @@ int main() {
     IWindow* window = new Window();
     window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    auto* input = new Input(window);
     IResourceManager* resourceManager = &ResourceManager::getInstance();
     // IRenderer* renderer = new Renderer();
     IRenderer* renderer = new DeferredRenderer();
@@ -72,6 +72,8 @@ int main() {
     scene.setCamera(camera);
     scene.processHierarchy();
     renderer->setScene(&scene);
+
+    auto* input = new Input(window);
 
     float speed = 15.0f;
     float rotationSpeed = 1.0f;
@@ -114,15 +116,15 @@ int main() {
             Transform* lightTransform = lightSource->transform;
             lightTransform->translate(direction * 10.0f * input->getDeltaTime());
 
-            if(lightTransform->getPosition().x > 80 || lightTransform->getPosition().x < -80) {
+            if(lightTransform->getPosition().x > 160 || lightTransform->getPosition().x < -160) {
                 lightTranslate[i].second.x *= -1;
             }
-            if(lightTransform->getPosition().z > 80 || lightTransform->getPosition().z < -80) {
+            if(lightTransform->getPosition().z > 160 || lightTransform->getPosition().z < -160) {
                 lightTranslate[i].second.z *= -1;
             }
         }
 
-        Hierarchy::updateTransformTree();
+        Hierarchy::updateTransformTree(cameraObject);
 
         renderer->render();
 
@@ -222,8 +224,8 @@ void setupTunnelScene(Loader* loader) {
 void setupManyLightsScene(Loader* loader) {
     srand(time(nullptr));
 
-    const int N = 20;
-    const int LIGHTS_NUM = 200;
+    const int N = 40;
+    const int LIGHTS_NUM = 2000;
 
     float distance = 4.0f;
 
@@ -241,7 +243,7 @@ void setupManyLightsScene(Loader* loader) {
 
     for(int i=0; i < LIGHTS_NUM; i++) {
         GameObject* lightSource = Hierarchy::createGameObject();
-        PointLight* pointLight = PointLight::D50();
+        PointLight* pointLight = PointLight::D20();
 
         float x = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);
         float z = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);

@@ -86,22 +86,34 @@ Texture* Loader::loadCubeMap(const char *path) {
 }
 
 GameObject *Loader::loadModel(const char *path) {
-    string strPath(path);
-    string directory = strPath.substr(0, strPath.find_last_of('/'));
-    string fullPath = RESOURCES_PATH + "/" + strPath;
+    const string strPath(path);
+    const string directory = strPath.substr(0, strPath.find_last_of('/'));
 
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
-
-    if(!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
-        throw std::runtime_error("Couldn't load model");
-    }
+    const aiScene* scene = loadScene(strPath);
 
     ModelParser parser(this, directory);
 
     GameObject* result = parser.parse(scene);
 
     return result;
+}
+
+const aiScene* Loader::loadScene(const string &path) {
+    const string fullPath = RESOURCES_PATH + "/" + path;
+
+    if(auto it = models.find(path); it != models.end()) {
+        return it->second;
+    }
+
+    const aiScene* scene = importer.ReadFile(fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+
+    if(!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
+        throw std::runtime_error("Couldn't load model");
+    }
+
+    models[path] = scene;
+
+    return scene;
 }
 
 // === Model Loader ===

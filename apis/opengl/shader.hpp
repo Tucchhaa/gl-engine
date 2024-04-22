@@ -42,18 +42,23 @@ private:
      */
     vector<pair<unsigned int, unsigned int>> reservedTextureSlots;
 
+    /**
+     * First: uniform name, second: location
+     */
+    vector<pair<string, int>> cachedLocations;
+
 // ==
 // Primitive setters
 // ===
 public:
-    void setBool(const string &name, bool value) const;
-    void setInt(const string &name, int value) const;
-    void setFloat(const string &name, float value) const;
+    void setBool(const string &name, bool value);
+    void setInt(const string &name, int value);
+    void setFloat(const string &name, float value);
     
-    void setMat4(const string& name, const mat4& matrix) const;
-    void setMat3(const string& name, const mat3& matrix) const;
+    void setMat4(const string& name, const mat4& matrix);
+    void setMat3(const string& name, const mat3& matrix);
     
-    void setVec3(const string& name, const vec3& vector) const;
+    void setVec3(const string& name, const vec3& vector);
 
 public:
     // ===
@@ -61,7 +66,7 @@ public:
     // ===
 
     void setTexture(const string& name, unsigned int textureId);
-    void setTexture(const string& name, unsigned int textureId, int slot) const;
+    void setTexture(const string& name, unsigned int textureId, int slot);
 
     // ===
     // Material
@@ -73,11 +78,11 @@ public:
     // Light components
     // ===
 
-    void setDirectLight(uint index, const DirectLight* lightSource) const;
+    void setDirectLight(uint index, const DirectLight* lightSource);
 
-    void setPointLight(const string& name, const PointLight* lightSource) const;
+    void setPointLight(const string& name, const PointLight* lightSource);
 
-    void setSpotLight(uint index, const SpotLight* lightSource) const;
+    void setSpotLight(uint index, const SpotLight* lightSource);
 
 // ===
 // Shader initialization
@@ -91,5 +96,5 @@ private:
 // Private methods
 // ===
 private:
-    int getLocation(const string& name) const;
+    int getLocation(const string& name);
 };

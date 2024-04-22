@@ -319,7 +319,7 @@ void DeferredRenderer::renderMeshes() {
 // Private methods
 // ===
 
-void DeferredRenderer::setLights(const Shader* shader) const {
+void DeferredRenderer::setLights(Shader* shader) const {
     for(int i=0; i < currentScene->getSpotLights().size(); i++) {
         shader->setSpotLight(i, currentScene->getSpotLights()[i]);
     }

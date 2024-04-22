@@ -22,12 +22,19 @@ class Loader {
 private:
     IResourceManager* resourceManager;
 
+    /**
+     * When destroyed, all resources will be freed
+     */
+    Assimp::Importer importer;
+
 public:
     explicit Loader(IResourceManager* resourceManager);
 
     ~Loader();
 
     GameObject* loadModel(const char* path);
+
+    const aiScene* loadScene(const string &path);
 
     Texture* loadTexture(const char* path);
     Texture* loadTexture(const char* path, TextureOptions options);
@@ -38,6 +45,7 @@ private:
     static TextureFormat getTextureFormat(int nrChannels);
 
     map<string, Texture*> textures;
+    map<string, const aiScene*> models;
 
 private:
     class ModelParser {

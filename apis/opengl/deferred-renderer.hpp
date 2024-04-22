@@ -70,7 +70,7 @@ private:
 // Private methods
 // ===
 private:
-    void setLights(const Shader* shader) const;
+    void setLights(Shader* shader) const;
 
     static mat4 calculateLightVolumeMatrix(const PointLight* light) ;
 };
