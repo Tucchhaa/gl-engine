@@ -1,5 +1,8 @@
 #pragma once
 
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl3.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -65,8 +68,8 @@ public:
     // Textures
     // ===
 
-    void setTexture(const string& name, unsigned int textureId);
-    void setTexture(const string& name, unsigned int textureId, int slot);
+    void setTexture(const string& name, unsigned int textureId, unsigned int type = GL_TEXTURE_2D);
+    void setTextureToSlot(const string& name, unsigned int textureId, int slot, unsigned int type = GL_TEXTURE_2D);
 
     // ===
     // Material

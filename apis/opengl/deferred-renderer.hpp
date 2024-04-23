@@ -47,7 +47,7 @@ private:
     Shader screenShader;
 
     unsigned int gBuffer = 0;
-    unsigned int gDepth = 0, gNormal = 0, gAlbedoSpec = 0;
+    unsigned int gDepthStencil = 0, gNormal = 0, gAlbedoSpec = 0;
 
     unsigned int lightingBuffer = 0;
     unsigned int lightDiffuse = 0, lightSpecular = 0;
@@ -63,6 +63,8 @@ private:
     void renderGBuffer();
 
     void renderLighting();
+
+    void renderSkybox();
 
     void renderScreen();
 

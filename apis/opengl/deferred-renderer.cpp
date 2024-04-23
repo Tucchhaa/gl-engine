@@ -42,14 +42,14 @@ void DeferredRenderer::initGBuffer() {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedoSpec, 0);
 
     // - Depth buffer
-    glGenTextures(1, &gDepth);
-    glBindTexture(GL_TEXTURE_2D, gDepth);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glGenTextures(1, &gDepthStencil);
+    glBindTexture(GL_TEXTURE_2D, gDepthStencil);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, screenWidth, screenHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, gDepth, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, gDepthStencil, 0);
 
-    unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    constexpr unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, attachments);
 
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -200,9 +200,13 @@ void DeferredRenderer::setScene(Scene *scene) {
 }
 
 void DeferredRenderer::render() {
+    glViewport(0, 0, screenWidth, screenHeight);
+
     renderGBuffer();
     renderLighting();
+
     renderScreen();
+    renderSkybox();
 
     glCheckError();
 }
@@ -212,14 +216,19 @@ void DeferredRenderer::render() {
 // ===
 
 void DeferredRenderer::renderGBuffer() {
-    glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 
     glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_STENCIL_TEST);
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     Camera* camera = currentScene->getCamera();
 
@@ -230,23 +239,25 @@ void DeferredRenderer::renderGBuffer() {
 }
 
 void DeferredRenderer::renderLighting() {
-    glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, lightingBuffer);
 
     glDisable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glDisable(GL_STENCIL_TEST);
+    // TODO: check performance with stencil test
+
     glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBlendFunc(GL_ONE, GL_ONE);
-    glCullFace(GL_FRONT);
-
     const Camera* camera = currentScene->getCamera();
 
     lightingShader.use();
-    lightingShader.setTexture("gDepth", gDepth);
+    lightingShader.setTexture("gDepth", gDepthStencil);
     lightingShader.setTexture("gNormal", gNormal);
     lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
 
@@ -265,18 +276,47 @@ void DeferredRenderer::renderLighting() {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
-    glDisable(GL_CULL_FACE);
+}
+
+void DeferredRenderer::renderSkybox() {
+    const Camera* camera = currentScene->getCamera();
+
+    const CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
+
+    if(cubeMap != nullptr) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_EQUAL, 0, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+        glDepthMask(GL_FALSE);
+
+        skyboxShader.use();
+        skyboxShader.setMat4("rotationMatrix", camera->getViewProjectionMatrix(false));
+        skyboxShader.setTexture("skybox", cubeMap->textureId, GL_TEXTURE_CUBE_MAP);
+
+        glBindVertexArray(cubeMap->VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glBindVertexArray(0);
+        glDepthMask(GL_TRUE);
+    }
 }
 
 void DeferredRenderer::renderScreen() {
-    glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
     glDisable(GL_CULL_FACE);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // ===
 

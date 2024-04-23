@@ -227,7 +227,7 @@ void setupManyLightsScene(Loader* loader) {
     srand(time(nullptr));
 
     const int N = 20;
-    const int LIGHTS_NUM = 1000;
+    const int LIGHTS_NUM = 500;
 
     float distance = 4.0f;
 
