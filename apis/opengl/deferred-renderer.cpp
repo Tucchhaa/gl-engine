@@ -3,11 +3,13 @@
 
 #include "render-object.hpp"
 #include "resource-manager.hpp"
+#include "../../../../../../Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h"
 
 DeferredRenderer::DeferredRenderer():
-    sceneShader("deferred/scene.vert", "deferred/scene.frag"),
+    meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
     lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
     skyboxShader("deferred/skybox.vert", "deferred/skybox.frag"),
+    cubicPatchShader("deferred/cubic-patch.vert", "deferred/mesh.frag", "deferred/cubic-patch.tesc", "deferred/cubic-patch.tese"),
     screenShader("deferred/screen.vert", "deferred/screen.frag")
 {
     initGBuffer();
@@ -18,7 +20,7 @@ DeferredRenderer::DeferredRenderer():
 }
 
 DeferredRenderer::~DeferredRenderer() {
-    sceneShader.deleteShader();
+    meshShader.deleteShader();
 }
 
 void DeferredRenderer::initGBuffer() {
@@ -179,9 +181,9 @@ void DeferredRenderer::initSphereVAO() {
 void DeferredRenderer::setScene(Scene *scene) {
     IRenderer::setScene(scene);
 
-    vector<Mesh*> meshes = scene->getMeshes();
-    vector<Terrain*> terrains = scene->getTerrains();
-    vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
+    const vector<Mesh*> meshes = scene->getMeshes();
+    const vector<Terrain*> terrains = scene->getTerrains();
+    const vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
 
     for(Mesh* mesh: meshes) {
         auto* object = new RenderObject(mesh);
@@ -225,25 +227,19 @@ void DeferredRenderer::renderGBuffer() {
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    Camera* camera = currentScene->getCamera();
+    mat4 viewProjection = currentScene->getCamera()->getViewProjectionMatrix();
 
-    sceneShader.use();
-    sceneShader.setMat4("perspective", camera->getViewProjectionMatrix());
-
-    renderMeshes();
+    renderMeshes(viewProjection);
+    renderCubicPatches(viewProjection);
 }
 
 void DeferredRenderer::renderLighting() {
     glBindFramebuffer(GL_FRAMEBUFFER, lightingBuffer);
 
     glDisable(GL_DEPTH_TEST);
-    // glDisable(GL_STENCIL_TEST);
-    // TODO: check performance with stencil test
+    glDisable(GL_STENCIL_TEST);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -328,15 +324,42 @@ void DeferredRenderer::renderScreen() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void DeferredRenderer::renderMeshes() {
+void DeferredRenderer::renderMeshes(const mat4& viewProjection) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    meshShader.use();
+    meshShader.setMat4("perspective", viewProjection);
+
     for(auto* object: meshes) {
         const Mesh* mesh = object->getMesh<Mesh>();
         const Transform* transform = mesh->transform;
 
-        sceneShader.setMat4("transform", transform->getTransformMatrix());
-        sceneShader.setMat3("normalTransform", transform->getNormalMatrix());
+        meshShader.setMat4("transform", transform->getTransformMatrix());
+        meshShader.setMat3("normalTransform", transform->getNormalMatrix());
 
-        sceneShader.setMaterial(&mesh->material);
+        meshShader.setMaterial(&mesh->material);
+
+        object->render();
+    }
+}
+
+void DeferredRenderer::renderCubicPatches(const mat4& viewProjection) {
+    glDisable(GL_CULL_FACE);
+
+    cubicPatchShader.use();
+    cubicPatchShader.setMat4("perspective", viewProjection);
+
+    for(auto* object: cubicPatches) {
+        const CubicPatch* patch = object->getMesh<CubicPatch>();
+        const Transform* transform = patch->transform;
+
+        cubicPatchShader.setMat4("transform", transform->getTransformMatrix());
+        cubicPatchShader.setMat3("normalTransform", transform->getNormalMatrix());
+
+        cubicPatchShader.setFloat("tessOuterLevel", patch->tessOuterLevel);
+        cubicPatchShader.setFloat("tessInnerLevel", patch->tessInnerLevel);
+        cubicPatchShader.setMaterial(&patch->material);
 
         object->render();
     }

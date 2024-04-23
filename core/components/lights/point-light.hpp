@@ -4,7 +4,7 @@
 
 class PointLight : public Light {
 public:
-    const float lightVolumeMinAttenuation = 0.02;
+    const float lightVolumeMinAttenuation = 0.10;
 
     float linear = 0.22;
     float quadratic = 0.20;

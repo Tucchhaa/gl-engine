@@ -32,7 +32,7 @@ private:
     /**
      * Computes gBuffer textures
      */
-    Shader sceneShader;
+    Shader meshShader;
 
     /**
      * Computes lighting for gBuffer textures
@@ -40,6 +40,8 @@ private:
     Shader lightingShader;
 
     Shader skyboxShader;
+
+    Shader cubicPatchShader;
 
     /**
      * Combines lighting buffers and outputs them the screen
@@ -68,7 +70,9 @@ private:
 
     void renderScreen();
 
-    void renderMeshes();
+    void renderMeshes(const mat4& viewProjection);
+
+    void renderCubicPatches(const mat4& viewProjection);
 
 // ===
 // Private methods
