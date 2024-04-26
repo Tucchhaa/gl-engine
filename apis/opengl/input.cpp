@@ -3,10 +3,11 @@
 #include "window.hpp"
 
 Input::Input(IWindow* window) {
-    lastFrameTime = (float)glfwGetTime();
+    lastFrameTime = static_cast<float>(glfwGetTime());
     deltaTime = 0;
 
     glfwWindow = dynamic_cast<Window*>(window)->getGLFWWindow();
+    instance = this;
 }
 
 // ===

@@ -3,9 +3,12 @@
 #include "./hierarchy.hpp"
 #include "./game-object.hpp"
 
-Scene::Scene() = default;
+Scene::Scene(Loader* loader): loader(loader) {}
 
-Camera* Scene::getCamera() {
+// ===
+// Getters
+// ===
+Camera* Scene::getCamera() const {
     return camera;
 }
 
@@ -36,6 +39,26 @@ const vector<DirectLight*>& Scene::getDirectLights() {
 const vector<SpotLight*> &Scene::getSpotLights() {
     return spotLights;
 }
+
+// ===
+// Events
+// ===
+
+void Scene::setupScene() {
+    processHierarchy();
+
+    Hierarchy::updateTransformTree();
+}
+
+void Scene::beforeRender() {
+    Hierarchy::updateTransformTree(camera->gameObject);
+}
+
+void Scene::afterRender() { }
+
+void Scene::finish() { }
+
+// ===
 
 void Scene::processHierarchy() {
     loadComponents(&meshes);

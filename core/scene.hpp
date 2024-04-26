@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "loader.hpp"
 #include "./components/camera.hpp"
 
 #include "./components/mesh.hpp"
@@ -13,9 +14,12 @@
 #include "./components/lights/spot-light.hpp"
 
 class Scene {
-private:
+protected:
+    Loader* loader;
+
     Camera* camera = nullptr;
 
+private:
     vector<Mesh*> meshes;
 
     vector<Terrain*> terrains;
@@ -27,14 +31,21 @@ private:
     vector<PointLight*> pointLights;
 
     vector<SpotLight*> spotLights;
-    
+
+
 public:
-    Scene();
-    
-    Camera* getCamera();
+    explicit Scene(Loader* loader);
+
+    virtual ~Scene() = default;
+
+// ===
+// Getters
+// ===
+public:
+    Camera* getCamera() const;
     
     void setCamera(Camera* camera);
-    
+
     const vector<Mesh*>& getMeshes();
 
     const vector<Terrain*>& getTerrains();
@@ -47,8 +58,22 @@ public:
 
     const vector<SpotLight*>& getSpotLights();
 
-    void processHierarchy();
-    
+// ===
+// Events
+// ===
+public:
+
+    virtual void beforeRender();
+
+    virtual void afterRender();
+
+    virtual void setupScene();
+
+    virtual void finish();
+
+protected:
+    virtual void processHierarchy();
+
 private:
     template<typename T>
     void loadComponents(vector<T*>* array);

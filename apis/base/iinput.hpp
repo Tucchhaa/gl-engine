@@ -3,8 +3,13 @@
 #include <glm/glm.hpp>
 
 class IInput {
+protected:
+    static IInput* instance;
+
 public:
     virtual ~IInput() = default;
+
+    static IInput* getInstance();
 
     // ===
 

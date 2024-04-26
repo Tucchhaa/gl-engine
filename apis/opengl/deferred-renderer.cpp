@@ -202,6 +202,8 @@ void DeferredRenderer::setScene(Scene *scene) {
 }
 
 void DeferredRenderer::render() {
+    currentScene->beforeRender();
+
     glViewport(0, 0, screenWidth, screenHeight);
 
     renderGBuffer();
@@ -211,6 +213,8 @@ void DeferredRenderer::render() {
     renderSkybox();
 
     glCheckError();
+
+    currentScene->afterRender();
 }
 
 // ===

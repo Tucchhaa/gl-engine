@@ -13,7 +13,7 @@ using namespace glm;
 
 class Input : public IInput {
 private:
-    GLFWwindow* glfwWindow;
+    GLFWwindow* glfwWindow = nullptr;
 
 private:
     float yPositivePressed = 0;
@@ -29,10 +29,9 @@ private:
     void calculateDeltaTime();
 
 public:
-    Input(IWindow* window);
+    explicit Input(IWindow* window);
 
 public:
-
     void process() override;
 
     // ===

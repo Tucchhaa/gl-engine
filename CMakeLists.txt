@@ -116,6 +116,17 @@ add_executable(gl_engine
         core/structures/texture-options.cpp
         core/structures/texture-options.hpp
 
+        # demos
+        demos/backpack-demo.cpp
+        demos/backpack-demo.hpp
+
+        demos/tunnel-demo.cpp
+        demos/tunnel-demo.hpp
+
+        demos/many-light-demo.cpp
+        demos/many-light-demo.hpp
+
         # other
         main.cpp
+        apis/base/iinput.cpp
 )
