@@ -126,7 +126,13 @@ add_executable(gl_engine
         demos/many-light-demo.cpp
         demos/many-light-demo.hpp
 
+        demos/gooch-shading-demo.cpp
+        demos/gooch-shading-demo.hpp
+
         # other
         main.cpp
         apis/base/iinput.cpp
+
+        apis/opengl/renderer.cpp
+        apis/opengl/renderer.hpp
 )

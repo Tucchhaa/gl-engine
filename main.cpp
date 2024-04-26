@@ -3,7 +3,9 @@
 
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
+
 #include "demos/backpack-demo.hpp"
+#include "demos/gooch-shading-demo.hpp"
 #include "demos/many-light-demo.hpp"
 #include "demos/tunnel-demo.hpp"
 
@@ -47,7 +49,8 @@ int main() {
 
     IInput* input = new Input(window);
     IResourceManager* resourceManager = &ResourceManager::getInstance();
-    IRenderer* renderer = new DeferredRenderer();
+    // IRenderer* renderer = new DeferredRenderer();
+    IRenderer* renderer = new Renderer();
     Loader loader(resourceManager);
 
     Hierarchy::initialize();
@@ -55,7 +58,8 @@ int main() {
     // Scene scene(&loader);
     // BackpackDemo scene(&loader);
     // TunnelDemo scene(&loader);
-    ManyLightsDemo scene(&loader);
+    // ManyLightsDemo scene(&loader);
+    GoochShadingDemo scene(&loader);
 
     // ===
 
@@ -122,7 +126,7 @@ GameObject* createCamera(Loader* loader) {
     camera->cubeMap = loader->loadCubeMap("textures/skybox");
     Hierarchy::addComponent(cameraObject, camera);
 
-    cameraTransform->translate(vec3(-10, 25, -30));
+    cameraTransform->translate(vec3(-3, 3, -8));
     cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
 
     camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);

@@ -35,6 +35,8 @@ public:
 private:
     Shader baseShader;
 
+    Shader goochShader;
+
     Shader depthShader;
     
     Shader screenShader;
@@ -75,7 +77,7 @@ private:
     
     void initScreenVAO();
 
-    void setLights(const Shader* shader) const;
+    void setLights(Shader* shader);
 
     void drawMesh(IRenderObject* object);
 

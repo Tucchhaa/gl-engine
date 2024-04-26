@@ -8,6 +8,7 @@ const string shaderDir = "forward/";
 
 Renderer::Renderer() :
     baseShader(shaderDir+"vertex.vert", shaderDir+"fragment.frag"),
+    goochShader(shaderDir+"vertex.vert", shaderDir+"gooch-fragment.frag"),
     depthShader(shaderDir+"depth-vertex.vert", shaderDir+"depth-fragment.frag"),
     screenShader(shaderDir+"screen-vertex.vert", shaderDir+"screen-fragment.frag"),
     skyboxShader(shaderDir+"skybox-vertex.vert", shaderDir+"skybox-fragment.frag"),
@@ -22,6 +23,7 @@ Renderer::Renderer() :
 
 Renderer::~Renderer() {
     baseShader.deleteShader();
+    goochShader.deleteShader();
     depthShader.deleteShader();
     screenShader.deleteShader();
     skyboxShader.deleteShader();
@@ -177,46 +179,46 @@ void Renderer::renderShadowMap() {
 }
 
 void Renderer::renderMeshes() {
-    DirectLight* light = currentScene->getDirectLights()[0];
-    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
-    mat4 lightPerspective = lightProjection * viewMatrix;
+    // DirectLight* light = currentScene->getDirectLights()[0];
+    // mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
+    // mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
+    // mat4 lightPerspective = lightProjection * viewMatrix;
 
     Camera* camera = currentScene->getCamera();
 
-    cubicPatchShader.use();
-    cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
-    cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    cubicPatchShader.setMat4("lightPerspective", lightPerspective);
-    cubicPatchShader.setTexture("shadowMap", shadowMap);
-
-    setLights(&cubicPatchShader);
-
-    for(auto* cubicPatch : cubicPatches) {
-        drawCubicPatch(cubicPatch);
-    }
+    // cubicPatchShader.use();
+    // cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
+    // cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
+    // // cubicPatchShader.setMat4("lightPerspective", lightPerspective);
+    // // cubicPatchShader.setTexture("shadowMap", shadowMap);
+    //
+    // setLights(&cubicPatchShader);
+    //
+    // for(auto* cubicPatch : cubicPatches) {
+    //     drawCubicPatch(cubicPatch);
+    // }
 
     // draw terrain
-    terrainShader.use();
-    terrainShader.setMat4("perspective", camera->getViewProjectionMatrix());
-    terrainShader.setMat4("rotationMatrix", camera->getViewMatrix());
-
-    for(auto* terrain: terrains) {
-        drawTerrain(terrain);
-    }
+    // terrainShader.use();
+    // terrainShader.setMat4("perspective", camera->getViewProjectionMatrix());
+    // terrainShader.setMat4("rotationMatrix", camera->getViewMatrix());
+    //
+    // for(auto* terrain: terrains) {
+    //     drawTerrain(terrain);
+    // }
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     // ===
 
-    baseShader.use();
-    baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
-    baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    baseShader.setMat4("lightPerspective", lightPerspective);
-    baseShader.setTexture("shadowMap", shadowMap);
+    goochShader.use();
+    goochShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
+    goochShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
+    // baseShader.setMat4("lightPerspective", lightPerspective);
+    // baseShader.setTexture("shadowMap", shadowMap);
 
-    setLights(&baseShader);
+    setLights(&goochShader);
 
     for(auto* mesh : meshes) {
         drawMesh(mesh);
@@ -244,8 +246,9 @@ void Renderer::renderCubeMap() {
 }
 
 void Renderer::render() {
-    renderShadowMap();
+    currentScene->beforeRender();
 
+    // renderShadowMap();
     glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
     glEnable(GL_DEPTH_TEST);
@@ -278,32 +281,36 @@ void Renderer::render() {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glCheckError();
+
+    currentScene->afterRender();
 }
 
-void Renderer::setLights(const Shader* shader) const {
+void Renderer::setLights(Shader* shader) {
     // TODO: size of lights exceed 5 then shader will not work
 
-    for(int i=0; i < currentScene->getSpotLights().size(); i++) {
-        shader->setSpotLight(i, currentScene->getSpotLights()[i]);
-    }
+    // for(int i=0; i < currentScene->getSpotLights().size(); i++) {
+    //     shader->setSpotLight(i, currentScene->getSpotLights()[i]);
+    // }
 
     for(int i=0; i < currentScene->getPointLights().size(); i++) {
-        shader->setPointLight(i, currentScene->getPointLights()[i]);
+        // shader->setPointLight(i, currentScene->getPointLights()[i]);
+        string index = to_string(i);
+        shader->setPointLight("pointLights["+index+"]", currentScene->getPointLights()[i]);
     }
 
-    for(int i=0; i < currentScene->getDirectLights().size(); i++) {
-        shader->setDirectLight(i, currentScene->getDirectLights()[i]);
-    }
+    // for(int i=0; i < currentScene->getDirectLights().size(); i++) {
+    //     shader->setDirectLight(i, currentScene->getDirectLights()[i]);
+    // }
 }
 
 void Renderer::drawMesh(IRenderObject* object) {
     const Mesh* mesh = object->getMesh<Mesh>();
     const Transform* transform = Hierarchy::getTransform(mesh);
 
-    baseShader.setMat4("transform", transform->getTransformMatrix());
-    baseShader.setMat3("normalTransform", transform->getNormalMatrix());
+    goochShader.setMat4("transform", transform->getTransformMatrix());
+    goochShader.setMat3("normalTransform", transform->getNormalMatrix());
 
-    baseShader.setMaterial(&mesh->material);
+    goochShader.setMaterial(&mesh->material);
 
     object->render();
 }

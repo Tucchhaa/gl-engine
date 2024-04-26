@@ -5,3 +5,4 @@
 #include "deferred-renderer.hpp"
 #include "shader.hpp"
 #include "input.hpp"
+#include "renderer.hpp"

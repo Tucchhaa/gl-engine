@@ -167,7 +167,9 @@ Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
 
         vertex.position = convertToVec3(mesh->mVertices[i]);
         vertex.normal = convertToVec3(mesh->mNormals[i]);
-        vertex.tangent = convertToVec3(mesh->mTangents[i]);
+
+        if(mesh->mTangents != nullptr)
+            vertex.tangent = convertToVec3(mesh->mTangents[i]);
 
         if (mesh->mTextureCoords[0])
             vertex.texCoords = convertToVec2(mesh->mTextureCoords[0][i]);
