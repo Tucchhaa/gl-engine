@@ -83,7 +83,7 @@ void Renderer::setScene(Scene *scene) {
     vector<Mesh*> meshes = scene->getMeshes();
     vector<Terrain*> terrains = scene->getTerrains();
     vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
-    
+
     for(Mesh* mesh: meshes) {
         setupMesh(mesh);
     }
@@ -105,13 +105,12 @@ void Renderer::setScreenSize(int width, int height) {
 void Renderer::render() {
     Camera* camera = currentScene->getCamera();
 
-//    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    //    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glCheckError();
 
     if(isPolygonLineMode)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -135,7 +134,6 @@ void Renderer::render() {
 
         glDepthMask(GL_TRUE);
     }
-    glCheckError();
 
     cubicPatchShader.use();
 
@@ -147,8 +145,6 @@ void Renderer::render() {
     for(auto &cubicPatch : cubicPatches) {
         drawCubicPatch(&cubicPatch);
     }
-
-    glCheckError();
 
     // draw terrain
     terrainShader.use();
@@ -174,6 +170,8 @@ void Renderer::render() {
     for(auto &mesh : meshes) {
         drawMesh(&mesh);
     }
+
+    glCheckError();
 
     // ===
 //    glBindFramebuffer(GL_FRAMEBUFFER, 0);

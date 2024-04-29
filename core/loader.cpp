@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/gl-engine/resources";
+const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/resources";
 
 Loader::Loader(IResourceManager* resourceManager) : resourceManager(resourceManager)
     {}

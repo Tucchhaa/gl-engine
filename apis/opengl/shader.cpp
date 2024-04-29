@@ -172,7 +172,7 @@ uint Shader::createShaderProgram(vector<const string*> shaderFiles) {
     uint programId = glCreateProgram();
     vector<uint> shaderIds;
 
-    const string SHADERS_DIR = "/Users/tucha/Repositories/gl-engine/gl-engine/apis/opengl/shaders";
+    const string SHADERS_DIR = "/Users/tucha/Repositories/gl-engine/apis/opengl/shaders";
 
     for(const string* path: shaderFiles) {
         if(path->empty())
