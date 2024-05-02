@@ -229,11 +229,11 @@ vector<Texture> Loader::ModelParser::loadTexturesByType(const aiMaterial* materi
 string Loader::ModelParser::getDefaultTexturePath(const aiTextureType type) {
     switch (type) {
         case aiTextureType_DIFFUSE:
-            return "textures/default_diffuse.jpeg";
+            return "textures/default_diffuse.png";
         case aiTextureType_SPECULAR:
-            return "textures/default_specular.jpeg";
+            return "textures/default_specular.png";
         case aiTextureType_HEIGHT:
-            return "textures/default_normal.jpeg";
+            return "textures/default_normal.png";
         default:
             throw runtime_error("Can not load default texture");
     }
