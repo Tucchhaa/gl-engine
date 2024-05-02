@@ -7,15 +7,15 @@ void BackpackDemo::setupScene() {
     // GameObject* terrainObject = createTerrain();
     // GameObject* cubicPatchObject = createCurvedSurface();
     backpack = createBackpack();
-    GameObject* cubeObject = createCube();
+    // GameObject* cubeObject = createCube();
 
-    cubeObject->transform->scaleBy(vec3(100, 1, 100));
+    // cubeObject->transform->scaleBy(vec3(100, 1, 100));
 
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = lightSource->transform;
-    lightTransform->translate(vec3(0, 20, 0));
+    lightTransform->translate(vec3(5, 10, 0));
     lightTransform->rotate(vec3(0, radians(180.0), 0));
     lightTransform->rotate(vec3(radians(-30.0), 0, 0));
 
@@ -97,7 +97,10 @@ GameObject* BackpackDemo::createCurvedSurface() {
     const Texture* patchDiffuseTexture = loader->loadTexture("textures/metal_art_diffuse.jpg");
     const Texture* patchSpecularTexture = loader->loadTexture("textures/metal_art_specular.jpg");
     const Texture* patchNormalTexture = loader->loadTexture("textures/metal_art_normal.jpg");
-    const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture, *patchNormalTexture);
+    // TODO:
+    const Texture* patchRoughnessTexture = loader->loadTexture("textures/metal_art_specular.jpg");
+    const Texture* patchAOTexture = loader->loadTexture("textures/metal_art_specular.jpg");
+    const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture, *patchNormalTexture, *patchRoughnessTexture, *patchAOTexture);
 
     auto* cubicPatch = new CubicPatch(controlPoints, patchMaterial);
     Hierarchy::addComponent(cubicPatchObject, cubicPatch);

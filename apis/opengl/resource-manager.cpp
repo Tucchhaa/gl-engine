@@ -28,6 +28,12 @@ unsigned int ResourceManager::getTextureId(const Material* material, glApiTextur
         case glApi_NORMAL_TEXTURE:
             textures = &material->normalTextures;
             break;
+        case glApi_ROUGHNESS_TEXTURE:
+            textures = &material->roughnessTextures;
+            break;
+        case glApi_AO_TEXTURE:
+            textures = &material->aoTextures;
+            break;
         default:
             throw runtime_error("can not get texture");
     }

@@ -7,10 +7,13 @@
 
 using namespace std;
 
+// TODO: maybe don't need this enum. Can use opengl's enums directly
 enum glApiTextureTypes {
     glApi_DIFFUSE_TEXTURE,
     glApi_SPECULAR_TEXTURE,
     glApi_NORMAL_TEXTURE,
+    glApi_ROUGHNESS_TEXTURE,
+    glApi_AO_TEXTURE
 };
 
 struct CubeMap {

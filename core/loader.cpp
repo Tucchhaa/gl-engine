@@ -7,6 +7,8 @@
 
 #include "hierarchy.hpp"
 
+#include <iostream>
+
 const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/resources";
 
 Loader::Loader(IResourceManager* resourceManager) : resourceManager(resourceManager)
@@ -197,6 +199,8 @@ Material Loader::ModelParser::processMaterial(const aiMaterial* material) const 
     result.diffuseTextures = loadTexturesByType(material, aiTextureType_DIFFUSE);
     result.specularTextures = loadTexturesByType(material, aiTextureType_SPECULAR);
     result.normalTextures = loadTexturesByType(material, aiTextureType_HEIGHT);
+    result.roughnessTextures = loadTexturesByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
+    result.aoTextures = loadTexturesByType(material, aiTextureType_AMBIENT);
 
     return result;
 }
@@ -234,6 +238,11 @@ string Loader::ModelParser::getDefaultTexturePath(const aiTextureType type) {
             return "textures/default_specular.png";
         case aiTextureType_HEIGHT:
             return "textures/default_normal.png";
+        // TODO: add default roughness and ao texture
+        case aiTextureType_DIFFUSE_ROUGHNESS:
+            return "textures/default_specular.png";
+        case aiTextureType_AMBIENT:
+            return "textures/default_specular.png";
         default:
             throw runtime_error("Can not load default texture");
     }

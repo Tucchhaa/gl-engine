@@ -7,7 +7,8 @@
 
 DeferredRenderer::DeferredRenderer():
     meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
-    lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
+    // lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
+    lightingShader("deferred/lighting.vert", "deferred/pbr.frag"),
     skyboxShader("deferred/skybox.vert", "deferred/skybox.frag"),
     cubicPatchShader("deferred/cubic-patch.vert", "deferred/mesh.frag", "deferred/cubic-patch.tesc", "deferred/cubic-patch.tese"),
     screenShader("deferred/screen.vert", "deferred/screen.frag")
@@ -35,13 +36,21 @@ void DeferredRenderer::initGBuffer() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gNormal, 0);
 
-    // - Color + Specular color buffer
+    // - Albedo + Specular/Metallic buffer
     glGenTextures(1, &gAlbedoSpec);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedoSpec, 0);
+
+    // - AO + Rougness buffer
+    glGenTextures(1, &gAORoughness);
+    glBindTexture(GL_TEXTURE_2D, gAORoughness);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAORoughness, 0);
 
     // - Depth buffer
     glGenTextures(1, &gDepthStencil);
@@ -51,8 +60,8 @@ void DeferredRenderer::initGBuffer() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, gDepthStencil, 0);
 
-    constexpr unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers(2, attachments);
+    constexpr unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -259,7 +268,9 @@ void DeferredRenderer::renderLighting() {
     lightingShader.use();
     lightingShader.setTexture("gDepth", gDepthStencil);
     lightingShader.setTexture("gNormal", gNormal);
-    lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
+    // lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
+    lightingShader.setTexture("gAlbedoMetallic", gAlbedoSpec);
+    lightingShader.setTexture("gAORoughness", gAORoughness);
 
     lightingShader.setMat4("perspective", camera->getViewProjectionMatrix());
     lightingShader.setVec3("cameraPos", camera->transform->getPosition());

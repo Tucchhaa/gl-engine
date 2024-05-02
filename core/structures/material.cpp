@@ -2,12 +2,13 @@
 
 Material::Material() = default;
 
-Material::Material(Texture specularTexture, Texture diffuseTexture, Texture normalTexture) {
+Material::Material(
+    Texture specularTexture, Texture diffuseTexture, Texture normalTexture,
+    Texture roughnessTexture, Texture aoTexture
+) {
     specularTextures = { specularTexture };
     diffuseTextures = { diffuseTexture };
     normalTextures = { normalTexture };
-}
-
-bool Material::isEmpty() const {
-    return specularTextures.empty() && diffuseTextures.empty();
+    roughnessTextures = { roughnessTexture };
+    aoTextures = { aoTexture };
 }

@@ -28,7 +28,7 @@ Shader::Shader(
 void Shader::use() {
     glUseProgram(ID);
 
-    texturesCount = 3;
+    texturesCount = 5; // these first slots are reserved for material textures
 }
 
 void Shader::deleteShader() const {
@@ -108,6 +108,8 @@ void Shader::setMaterial(const Material* material) {
     setTextureToSlot("material.diffuse", ResourceManager::getTextureId(material, glApi_DIFFUSE_TEXTURE), 0);
     setTextureToSlot("material.specular", ResourceManager::getTextureId(material, glApi_SPECULAR_TEXTURE), 1);
     setTextureToSlot("material.normal", ResourceManager::getTextureId(material, glApi_NORMAL_TEXTURE), 2);
+    setTextureToSlot("material.roughness", ResourceManager::getTextureId(material, glApi_ROUGHNESS_TEXTURE), 3);
+    setTextureToSlot("material.ao", ResourceManager::getTextureId(material, glApi_AO_TEXTURE), 4);
     
     setFloat("material.shininess", 32);
 }

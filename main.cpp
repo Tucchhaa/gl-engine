@@ -53,9 +53,9 @@ int main() {
     Hierarchy::initialize();
 
     // Scene scene(&loader);
-    // BackpackDemo scene(&loader);
+    BackpackDemo scene(&loader);
     // TunnelDemo scene(&loader);
-    ManyLightsDemo scene(&loader);
+    // ManyLightsDemo scene(&loader);
 
     // ===
 
