@@ -1,6 +1,8 @@
 #include "loader.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -23,17 +25,31 @@ Loader::~Loader() {
 
 // === Loader functions ===
 
-Texture* Loader::loadTexture(const char* path) {
-    return loadTexture(path, TEXTURE_2D_OPTIONS);
+/**
+ * Load texture from the file with default options
+ * @param file relative path to the texture
+ * @return pointer to the loaded texture, nullptr if the file does not exist
+ */
+Texture* Loader::loadTexture(const string &file) {
+    return loadTexture(file, TEXTURE_2D_OPTIONS);
 }
 
-Texture* Loader::loadTexture(const char *path, const TextureOptions options) {
-    auto cached = textures.find(path);
+/**
+ * Load texture from the file
+ * @param file relative path to the texture
+ * @param options texture options
+ * @return pointer to the loaded texture, nullptr if the file does not exist
+ */
+Texture* Loader::loadTexture(const string &file, const TextureOptions options) {
+    auto cachedTexture = textures.find(file);
+    const string fullPath = RESOURCES_PATH + "/" + file;
 
-    if(cached != textures.end())
-        return cached->second;
+    if(cachedTexture != textures.end())
+        return cachedTexture->second;
 
-    string fullPath = RESOURCES_PATH + "/" + path;
+    if(isFileExists(fullPath) == false) {
+        return nullptr;
+    }
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -45,7 +61,7 @@ Texture* Loader::loadTexture(const char *path, const TextureOptions options) {
     auto* texture = new Texture(fullPath, width, height, format, data, options);
 
     resourceManager->handleTexture(texture);
-    textures[path] = texture;
+    textures[file] = texture;
 
     stbi_image_free(data);
     stbi_set_flip_vertically_on_load(false);
@@ -53,13 +69,13 @@ Texture* Loader::loadTexture(const char *path, const TextureOptions options) {
     return texture;
 }
 
-Texture* Loader::loadCubeMap(const char *path) {
-    auto cached = textures.find(path);
+Texture* Loader::loadCubeMap(const string &directoryPath) {
+    auto cached = textures.find(directoryPath);
 
     if(cached != textures.end())
         return cached->second;
 
-    string fullPath = RESOURCES_PATH + "/" + path;
+    string fullPath = RESOURCES_PATH + "/" + directoryPath;
 
     vector<string> textures_faces = {
         "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg"
@@ -76,10 +92,10 @@ Texture* Loader::loadCubeMap(const char *path) {
 
     TextureFormat format = getTextureFormat(nrChannels);
 
-    auto* texture = new Texture(path, width, height, format, &data, CUBE_MAP_TEXTURE_OPTIONS);
+    auto* texture = new Texture(directoryPath, width, height, format, &data, CUBE_MAP_TEXTURE_OPTIONS);
 
     resourceManager->handleCubeMap(texture);
-    textures[path] = texture;
+    textures[directoryPath] = texture;
 
     for(int i=0; i < N; i++) {
         stbi_image_free(data[i]);
@@ -88,13 +104,16 @@ Texture* Loader::loadCubeMap(const char *path) {
     return texture;
 }
 
-GameObject *Loader::loadModel(const char *path) {
-    const string strPath(path);
-    const string directory = strPath.substr(0, strPath.find_last_of('/'));
+GameObject *Loader::loadModel(const string &file) {
+    const string directory = file.substr(0, file.find_last_of('/'));
 
-    const aiScene* scene = loadScene(strPath);
+    return loadModel(file, directory);
+}
 
-    ModelParser parser(this, directory);
+GameObject *Loader::loadModel(const string &file, const string& texturesDirectory) {
+    const aiScene* scene = loadScene(file);
+
+    ModelParser parser(this, texturesDirectory);
 
     GameObject* result = parser.parse(scene);
 
@@ -120,9 +139,28 @@ const aiScene* Loader::loadScene(const string &path) {
     return scene;
 }
 
+// ===
+// Loader private methods
+// ===
+
+TextureFormat Loader::getTextureFormat(const int nrChannels) {
+    if (nrChannels == 1)
+        return TEXTURE_FORMAT_R;
+    if (nrChannels == 3)
+        return TEXTURE_FORMAT_RGB;
+
+    return TEXTURE_FORMAT_RGBA;
+}
+
+bool Loader::isFileExists(const string& path) {
+    std::ifstream file(path);
+    return file.good();
+}
+
 // === Model Loader ===
-Loader::ModelParser::ModelParser(Loader *loader, string directory):
-        loader(loader), directory(std::move(directory))
+
+Loader::ModelParser::ModelParser(Loader *loader, string texturesDirectory):
+        loader(loader), texturesDirectory(std::move(texturesDirectory))
     {}
 
 GameObject* Loader::ModelParser::parse(const aiScene* scene) {
@@ -140,6 +178,7 @@ GameObject* Loader::ModelParser::parse(const aiScene* scene) {
 }
 
 GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, const aiNode* node) {
+
     auto* result = Hierarchy::createGameObject();
 
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -210,58 +249,43 @@ Material Loader::ModelParser::processMaterial(const aiMaterial* material) const 
 }
 
 Texture Loader::ModelParser::loadTextureByType(const aiMaterial* material, const aiTextureType type) const {
-    for(int i = 0; i < material->GetTextureCount(type); i++)
-    {
+    if(material->GetTextureCount(type) > 0) {
         aiString file;
-        material->GetTexture(type, i, &file);
+        material->GetTexture(type, 0, &file);
 
-        string path = directory + "/" + file.C_Str();
+        const string fileStr = file.C_Str();
 
-        Texture texture = *loader->loadTexture(path.c_str());
+        const string filename = fileStr.substr(fileStr.find_last_of("/\\") + 1);
+        const string path = texturesDirectory + "/" + filename;
 
-        return texture;
+        Texture* texture = loader->loadTexture(path);
+
+        if(texture != nullptr)
+            return *texture;
     }
 
-    const string path = getDefaultTexturePath(type);
-    Texture texture = *loader->loadTexture(path.c_str());
-
-    return texture;
+    return *loadDefaultTexture(type);
 }
 
-string Loader::ModelParser::getDefaultTexturePath(const aiTextureType type) {
+Texture* Loader::ModelParser::loadDefaultTexture(const aiTextureType type) const {
     switch (type) {
         case aiTextureType_DIFFUSE:
-            return "textures/default_diffuse.png";
+            return loader->loadTexture("textures/default_diffuse.png", TEXTURE_2D_OPTIONS);
         case aiTextureType_SPECULAR:
-            return "textures/default_specular.png";
+            return loader->loadTexture("textures/default_specular.png", TEXTURE_2D_OPTIONS);
         case aiTextureType_HEIGHT:
-            return "textures/default_normal.png";
+            return loader->loadTexture("textures/default_normal.png", TEXTURE_2D_OPTIONS);
         // TODO: add default roughness and ao texture
         case aiTextureType_DIFFUSE_ROUGHNESS:
-            return "textures/default_specular.png";
+            return loader->loadTexture("textures/default_roughness.png", TEXTURE_2D_OPTIONS);
         case aiTextureType_AMBIENT:
-            return "textures/default_specular.png";
+            return loader->loadTexture("textures/default_ao.png", TEXTURE_2D_OPTIONS);
         default:
             throw runtime_error("Can not load default texture");
     }
 }
 
-// ===
-// Loader private methods
-// ===
-
-TextureFormat Loader::getTextureFormat(const int nrChannels) {
-    if (nrChannels == 1)
-        return TEXTURE_FORMAT_R;
-    if (nrChannels == 3)
-        return TEXTURE_FORMAT_RGB;
-
-    return TEXTURE_FORMAT_RGBA;
-}
-
-// ===
-// aiMaterial Info
-// ===
+// === aiMaterial Info ===
 
 void Loader::aiMaterialInfo::print(const aiMaterial* material) {
     std::cout << "= Material Info =" << std::endl;

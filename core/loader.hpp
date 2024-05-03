@@ -32,17 +32,20 @@ public:
 
     ~Loader();
 
-    GameObject* loadModel(const char* path);
+    GameObject* loadModel(const string &file);
+    GameObject* loadModel(const string &file, const string& texturesDirectory);
 
     const aiScene* loadScene(const string &path);
 
-    Texture* loadTexture(const char* path);
-    Texture* loadTexture(const char* path, TextureOptions options);
+    Texture* loadTexture(const string &file);
+    Texture* loadTexture(const string &file, TextureOptions options);
 
-    Texture* loadCubeMap(const char* path);
+    Texture* loadCubeMap(const string &directoryPath);
 
 private:
     static TextureFormat getTextureFormat(int nrChannels);
+
+    static bool isFileExists(const string& path);
 
     map<string, Texture*> textures;
     map<string, const aiScene*> models;
@@ -55,10 +58,10 @@ private:
 
         Loader* loader;
 
-        const string directory;
+        const string texturesDirectory;
 
     public:
-        ModelParser(Loader* loader, string directoryPath);
+        ModelParser(Loader* loader, string texturesDirectory);
 
         GameObject* parse(const aiScene* scene);
 
@@ -71,7 +74,7 @@ private:
 
         Texture loadTextureByType(const aiMaterial* material, aiTextureType type) const;
 
-        static string getDefaultTexturePath(aiTextureType type);
+        Texture* loadDefaultTexture(aiTextureType type) const;
 
     };
 

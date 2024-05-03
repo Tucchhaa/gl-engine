@@ -18,15 +18,15 @@ unsigned int ResourceManager::getTextureId(Texture* texture) {
 unsigned int ResourceManager::getTextureId(const Material* material, glApiTextureTypes textureType) {
     switch(textureType) {
         case glApi_DIFFUSE_TEXTURE:
-            return material->diffuseTexture.ID;
+            return getInstance().textures[material->diffuseTexture.ID];
         case glApi_SPECULAR_TEXTURE:
-            return material->specularTexture.ID;
+            return getInstance().textures[material->specularTexture.ID];
         case glApi_NORMAL_TEXTURE:
-            return material->normalTexture.ID;
+            return getInstance().textures[material->normalTexture.ID];
         case glApi_ROUGHNESS_TEXTURE:
-            return material->roughnessTexture.ID;
+            return getInstance().textures[material->roughnessTexture.ID];
         case glApi_AO_TEXTURE:
-            return material->aoTexture.ID;
+            return getInstance().textures[material->aoTexture.ID];
         default:
             throw runtime_error("can not get texture");
     }
