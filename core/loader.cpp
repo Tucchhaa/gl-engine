@@ -1,5 +1,7 @@
 #include "loader.hpp"
 
+#include <iostream>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -7,7 +9,6 @@
 
 #include "hierarchy.hpp"
 
-#include <iostream>
 
 const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/resources";
 
@@ -107,7 +108,8 @@ const aiScene* Loader::loadScene(const string &path) {
         return it->second;
     }
 
-    const aiScene* scene = importer.ReadFile(fullPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+    unsigned int flags = aiProcess_RemoveRedundantMaterials | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace;
+    const aiScene* scene = importer.ReadFile(fullPath, flags);
 
     if(!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
         throw std::runtime_error("Couldn't load model");
@@ -196,18 +198,18 @@ Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
 Material Loader::ModelParser::processMaterial(const aiMaterial* material) const {
     Material result;
 
-    result.diffuseTextures = loadTexturesByType(material, aiTextureType_DIFFUSE);
-    result.specularTextures = loadTexturesByType(material, aiTextureType_SPECULAR);
-    result.normalTextures = loadTexturesByType(material, aiTextureType_HEIGHT);
-    result.roughnessTextures = loadTexturesByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
-    result.aoTextures = loadTexturesByType(material, aiTextureType_AMBIENT);
+    aiMaterialInfo::print(material);
+
+    result.diffuseTexture = loadTextureByType(material, aiTextureType_DIFFUSE);
+    result.specularTexture = loadTextureByType(material, aiTextureType_SPECULAR);
+    result.normalTexture = loadTextureByType(material, aiTextureType_HEIGHT);
+    result.roughnessTexture = loadTextureByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
+    result.aoTexture = loadTextureByType(material, aiTextureType_AMBIENT);
 
     return result;
 }
 
-vector<Texture> Loader::ModelParser::loadTexturesByType(const aiMaterial* material, const aiTextureType type) const {
-    vector<Texture> textures;
-
+Texture Loader::ModelParser::loadTextureByType(const aiMaterial* material, const aiTextureType type) const {
     for(int i = 0; i < material->GetTextureCount(type); i++)
     {
         aiString file;
@@ -217,17 +219,13 @@ vector<Texture> Loader::ModelParser::loadTexturesByType(const aiMaterial* materi
 
         Texture texture = *loader->loadTexture(path.c_str());
 
-        textures.emplace_back(texture);
+        return texture;
     }
 
-    if(textures.empty()) {
-        string path = getDefaultTexturePath(type);
-        Texture texture = *loader->loadTexture(path.c_str());
+    const string path = getDefaultTexturePath(type);
+    Texture texture = *loader->loadTexture(path.c_str());
 
-        textures.emplace_back(texture);
-    }
-
-    return textures;
+    return texture;
 }
 
 string Loader::ModelParser::getDefaultTexturePath(const aiTextureType type) {
@@ -261,5 +259,85 @@ TextureFormat Loader::getTextureFormat(const int nrChannels) {
     return TEXTURE_FORMAT_RGBA;
 }
 
+// ===
+// aiMaterial Info
+// ===
 
+void Loader::aiMaterialInfo::print(const aiMaterial* material) {
+    std::cout << "= Material Info =" << std::endl;
+
+    // output properties
+    printProperty<aiString>(material, "Name", AI_MATKEY_NAME);
+    printProperty<aiColor4D>(material, "Diffuse color", AI_MATKEY_COLOR_DIFFUSE);
+    printProperty<aiColor4D>(material, "Specular color", AI_MATKEY_COLOR_SPECULAR);
+    printProperty<aiColor4D>(material, "Ambient color", AI_MATKEY_COLOR_AMBIENT);
+    printProperty<aiColor4D>(material, "Emissive color", AI_MATKEY_COLOR_EMISSIVE);
+    printProperty<aiColor4D>(material, "Reflective color", AI_MATKEY_COLOR_REFLECTIVE);
+
+    // output textures
+    map<aiTextureType, string> typesName = {
+        { aiTextureType_NONE, "NONE" },
+        { aiTextureType_DIFFUSE, "DIFFUSE" },
+        { aiTextureType_SPECULAR, "SPECULAR" },
+        { aiTextureType_AMBIENT, "AMBIENT" },
+        { aiTextureType_EMISSIVE, "EMISSIVE" },
+        { aiTextureType_HEIGHT, "HEIGHT" },
+        { aiTextureType_NORMALS, "NORMALS" },
+        { aiTextureType_SHININESS, "SHININESS" },
+        { aiTextureType_OPACITY, "OPACITY" },
+        { aiTextureType_DISPLACEMENT, "DISPLACEMENT" },
+        { aiTextureType_LIGHTMAP, "LIGHTMAP" },
+        { aiTextureType_REFLECTION, "REFLECTION" },
+        { aiTextureType_BASE_COLOR, "BASE_COLOR" },
+        { aiTextureType_NORMAL_CAMERA, "NORMAL_CAMERA" },
+        { aiTextureType_EMISSION_COLOR, "EMISSION_COLOR" },
+        { aiTextureType_METALNESS, "METALNESS" },
+        { aiTextureType_DIFFUSE_ROUGHNESS, "DIFFUSE_ROUGHNESS" },
+        { aiTextureType_AMBIENT_OCCLUSION, "AMBIENT_OCCLUSION" },
+        { aiTextureType_UNKNOWN, "UNKNOWN" },
+        { aiTextureType_TRANSMISSION, "TRANSMISSION" }
+    };
+
+    for(int type=aiTextureType_NONE; type <= aiTextureType_TRANSMISSION; type++) {
+        aiTextureType aiType = static_cast<aiTextureType>(type);
+        unsigned int count = material->GetTextureCount(aiType);
+
+        if(count > 0) {
+            string typeName = typesName[aiType];
+            std::cout << "Texture type: " << typeName << ", count: " << count << ": ";
+
+            for(unsigned int i = 0; i < count; ++i) {
+                aiString path;
+
+                if(material->GetTexture(aiType, i, &path) == AI_SUCCESS) {
+                    std::cout << path.C_Str() << ", ";
+                }
+            }
+
+            std::cout << std::endl;
+        }
+    }
+}
+
+template<typename T>
+void Loader::aiMaterialInfo::printProperty(
+    const aiMaterial* material, const string &propertyName, const char* key,
+    unsigned int type, unsigned int idx
+) {
+    const bool isString = typeid(T) == typeid(aiString);
+    const bool isColor  = typeid(T) == typeid(aiColor4D);
+
+    cout << "Property: " << propertyName << ": ";
+    if(aiString str; isString && material->Get(key, type, idx, str) == AI_SUCCESS) {
+        std::cout << str.C_Str();
+    }
+    else if(aiColor4D color; isColor && material->Get(key, type, idx, color) == AI_SUCCESS) {
+        std::cout << color.r << " " << color.g << " " << color.b;
+    }
+    else {
+        std::cout << "Can not get property";
+    }
+
+    cout << std::endl;
+}
 

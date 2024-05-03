@@ -69,8 +69,19 @@ private:
 
         Material processMaterial(const aiMaterial* material) const;
 
-        vector<Texture> loadTexturesByType(const aiMaterial* material, aiTextureType type) const;
+        Texture loadTextureByType(const aiMaterial* material, aiTextureType type) const;
 
-        static string getDefaultTexturePath(aiTextureType type) ;
+        static string getDefaultTexturePath(aiTextureType type);
+
+    };
+
+    class aiMaterialInfo {
+    public:
+        static void print(const aiMaterial* material);
+
+    private:
+        template<typename T>
+        static void printProperty(const aiMaterial* material, const string& propertyName, const char* key, unsigned int type,
+        unsigned int idx);
     };
 };

@@ -1,5 +1,7 @@
 #include "texture.hpp"
 
+Texture::Texture() = default;
+
 Texture::Texture(
         string path, int width, int height,
         TextureFormat format, void* data, TextureOptions options

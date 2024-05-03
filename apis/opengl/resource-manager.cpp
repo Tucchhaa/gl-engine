@@ -16,29 +16,20 @@ unsigned int ResourceManager::getTextureId(Texture* texture) {
 }
 
 unsigned int ResourceManager::getTextureId(const Material* material, glApiTextureTypes textureType) {
-    const vector<Texture>* textures;
-
     switch(textureType) {
         case glApi_DIFFUSE_TEXTURE:
-            textures = &material->diffuseTextures;
-            break;
+            return material->diffuseTexture.ID;
         case glApi_SPECULAR_TEXTURE:
-            textures = &material->specularTextures;
-            break;
+            return material->specularTexture.ID;
         case glApi_NORMAL_TEXTURE:
-            textures = &material->normalTextures;
-            break;
+            return material->normalTexture.ID;
         case glApi_ROUGHNESS_TEXTURE:
-            textures = &material->roughnessTextures;
-            break;
+            return material->roughnessTexture.ID;
         case glApi_AO_TEXTURE:
-            textures = &material->aoTextures;
-            break;
+            return material->aoTexture.ID;
         default:
             throw runtime_error("can not get texture");
     }
-
-    return getInstance().textures[(*textures)[0].ID];
 }
 
 CubeMap* ResourceManager::getCubeMap(const Texture* texture) {

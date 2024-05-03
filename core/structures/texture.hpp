@@ -33,6 +33,8 @@ public:
     string path;
     void* data = nullptr;
 
+    Texture();
+
     explicit Texture(string path, int width, int height, TextureFormat format, void* data, TextureOptions options = TextureOptions());
 
     unsigned char* getTextureData() const;
