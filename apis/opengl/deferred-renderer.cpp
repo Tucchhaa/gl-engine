@@ -37,12 +37,12 @@ void DeferredRenderer::initGBuffer() {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gNormal, 0);
 
     // - Albedo + Specular/Metallic buffer
-    glGenTextures(1, &gAlbedoSpec);
-    glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+    glGenTextures(1, &gAlbedoMetal);
+    glBindTexture(GL_TEXTURE_2D, gAlbedoMetal);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedoSpec, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedoMetal, 0);
 
     // - AO + Rougness buffer
     glGenTextures(1, &gAORoughness);
@@ -269,7 +269,7 @@ void DeferredRenderer::renderLighting() {
     lightingShader.setTexture("gDepth", gDepthStencil);
     lightingShader.setTexture("gNormal", gNormal);
     // lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
-    lightingShader.setTexture("gAlbedoMetallic", gAlbedoSpec);
+    lightingShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
     lightingShader.setTexture("gAORoughness", gAORoughness);
 
     lightingShader.setMat4("perspective", camera->getViewProjectionMatrix());
@@ -352,7 +352,6 @@ void DeferredRenderer::renderMeshes(const mat4& viewProjection) {
 
         meshShader.setMat4("transform", transform->getTransformMatrix());
         meshShader.setMat3("normalTransform", transform->getNormalMatrix());
-
         meshShader.setMaterial(&mesh->material);
 
         object->render();

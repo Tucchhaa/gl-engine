@@ -13,6 +13,14 @@ enum TextureFormat {
     TEXTURE_FORMAT_RGBA,
 };
 
+enum TextureType {
+    TEXTURE_DIFFUSE,
+    TEXTURE_SPECULAR,
+    TEXTURE_NORMAL,
+    TEXTURE_ROUGHNESS,
+    TEXTURE_AO
+};
+
 struct Texture {
 private:
     static inline int lastID = 1;

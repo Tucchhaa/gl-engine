@@ -4,13 +4,11 @@
 #include <assimp/scene.h>
 
 #include <queue>
-#include <vector>
 #include <string>
 #include <map>
 
 #include "../apis/base/iresource-manager.hpp"
 
-#include "game-object.hpp"
 #include "components/mesh.hpp"
 
 #include "structures/material.hpp"
@@ -67,6 +65,8 @@ private:
 
     private:
         GameObject* parseNodeToGameObject(const aiScene* scene, const aiNode* node);
+
+        static void decomposeNodeTransform(const aiNode* node, const GameObject& gameObject);
 
         Mesh* processMesh(const aiScene* scene, aiMesh* mesh);
 

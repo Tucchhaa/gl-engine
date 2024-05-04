@@ -102,7 +102,7 @@ vec3 calculatePointLight(PointLight lightSource, vec3 normal, vec3 position, vec
 
     vec3 result = (kD * albedo / PI + specular) * radiance * NdotL;
     // TODO: change to IBL
-    result += kS * vec3(1.0, 1.0, 1.0);
+    result += kS * vec3(0.01, 0.01, 0.01);
     result *= ao;
 
     return result;

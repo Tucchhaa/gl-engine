@@ -7,15 +7,6 @@
 
 using namespace std;
 
-// TODO: maybe don't need this enum. Can use opengl's enums directly
-enum glApiTextureTypes {
-    glApi_DIFFUSE_TEXTURE,
-    glApi_SPECULAR_TEXTURE,
-    glApi_NORMAL_TEXTURE,
-    glApi_ROUGHNESS_TEXTURE,
-    glApi_AO_TEXTURE
-};
-
 struct CubeMap {
     unsigned int textureId = 0;
     unsigned int VAO = 0;
@@ -53,7 +44,7 @@ public:
 public:
     static unsigned int getTextureId(Texture* texture);
 
-    static unsigned int getTextureId(const Material* material, glApiTextureTypes textureType);
+    static unsigned int getTextureId(const Material* material, TextureType textureType);
 
     static CubeMap* getCubeMap(const Texture* texture);
 

@@ -105,11 +105,11 @@ void Shader::setTextureToSlot(const string& name, const unsigned int textureId, 
  * @param material
  */
 void Shader::setMaterial(const Material* material) {
-    setTextureToSlot("material.diffuse", ResourceManager::getTextureId(material, glApi_DIFFUSE_TEXTURE), 0);
-    setTextureToSlot("material.specular", ResourceManager::getTextureId(material, glApi_SPECULAR_TEXTURE), 1);
-    setTextureToSlot("material.normal", ResourceManager::getTextureId(material, glApi_NORMAL_TEXTURE), 2);
-    setTextureToSlot("material.roughness", ResourceManager::getTextureId(material, glApi_ROUGHNESS_TEXTURE), 3);
-    setTextureToSlot("material.ao", ResourceManager::getTextureId(material, glApi_AO_TEXTURE), 4);
+    setTextureToSlot("material.diffuse", ResourceManager::getTextureId(material, TEXTURE_DIFFUSE), 0);
+    setTextureToSlot("material.specular", ResourceManager::getTextureId(material, TEXTURE_SPECULAR), 1);
+    setTextureToSlot("material.normal", ResourceManager::getTextureId(material, TEXTURE_NORMAL), 2);
+    setTextureToSlot("material.roughness", ResourceManager::getTextureId(material, TEXTURE_ROUGHNESS), 3);
+    setTextureToSlot("material.ao", ResourceManager::getTextureId(material, TEXTURE_AO), 4);
     
     setFloat("material.shininess", 32);
 }

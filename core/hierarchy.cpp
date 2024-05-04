@@ -166,6 +166,7 @@ void Hierarchy::setParent(GameObject* parent, GameObject* child) {
         set<GameObject*> oldSiblings = child->parent->children;
 
         auto it = oldSiblings.find(child);
+
         if(it != oldSiblings.end()) {
             oldSiblings.erase(child);
         }

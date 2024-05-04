@@ -123,11 +123,11 @@ GameObject *Loader::loadModel(const string &file, const string& texturesDirector
 const aiScene* Loader::loadScene(const string &path) {
     const string fullPath = RESOURCES_PATH + "/" + path;
 
-    if(auto it = models.find(path); it != models.end()) {
+    if(const auto it = models.find(path); it != models.end()) {
         return it->second;
     }
 
-    unsigned int flags = aiProcess_RemoveRedundantMaterials | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace;
+    constexpr unsigned int flags = aiProcess_RemoveRedundantMaterials | aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace;
     const aiScene* scene = importer.ReadFile(fullPath, flags);
 
     if(!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
@@ -178,8 +178,9 @@ GameObject* Loader::ModelParser::parse(const aiScene* scene) {
 }
 
 GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, const aiNode* node) {
-
     auto* result = Hierarchy::createGameObject();
+
+    decomposeNodeTransform(node, *result);
 
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -197,6 +198,18 @@ GameObject* Loader::ModelParser::parseNodeToGameObject(const aiScene* scene, con
     return result;
 }
 
+void Loader::ModelParser::decomposeNodeTransform(const aiNode* node, const GameObject& gameObject) {
+    aiVector3t<float> position;
+    aiVector3t<float> scale;
+    aiQuaterniont<float> rotation;
+
+    node->mTransformation.Decompose(scale,rotation, position);
+
+    gameObject.transform->setPosition(position.x, position.y, position.z);
+    gameObject.transform->setRotation(rotation.w, rotation.x, rotation.y, rotation.z);
+    gameObject.transform->setScale(scale.x, scale.y, scale.z);
+}
+
 Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
     auto convertToVec3 = [](aiVector3D vec) { return Vec3(vec.x, vec.y, vec.z); };
     auto convertToVec2 = [](aiVector3D vec) { return Vec2(vec.x, vec.y); };
@@ -211,11 +224,7 @@ Mesh* Loader::ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
         vertex.position = convertToVec3(mesh->mVertices[i]);
         vertex.normal = convertToVec3(mesh->mNormals[i]);
         vertex.tangent = convertToVec3(mesh->mTangents[i]);
-
-        if (mesh->mTextureCoords[0])
-            vertex.texCoords = convertToVec2(mesh->mTextureCoords[0][i]);
-        else
-            vertex.texCoords = Vec2(0, 0);
+        vertex.texCoords = mesh->HasTextureCoords(0) ? convertToVec2(mesh->mTextureCoords[0][i]) : Vec2(0, 0);
 
         vertices.push_back(vertex);
     }
@@ -241,7 +250,7 @@ Material Loader::ModelParser::processMaterial(const aiMaterial* material) const 
 
     result.diffuseTexture = loadTextureByType(material, aiTextureType_DIFFUSE);
     result.specularTexture = loadTextureByType(material, aiTextureType_SPECULAR);
-    result.normalTexture = loadTextureByType(material, aiTextureType_HEIGHT);
+    result.normalTexture = loadTextureByType(material, aiTextureType_NORMALS);
     result.roughnessTexture = loadTextureByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
     result.aoTexture = loadTextureByType(material, aiTextureType_AMBIENT);
 
@@ -258,7 +267,7 @@ Texture Loader::ModelParser::loadTextureByType(const aiMaterial* material, const
         const string filename = fileStr.substr(fileStr.find_last_of("/\\") + 1);
         const string path = texturesDirectory + "/" + filename;
 
-        Texture* texture = loader->loadTexture(path);
+        const Texture* texture = loader->loadTexture(path);
 
         if(texture != nullptr)
             return *texture;
@@ -273,9 +282,8 @@ Texture* Loader::ModelParser::loadDefaultTexture(const aiTextureType type) const
             return loader->loadTexture("textures/default_diffuse.png", TEXTURE_2D_OPTIONS);
         case aiTextureType_SPECULAR:
             return loader->loadTexture("textures/default_specular.png", TEXTURE_2D_OPTIONS);
-        case aiTextureType_HEIGHT:
+        case aiTextureType_NORMALS:
             return loader->loadTexture("textures/default_normal.png", TEXTURE_2D_OPTIONS);
-        // TODO: add default roughness and ao texture
         case aiTextureType_DIFFUSE_ROUGHNESS:
             return loader->loadTexture("textures/default_roughness.png", TEXTURE_2D_OPTIONS);
         case aiTextureType_AMBIENT:
@@ -323,7 +331,7 @@ void Loader::aiMaterialInfo::print(const aiMaterial* material) {
     };
 
     for(int type=aiTextureType_NONE; type <= aiTextureType_TRANSMISSION; type++) {
-        aiTextureType aiType = static_cast<aiTextureType>(type);
+        auto aiType = static_cast<aiTextureType>(type);
         unsigned int count = material->GetTextureCount(aiType);
 
         if(count > 0) {
