@@ -1,7 +1,7 @@
 #version 410 core
 
 layout (location = 0) out vec3 gNormal;
-layout (location = 1) out vec4 gAlbedoSpec;
+layout (location = 1) out vec4 gAlbedoMetal;
 layout (location = 2) out vec3 gAORoughness;
 
 uniform struct Material {
@@ -26,8 +26,8 @@ void main() {
 
     gNormal = calculateNormal();
 
-    gAlbedoSpec.rgb = texture(material.diffuse, texCoord).rgb;
-    gAlbedoSpec.a = texture(material.specular, texCoord).r;
+    gAlbedoMetal.rgb = texture(material.diffuse, texCoord).rgb;
+    gAlbedoMetal.a = texture(material.specular, texCoord).r;
 
     float roughness = texture(material.roughness, texCoord).r;
     float ao = texture(material.ao, texCoord).r;

@@ -1,12 +1,32 @@
 #include "transform.hpp"
+#include <iostream>
 
 using namespace std;
 
-const Transform Transform::World = Transform(vec3(0), quat(vec3(0, 0, 0)), vec3(1));
+const Transform Transform::World = Transform(
+    vec3(0), quat(vec3(0, 0, 0)), vec3(1)
+);
 
 Transform::Transform(vec3 position, quat rotation, vec3 scale) :
     position(position), scale(scale), rotation(rotation)
 { }
+
+void Transform::print() const {
+    cout << "Local coordinates: " << endl;
+    cout << "position: " << position.x << " " << position.y << " " << position.z << endl;
+    cout << "rotation: " << rotation.x << " " << rotation.y << " " << rotation.z << " " << rotation.w << endl;
+    cout << "scale: " << scale.x << " " << scale.y << " " << scale.z << endl;
+
+    const vec3 absolutePosition = getAbsolutePosition();
+    const vec3 absoluteScale = getAbsoluteScale();
+    const quat absoluteRotation = getAbsoluteRotation();
+
+    cout << "Absolute coordinates: " << endl;
+    cout << "position: " << absolutePosition.x << " " << absolutePosition.y << " " << absolutePosition.z << endl;
+    cout << "rotation: " << absoluteRotation.x << " " << absoluteRotation.y << " " << absoluteRotation.z << " " << absoluteRotation.w << endl;
+    cout << "scale: " << absoluteScale.x << " " << absoluteScale.y << " " << absoluteScale.z << endl;
+    cout << endl;
+}
 
 void Transform::setValues(vec3 position, quat rotation, vec3 scale) {
     this->position = position;
@@ -14,8 +34,28 @@ void Transform::setValues(vec3 position, quat rotation, vec3 scale) {
     this->scale = scale;
 }
 
-void Transform::setPosition(vec3 position) {
+void Transform::setPosition(float x, float y, float z) {
+    this->position = vec3(x, y, z);
+}
+
+void Transform::setPosition(const vec3 position) {
     this->position = position;
+}
+
+void Transform::setRotation(float w, float x, float y, float z) {
+    this->rotation = quat(w, x, y, z);
+}
+
+void Transform::setRotation(const quat rotation) {
+    this->rotation = rotation;
+}
+
+void Transform::setScale(float x, float y, float z) {
+    this->scale = vec3(x, y, z);
+}
+
+void Transform::setScale(const vec3 scale) {
+    this->scale = scale;
 }
 
 void Transform::translate(vec3 vector, const Transform* transform) {

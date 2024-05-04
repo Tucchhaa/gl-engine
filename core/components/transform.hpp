@@ -38,10 +38,18 @@ private:
 public:
     explicit Transform(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
 
+    void print() const;
 public:
     void setValues(vec3 position = vec3(0, 0, 0), quat rotation = quat(vec3(0, 0, 0)), vec3 scale = vec3(1, 1, 1));
 
+    void setPosition(float x, float y, float z);
     void setPosition(vec3 position);
+
+    void setRotation(float w, float x, float y, float z);
+    void setRotation(quat rotation);
+
+    void setScale(float x, float y, float z);
+    void setScale(vec3 scale);
 
     void translate(vec3 vector, const Transform* transform = nullptr);
 
