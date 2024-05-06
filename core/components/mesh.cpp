@@ -2,8 +2,8 @@
 
 Mesh::Mesh() = default;
 
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material) :
-    vertices(std::move(vertices)), indices(std::move(indices)), material(std::move(material))
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, const Material* material) :
+    vertices(std::move(vertices)), indices(std::move(indices)), material(material)
 {}
 
 // === IMesh implementation ===

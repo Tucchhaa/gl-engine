@@ -352,7 +352,7 @@ void DeferredRenderer::renderMeshes(const mat4& viewProjection) {
 
         meshShader.setMat4("transform", transform->getTransformMatrix());
         meshShader.setMat3("normalTransform", transform->getNormalMatrix());
-        meshShader.setMaterial(&mesh->material);
+        meshShader.setMaterial(mesh->material);
 
         object->render();
     }

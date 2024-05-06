@@ -6,36 +6,34 @@
 
 ModelParser::ModelParser(Loader *loader, string texturesDirectory):
         loader(loader), texturesDirectory(std::move(texturesDirectory))
-    {}
+{ }
 
 GameObject* ModelParser::parse(const aiScene* scene) {
-    for(int i=0; i < scene->mNumMaterials; i++) {
-        aiMaterial* _material = scene->mMaterials[i];
+    GameObject* result = Hierarchy::createGameObject();
 
-        Material material = processMaterial(_material);
+    processMaterials(scene, result);
 
-        materials[i] = material;
-    }
+    GameObject* mesh = nodeToGameObject(scene, scene->mRootNode);
 
-    GameObject* result = parseNodeToGameObject(scene, scene->mRootNode);
+    Hierarchy::setParent(result, mesh);
 
     return result;
 }
 
-GameObject* ModelParser::parseNodeToGameObject(const aiScene* scene, const aiNode* node) {
+GameObject* ModelParser::nodeToGameObject(const aiScene* scene, const aiNode* node) {
     auto* result = Hierarchy::createGameObject();
 
     // decomposeNodeTransform(node, *result);
 
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        Mesh* meshComponent = processMesh(scene, mesh);
+        Mesh* meshComponent = processMesh(mesh);
 
         Hierarchy::addComponent(result, meshComponent);
     }
 
     for(unsigned int i = 0; i < node->mNumChildren; i++) {
-        GameObject* child = parseNodeToGameObject(scene, node->mChildren[i]);
+        GameObject* child = nodeToGameObject(scene, node->mChildren[i]);
 
         Hierarchy::setParent(result, child);
     }
@@ -55,7 +53,7 @@ void ModelParser::decomposeNodeTransform(const aiNode* node, const GameObject& g
     gameObject.transform->setScale(scale.x, scale.y, scale.z);
 }
 
-Mesh* ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
+Mesh* ModelParser::processMesh(aiMesh* mesh) {
     auto convertToVec3 = [](aiVector3D vec) { return Vec3(vec.x, vec.y, vec.z); };
     auto convertToVec2 = [](aiVector3D vec) { return Vec2(vec.x, vec.y); };
 
@@ -83,21 +81,31 @@ Mesh* ModelParser::processMesh(const aiScene* scene, aiMesh* mesh) {
     }
 
     // Material
-    const Material material = materials[static_cast<int>(mesh->mMaterialIndex)];
+    const Material* material = materials[static_cast<int>(mesh->mMaterialIndex)];
 
     return new Mesh(vertices, indices, material);
 }
 
-Material ModelParser::processMaterial(const aiMaterial* material) const {
-    Material result;
+void ModelParser::processMaterials(const aiScene* scene, GameObject* result) {
+    for(int i=0; i < scene->mNumMaterials; i++) {
+        Material* material = processMaterial(scene->mMaterials[i]);
+
+        materials[i] = material;
+
+        result->data.push_back(material);
+    }
+}
+
+Material* ModelParser::processMaterial(const aiMaterial* material) const {
+    auto* result = new Material();
 
     MaterialInfo::print(material);
 
-    result.diffuseTexture = loadTextureByType(material, aiTextureType_DIFFUSE);
-    result.specularTexture = loadTextureByType(material, aiTextureType_SPECULAR);
-    result.normalTexture = loadTextureByType(material, aiTextureType_NORMALS);
-    result.roughnessTexture = loadTextureByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
-    result.aoTexture = loadTextureByType(material, aiTextureType_AMBIENT);
+    result->diffuseTexture = loadTextureByType(material, aiTextureType_DIFFUSE);
+    result->specularTexture = loadTextureByType(material, aiTextureType_SPECULAR);
+    result->normalTexture = loadTextureByType(material, aiTextureType_NORMALS);
+    result->roughnessTexture = loadTextureByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
+    result->aoTexture = loadTextureByType(material, aiTextureType_AMBIENT);
 
     return result;
 }

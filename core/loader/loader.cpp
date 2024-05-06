@@ -41,13 +41,14 @@ Texture* Loader::loadTexture(const string &file) {
  * @return pointer to the loaded texture, nullptr if the file does not exist
  */
 Texture* Loader::loadTexture(const string &file, const TextureOptions options) {
-    auto cachedTexture = textures.find(file);
+    const auto cachedTexture = textures.find(file);
     const string fullPath = RESOURCES_PATH + "/" + file;
 
     if(cachedTexture != textures.end())
         return cachedTexture->second;
 
     if(isFileExists(fullPath) == false) {
+        cout << "WARNING: File " << fullPath << " does not exist\n";
         return nullptr;
     }
 
@@ -56,7 +57,7 @@ Texture* Loader::loadTexture(const string &file, const TextureOptions options) {
     int height, width, nrChannels;
     unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
 
-    TextureFormat format = getTextureFormat(nrChannels);
+    const TextureFormat format = getTextureFormat(nrChannels);
 
     auto* texture = new Texture(fullPath, width, height, format, data, options);
 
@@ -70,18 +71,18 @@ Texture* Loader::loadTexture(const string &file, const TextureOptions options) {
 }
 
 Texture* Loader::loadCubeMap(const string &directoryPath) {
-    auto cached = textures.find(directoryPath);
+    const auto cached = textures.find(directoryPath);
 
     if(cached != textures.end())
         return cached->second;
 
-    string fullPath = RESOURCES_PATH + "/" + directoryPath;
+    const string fullPath = RESOURCES_PATH + "/" + directoryPath;
 
-    vector<string> textures_faces = {
+    const vector<string> textures_faces = {
         "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg"
     };
 
-    const int N = 6;
+    constexpr int N = 6;
     vector<unsigned char*> data(N);
 
     int width, height, nrChannels;
@@ -127,7 +128,10 @@ const aiScene* Loader::loadScene(const string &path) {
         return it->second;
     }
 
-    constexpr unsigned int flags = aiProcess_PreTransformVertices | aiProcess_RemoveRedundantMaterials | aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace;
+    constexpr unsigned int flags =
+        aiProcess_PreTransformVertices | aiProcess_RemoveRedundantMaterials |
+        aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace;
+
     const aiScene* scene = importer.ReadFile(fullPath, flags);
 
     if(!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
@@ -153,6 +157,7 @@ TextureFormat Loader::getTextureFormat(const int nrChannels) {
 }
 
 bool Loader::isFileExists(const string& path) {
-    std::ifstream file(path);
+    const std::ifstream file(path);
+
     return file.good();
 }

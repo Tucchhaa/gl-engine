@@ -11,7 +11,7 @@ private:
     /**
      * MaterialId - Material struct
      */
-    std::map<int, Material> materials;
+    std::map<int, Material*> materials;
 
     Loader* loader;
 
@@ -23,13 +23,15 @@ public:
     GameObject* parse(const aiScene* scene);
 
 private:
-    GameObject* parseNodeToGameObject(const aiScene* scene, const aiNode* node);
+    GameObject* nodeToGameObject(const aiScene* scene, const aiNode* node);
 
     static void decomposeNodeTransform(const aiNode* node, const GameObject& gameObject);
 
-    Mesh* processMesh(const aiScene* scene, aiMesh* mesh);
+    Mesh* processMesh(aiMesh* mesh);
 
-    Material processMaterial(const aiMaterial* material) const;
+    void processMaterials(const aiScene* scene, GameObject* result);
+
+    Material* processMaterial(const aiMaterial* material) const;
 
     Texture loadTextureByType(const aiMaterial* material, aiTextureType type) const;
 

@@ -2,7 +2,8 @@
 
 #include <set>
 
-#include "./components/transform.hpp"
+#include "components/transform.hpp"
+#include "structures/material.hpp"
 
 using namespace std;
 
@@ -23,6 +24,15 @@ public:
 
     Transform* transform = nullptr;
 
+    /**
+     * Contains pointers to data, that children use. It has Materials.
+     */
+    vector<void*> data;
+
 public:
     explicit GameObject(Transform* transform);
+
+public:
+    template<typename T>
+    T* getData(int index = 0) const;
 };

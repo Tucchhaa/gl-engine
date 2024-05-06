@@ -31,7 +31,7 @@ vector<T*> Hierarchy::Components<T>::_get(const int objectId, const bool all, bo
     vector<T*> result;
     
     for(ObjectComponent* component : components[objectId]) {
-        bool isSameType = typeid(*component) == typeid(T);
+        const bool isSameType = typeid(*component) == typeid(T);
 
         if(isSameType) {
             result.push_back(static_cast<T*>(component));

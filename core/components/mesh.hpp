@@ -21,12 +21,14 @@ struct Vertex {
 class Mesh : public ObjectComponent, public IMesh {
 public:
     vector<Vertex> vertices;
+
     vector<unsigned int> indices;
-    Material material;
+
+    const Material* material;
     
     Mesh();
     
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material);
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, const Material* material);
 
 // === IMesh implementation ===
 public:
