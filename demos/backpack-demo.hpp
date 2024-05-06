@@ -15,6 +15,8 @@ private:
 
     GameObject* createBackpack();
 
+    GameObject* createHelmet();
+
     GameObject* createCube();
 
     GameObject* createTerrain();

@@ -1,21 +1,26 @@
 #include "backpack-demo.hpp"
 #include "../core/hierarchy.hpp"
 
+#include <iostream>
+
 BackpackDemo::BackpackDemo(Loader* loader): Scene(loader) { }
 
 void BackpackDemo::setupScene() {
     // GameObject* terrainObject = createTerrain();
     // GameObject* cubicPatchObject = createCurvedSurface();
     backpack = createBackpack();
-    // GameObject* cubeObject = createCube();
 
-    // cubeObject->transform->scaleBy(vec3(100, 1, 100));
+    GameObject* helmet = createHelmet();
+    GameObject* cubeObject = createCube();
+
+    cubeObject->transform->scaleBy(vec3(100, 1, 100));
+    cubeObject->transform->translate(vec3(0, -10, 0));
 
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
 
     Transform* lightTransform = lightSource->transform;
-    lightTransform->translate(vec3(5, 10, 0));
+    lightTransform->translate(vec3(-8, 15, -10));
     lightTransform->rotate(vec3(0, radians(180.0), 0));
     lightTransform->rotate(vec3(radians(-30.0), 0, 0));
 
@@ -38,26 +43,43 @@ void BackpackDemo::setupScene() {
 
 void BackpackDemo::beforeRender() {
     backpack->transform->rotate(quat(vec3(0, radians(0.15f), 0)));
-    Hierarchy::updateTransformTree(backpack);
+
+    Hierarchy::updateTransformTree();
 
     Scene::beforeRender();
 }
 
 GameObject* BackpackDemo::createBackpack() {
-    GameObject* object = loader->loadModel("models/backpack/backpack.obj");
+    GameObject* object = loader->loadModel("models/backpack/backpack.fbx");
+
+    auto* material = object->getData<Material>();
+
+    material->diffuseTexture = *loader->loadTexture("models/backpack/albedo.jpg");
+    material->normalTexture = *loader->loadTexture("models/backpack/normal.png");
+    material->aoTexture = *loader->loadTexture("models/backpack/AO.jpg");
+    material->roughnessTexture = *loader->loadTexture("models/backpack/roughness.jpg");
+    material->specularTexture = *loader->loadTexture("models/backpack/metallic.jpg");
 
     Transform* objectTransform = object->transform;
-    objectTransform->translate(vec3(0, 0, -5));
-    // objectTransform->scaleBy(vec3(5, 5, 5));
+
+    objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
+    objectTransform->translate(vec3(-5, -3, 0));
+
+    return object;
+}
+
+GameObject* BackpackDemo::createHelmet() {
+    GameObject* object = loader->loadModel("models/helmet/source/helmet.fbx", "models/helmet/textures");
+
+    Transform* objectTransform = object->transform;
+
+    objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
 
     return object;
 }
 
 GameObject* BackpackDemo::createCube() {
     GameObject* cubeObject = loader->loadModel("models/cube/cube.obj");
-    Transform* cubeTransform = cubeObject->transform;
-
-    cubeTransform->translate(vec3(0, -3, 0));
 
     return cubeObject;
 }
