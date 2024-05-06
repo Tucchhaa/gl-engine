@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "loader.hpp"
+#include "./loader/loader.hpp"
 #include "./components/camera.hpp"
 
 #include "./components/mesh.hpp"

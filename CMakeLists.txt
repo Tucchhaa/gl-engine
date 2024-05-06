@@ -20,13 +20,15 @@ endif ()
 
 add_executable(gl_engine
         # base
-        apis/base/irenderer.hpp
-        apis/base/irenderer.cpp
-
         apis/base/iwindow.hpp
         apis/base/iresource-manager.hpp
-        apis/base/iinput.hpp
         apis/base/irender-object.hpp
+
+        apis/base/iinput.hpp
+        apis/base/iinput.cpp
+
+        apis/base/irenderer.hpp
+        apis/base/irenderer.cpp
 
         # apis/opengl
         apis/opengl/include.hpp
@@ -64,10 +66,17 @@ add_executable(gl_engine
         core/scene.cpp
         core/scene.hpp
 
-        core/loader.cpp
-        core/loader.hpp
-
         core/imesh.hpp
+
+        # core/loader
+        core/loader/loader.cpp
+        core/loader/loader.hpp
+
+        core/loader/model-parser.cpp
+        core/loader/model-parser.hpp
+
+        core/loader/material-info.cpp
+        core/loader/material-info.hpp
 
         # core/components
         core/components/lights/light.cpp
@@ -128,5 +137,4 @@ add_executable(gl_engine
 
         # other
         main.cpp
-        apis/base/iinput.cpp
 )
