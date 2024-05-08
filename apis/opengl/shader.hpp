@@ -60,7 +60,8 @@ public:
     
     void setMat4(const string& name, const mat4& matrix);
     void setMat3(const string& name, const mat3& matrix);
-    
+
+    void setVec3(const string& name, const Vec3& vector);
     void setVec3(const string& name, const vec3& vector);
 
 public:

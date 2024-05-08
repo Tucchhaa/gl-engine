@@ -24,18 +24,16 @@ vector<pair<GameObject*, vec3>> lightTranslate;
 TODO:
 Optimizations:
 1) Normal mapping - use tangent space
-2) reconstruct position from depth
-3) do not unbind textures in different shaders
-4) render objects with same material in one batch
-5) instancing for meshes
-6) instancing for light volumes
-7) use stencil pass for light volumes: https://ogldev.org/www/tutorial37/tutorial37.html
+2) do not unbind textures in different shaders
+3) render objects with same material in one batch
+4) instancing for meshes
+5) instancing for light volumes
+6) use stencil pass for light volumes: https://ogldev.org/www/tutorial37/tutorial37.html
 
 Features:
 1) Bloom
-2) Scene events
-3) Deferred + Forward renderings for transparency
-4) PBR
+2) Deferred + Forward renderings for transparency
+3) PBR
 
 Other:
 Class with pre-defined meshes: cube, sphere, plane, etc.

@@ -9,6 +9,9 @@ public:
     Vec3();
 
     Vec3(float x, float y, float z);
+
+public:
+    Vec3 &operator=(const Vec3 &other);
 };
 
 struct  Vec2 {

@@ -7,18 +7,65 @@
 #include <iostream>
 #include <map>
 
-void MaterialInfo::print(const aiMaterial* material) {
+MaterialInfo::MaterialInfo(const aiMaterial* material): material(material) {
+    collectInfo();
+}
+
+void MaterialInfo::collectInfo() {
+    name = getProperty<string>(AI_MATKEY_NAME);
+    diffuseColor = getProperty<Vec3>(AI_MATKEY_COLOR_DIFFUSE);
+    specularColor = getProperty<Vec3>(AI_MATKEY_COLOR_SPECULAR);
+    ambientColor = getProperty<Vec3>(AI_MATKEY_COLOR_AMBIENT);
+    emissiveColor = getProperty<Vec3>(AI_MATKEY_COLOR_EMISSIVE);
+    reflectiveColor = getProperty<Vec3>(AI_MATKEY_COLOR_REFLECTIVE);
+
+    collectTextures();
+}
+
+template<>
+string MaterialInfo::getProperty(const char* key, unsigned int type, unsigned int idx) {
+    if(aiString str; material->Get(key, type, idx, str) == AI_SUCCESS) {
+        return {str.C_Str()};
+    }
+}
+
+template<>
+Vec3 MaterialInfo::getProperty(const char* key, unsigned int type, unsigned int idx) {
+    if(aiColor4D color; material->Get(key, type, idx, color) == AI_SUCCESS) {
+        return Vec3(color.r, color.g, color.b);
+    }
+}
+
+void MaterialInfo::collectTextures() {
+    for(int type=aiTextureType_NONE; type <= aiTextureType_TRANSMISSION; type++) {
+        auto aiType = static_cast<aiTextureType>(type);
+        const unsigned int count = material->GetTextureCount(aiType);
+
+        if(count > 0) {
+            aiString path;
+
+            if(material->GetTexture(aiType, 0, &path) == AI_SUCCESS) {
+                textures[aiType] = path.C_Str();
+            }
+        }
+    }
+}
+
+void MaterialInfo::print() {
     std::cout << "= Material Info =" << std::endl;
 
     // output properties
-    printProperty<aiString>(material, "Name", AI_MATKEY_NAME);
-    printProperty<aiColor4D>(material, "Diffuse color", AI_MATKEY_COLOR_DIFFUSE);
-    printProperty<aiColor4D>(material, "Specular color", AI_MATKEY_COLOR_SPECULAR);
-    printProperty<aiColor4D>(material, "Ambient color", AI_MATKEY_COLOR_AMBIENT);
-    printProperty<aiColor4D>(material, "Emissive color", AI_MATKEY_COLOR_EMISSIVE);
-    printProperty<aiColor4D>(material, "Reflective color", AI_MATKEY_COLOR_REFLECTIVE);
+    printProperty<string>("Name", AI_MATKEY_NAME);
+    printProperty<Vec3>("Diffuse color", AI_MATKEY_COLOR_DIFFUSE);
+    printProperty<Vec3>("Specular color", AI_MATKEY_COLOR_SPECULAR);
+    printProperty<Vec3>("Ambient color", AI_MATKEY_COLOR_AMBIENT);
+    printProperty<Vec3>("Emissive color", AI_MATKEY_COLOR_EMISSIVE);
+    printProperty<Vec3>("Reflective color", AI_MATKEY_COLOR_REFLECTIVE);
 
-    // output textures
+    printTextures();
+}
+
+void MaterialInfo::printTextures() {
     map<aiTextureType, string> typesName = {
         { aiTextureType_NONE, "NONE" },
         { aiTextureType_DIFFUSE, "DIFFUSE" },
@@ -44,10 +91,11 @@ void MaterialInfo::print(const aiMaterial* material) {
 
     for(int type=aiTextureType_NONE; type <= aiTextureType_TRANSMISSION; type++) {
         auto aiType = static_cast<aiTextureType>(type);
-        unsigned int count = material->GetTextureCount(aiType);
 
-        if(count > 0) {
+        if(auto it = textures.find(aiType); it != textures.end()) {
             string typeName = typesName[aiType];
+            unsigned int count = material->GetTextureCount(aiType);
+
             std::cout << "Texture type: " << typeName << ", count: " << count << ": ";
 
             for(unsigned int i = 0; i < count; ++i) {
@@ -65,11 +113,11 @@ void MaterialInfo::print(const aiMaterial* material) {
 
 template<typename T>
 void MaterialInfo::printProperty(
-    const aiMaterial* material, const string &propertyName, const char* key,
+    const string &propertyName, const char* key,
     const unsigned int type, const unsigned int idx
-) {
-    const bool isString = typeid(T) == typeid(aiString);
-    const bool isColor  = typeid(T) == typeid(aiColor4D);
+) const {
+    const bool isString = typeid(T) == typeid(string);
+    const bool isColor  = typeid(T) == typeid(Vec3);
 
     cout << "Property: " << propertyName << ": ";
     if(aiString str; isString && material->Get(key, type, idx, str) == AI_SUCCESS) {

@@ -21,12 +21,12 @@ public:
     /**
      * Diffuse color
      */
-    Vec3 Kd = Vec3(0.3f, 0.3f, 0.3f);
+    Vec3 Kd = Vec3(1.0f, 1.0f, 1.0f);
 
     /**
      * Specular color
      */
-    Vec3 Ks = Vec3(1.0f, 1.0f, 1.0f);
+    Vec3 Ks = Vec3(0.0f, 0.0f, 0.0f);
 
     /**
      * Shininess of the material

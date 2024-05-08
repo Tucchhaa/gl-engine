@@ -66,8 +66,11 @@ Mesh* ModelParser::processMesh(aiMesh* mesh) {
 
         vertex.position = convertToVec3(mesh->mVertices[i]);
         vertex.normal = convertToVec3(mesh->mNormals[i]);
-        vertex.tangent = convertToVec3(mesh->mTangents[i]);
-        vertex.texCoords = mesh->HasTextureCoords(0) ? convertToVec2(mesh->mTextureCoords[0][i]) : Vec2(0, 0);
+
+        if(mesh->HasTextureCoords(0)) {
+            vertex.tangent = convertToVec3(mesh->mTangents[i]);
+            vertex.texCoords = convertToVec2(mesh->mTextureCoords[0][i]);
+        }
 
         vertices.push_back(vertex);
     }
@@ -99,7 +102,11 @@ void ModelParser::processMaterials(const aiScene* scene, GameObject* result) {
 Material* ModelParser::processMaterial(const aiMaterial* material) const {
     auto* result = new Material();
 
-    MaterialInfo::print(material);
+    auto materialInfo = MaterialInfo(material);
+    materialInfo.print();
+
+    result->Kd = materialInfo.diffuseColor;
+    result->Ks = materialInfo.specularColor;
 
     result->diffuseTexture = loadTextureByType(material, aiTextureType_DIFFUSE);
     result->specularTexture = loadTextureByType(material, aiTextureType_SPECULAR);

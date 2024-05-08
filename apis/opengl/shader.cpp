@@ -59,6 +59,10 @@ void Shader::setMat3(const string& name, const mat3& matrix)  {
     glUniformMatrix3fv(getLocation(name), 1, GL_FALSE, value_ptr(matrix));
 }
 
+void Shader::setVec3(const string& name, const Vec3& vector) {
+    glUniform3f(getLocation(name), vector.x, vector.y, vector.z);
+}
+
 void Shader::setVec3(const string& name, const vec3& vector)  {
     glUniform3f(getLocation(name), vector.x, vector.y, vector.z);
 }
@@ -112,6 +116,8 @@ void Shader::setMaterial(const Material* material) {
     setTextureToSlot("material.ao", ResourceManager::getTextureId(material, TEXTURE_AO), 4);
     
     setFloat("material.shininess", 32);
+    setVec3("material.Kd", material->Kd);
+    setVec3("material.Ks", material->Ks);
 }
 
 // ==

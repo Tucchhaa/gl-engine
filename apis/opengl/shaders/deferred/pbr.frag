@@ -39,7 +39,6 @@ void main() {
     vec3 position = calculatePosition(texCoord);
     vec3 normal = texture(gNormal, texCoord).xyz;
 
-//    LightColors lightColors = getLightingColors(light.colors, texCoord);
     vec3 lighting = calculatePointLight(light, normal, position, texCoord);
 
     color = vec4(lighting, 1.0);

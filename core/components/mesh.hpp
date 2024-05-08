@@ -14,8 +14,8 @@ using namespace std;
 struct Vertex {
     Vec3 position;
     Vec3 normal;
-    Vec3 tangent;
-    Vec2 texCoords;
+    Vec3 tangent = Vec3(0, 0, 0);
+    Vec2 texCoords = Vec2(0, 0);
 };
 
 class Mesh : public ObjectComponent, public IMesh {
