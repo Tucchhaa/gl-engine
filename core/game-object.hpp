@@ -3,7 +3,6 @@
 #include <set>
 
 #include "components/transform.hpp"
-#include "structures/material.hpp"
 
 using namespace std;
 

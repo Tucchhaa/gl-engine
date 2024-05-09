@@ -83,4 +83,18 @@ protected:
 private:
     template<typename T>
     void loadComponents(vector<T*>* array);
+
+// ===
+// Basic shapes
+// ===
+public:
+    GameObject* createCube();
+
+    GameObject* createSphere();
+
+    GameObject* createPlane();
+
+    GameObject* createCylinder();
+
+    GameObject* createCone();
 };

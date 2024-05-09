@@ -50,6 +50,10 @@ void Transform::setRotation(const quat rotation) {
     this->rotation = rotation;
 }
 
+void Transform::setScale(float s) {
+    this->scale = vec3(s);
+}
+
 void Transform::setScale(float x, float y, float z) {
     this->scale = vec3(x, y, z);
 }
@@ -76,6 +80,14 @@ void Transform::rotate(quat rotation, const Transform* transform) {
     }
     else
         this->rotation *= rotation;
+}
+
+void Transform::scaleBy(float s) {
+    this->scale = this->scale * s;
+}
+
+void Transform::scaleBy(float x, float y, float z) {
+    this->scale = this->scale * vec3(x, y, z);
 }
 
 void Transform::scaleBy(vec3 scale) {

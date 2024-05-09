@@ -4,7 +4,7 @@
 
 #include "loader.hpp"
 
-#include "../game-object.hpp"
+#include "../components/mesh.hpp"
 
 class ModelParser {
 private:

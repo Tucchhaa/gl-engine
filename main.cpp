@@ -37,7 +37,6 @@ Features:
 4) Physics
 
 Other:
-Class with pre-defined meshes: cube, sphere, plane, etc.
 check for memory leaks
  */
 int main() {

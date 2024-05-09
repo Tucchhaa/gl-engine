@@ -9,12 +9,11 @@ void BackpackDemo::setupScene() {
     // GameObject* terrainObject = createTerrain();
     // GameObject* cubicPatchObject = createCurvedSurface();
     backpack = createBackpack();
-
     GameObject* helmet = createHelmet();
-    GameObject* cubeObject = createCube();
+    GameObject* plane = createPlane();
 
-    cubeObject->transform->scaleBy(vec3(100, 1, 100));
-    cubeObject->transform->translate(vec3(0, -10, 0));
+    plane->transform->scaleBy(vec3(100, 1, 100));
+    plane->transform->translate(vec3(0, -10, 0));
 
     // = light source =
     auto* lightSource = Hierarchy::createGameObject();
@@ -42,7 +41,7 @@ void BackpackDemo::setupScene() {
 }
 
 void BackpackDemo::beforeRender() {
-    backpack->transform->rotate(quat(vec3(0, radians(0.15f), 0)));
+    // backpack->transform->rotate(quat(vec3(0, radians(0.15f), 0)));
 
     Hierarchy::updateTransformTree();
 
@@ -76,12 +75,6 @@ GameObject* BackpackDemo::createHelmet() {
     objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
 
     return object;
-}
-
-GameObject* BackpackDemo::createCube() {
-    GameObject* cubeObject = loader->loadModel("models/cube/cube.obj");
-
-    return cubeObject;
 }
 
 GameObject* BackpackDemo::createCurvedSurface() {

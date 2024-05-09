@@ -15,8 +15,6 @@ private:
     vector<pair<GameObject*, vec3>> lightTranslate;
 
     IInput* input;
-
-    GameObject* createCube();
 };
 
 

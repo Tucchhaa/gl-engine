@@ -19,7 +19,7 @@ void ManyLightsDemo::setupScene() {
         for(int j=-N; j < N; j++) {
             GameObject* cube = createCube();
 
-            cube->transform->setPosition(vec3(distance * i, 0, distance * j));
+            cube->transform->setPosition(vec3(distance * i, -3, distance * j));
         }
     }
 
@@ -37,8 +37,6 @@ void ManyLightsDemo::setupScene() {
         float r = (float)rand()/RAND_MAX;
         float b = (float)rand()/RAND_MAX;
         float g = (float)rand()/RAND_MAX;
-
-        // cout << x << " " << z << endl;
 
         pointLight->diffuse = vec3(r, g, b);
         pointLight->ambient = vec3(0, 0, 0);
@@ -71,13 +69,4 @@ void ManyLightsDemo::beforeRender() {
     }
 
     Scene::beforeRender();
-}
-
-GameObject* ManyLightsDemo::createCube() {
-    GameObject* cubeObject = loader->loadModel("models/cube/cube.obj");
-    Transform* cubeTransform = cubeObject->transform;
-
-    cubeTransform->translate(vec3(0, -3, 0));
-
-    return cubeObject;
 }

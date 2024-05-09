@@ -17,7 +17,7 @@ private:
 
     GameObject* createHelmet();
 
-    GameObject* createCube();
+    // GameObject* createCube();
 
     GameObject* createTerrain();
 

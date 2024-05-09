@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "../structures/vectors.hpp"
-
 #include "component.hpp"
+
+#include "../structures/vectors.hpp"
 #include "../imesh.hpp"
 #include "../structures/material.hpp"
 

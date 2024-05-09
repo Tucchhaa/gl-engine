@@ -8,8 +8,6 @@
 
 #include <assimp/postprocess.h>
 
-#include "../hierarchy.hpp"
-
 #include "model-parser.hpp"
 
 const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/resources";

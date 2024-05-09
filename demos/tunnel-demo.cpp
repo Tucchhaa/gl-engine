@@ -36,7 +36,6 @@ void TunnelDemo::setupScene() {
     auto* pointLight4 = PointLight::D3250();
     // pointLight->diffuse = vec3(4, 4, 4);
     // pointLight->quadratic = 0.000007;
-    lightSource->transform->translate(vec3(0, -3, 0));
     cube->transform->setPosition(lightSource->transform->getPosition());
 
     auto* redLightSource = Hierarchy::createGameObject();
@@ -61,13 +60,4 @@ void TunnelDemo::setupScene() {
 
 void TunnelDemo::beforeRender() {
     Scene::beforeRender();
-}
-
-GameObject* TunnelDemo::createCube() {
-    GameObject* cubeObject = loader->loadModel("models/cube/cube.obj");
-    Transform* cubeTransform = cubeObject->transform;
-
-    cubeTransform->translate(vec3(0, -3, 0));
-
-    return cubeObject;
 }

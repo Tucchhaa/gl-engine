@@ -8,7 +8,4 @@ public:
     void setupScene() override;
 
     void beforeRender() override;
-
-private:
-    GameObject* createCube();
 };

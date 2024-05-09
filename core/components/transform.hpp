@@ -48,6 +48,7 @@ public:
     void setRotation(float w, float x, float y, float z);
     void setRotation(quat rotation);
 
+    void setScale(float s);
     void setScale(float x, float y, float z);
     void setScale(vec3 scale);
 
@@ -55,6 +56,8 @@ public:
 
     void rotate(quat rotation, const Transform* transform = nullptr);
 
+    void scaleBy(float s);
+    void scaleBy(float x, float y, float z);
     void scaleBy(vec3 scale);
 
 // ===

@@ -103,3 +103,27 @@ void Scene::loadComponents(vector<T*>* array) {
         array->insert(array->end(), components.begin(), components.end());
     }
 }
+
+// ===
+// Basic shapes
+// ===
+
+GameObject* Scene::createCube() {
+    return loader->loadModel("models/shapes/cube.obj");
+}
+
+GameObject* Scene::createSphere() {
+    return loader->loadModel("models/shapes/sphere.obj");
+}
+
+GameObject* Scene::createPlane() {
+    return loader->loadModel("models/shapes/plane.obj");
+}
+
+GameObject* Scene::createCylinder() {
+    return loader->loadModel("models/shapes/cylinder.obj");
+}
+
+GameObject* Scene::createCone() {
+    return loader->loadModel("models/shapes/cone.obj");
+}

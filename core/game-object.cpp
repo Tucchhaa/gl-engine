@@ -1,5 +1,7 @@
 #include "game-object.hpp"
 
+#include "structures/material.hpp"
+
 GameObject::GameObject(Transform* transform): transform(transform) {
     ID = generateId();
 }
