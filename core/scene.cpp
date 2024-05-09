@@ -5,6 +5,8 @@
 
 Scene::Scene(Loader* loader): loader(loader) {}
 
+Scene::~Scene() = default;
+
 // ===
 // Getters
 // ===
@@ -18,6 +20,10 @@ void Scene::setCamera(Camera* camera) {
 
 const vector<Mesh*>& Scene::getMeshes() {
     return meshes;
+}
+
+const map<const Material*, vector<Mesh*>> Scene::getMeshesByMaterial() const {
+    return meshesByMaterial;
 }
 
 const vector<Terrain*>& Scene::getTerrains() {
@@ -67,12 +73,24 @@ void Scene::processHierarchy() {
     loadComponents(&directLights);
     loadComponents(&pointLights);
     loadComponents(&spotLights);
+
+    meshesByMaterial = processMeshesByMaterial();
+}
+
+map<const Material*, vector<Mesh*>> Scene::processMeshesByMaterial() const {
+    map<const Material*, vector<Mesh*>> result;
+
+    for(auto* mesh: meshes) {
+        result[mesh->material].push_back(mesh);
+    }
+
+    return result;
 }
 
 template<typename T>
 void Scene::loadComponents(vector<T*>* array) {
     array->clear();
-    
+
     map<int, GameObject*>* gameObjects = Hierarchy::getGameObjects();
     
     map<int, GameObject*>::iterator iterator;

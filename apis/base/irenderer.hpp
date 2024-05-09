@@ -13,6 +13,8 @@ protected:
 
     vector<IRenderObject*> meshes;
 
+    map<const Material*, vector<IRenderObject*>> meshesByMaterial;
+
     vector<IRenderObject*> terrains;
 
     vector<IRenderObject*> cubicPatches;

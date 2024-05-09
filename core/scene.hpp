@@ -22,6 +22,8 @@ protected:
 private:
     vector<Mesh*> meshes;
 
+    map<const Material*, vector<Mesh*>> meshesByMaterial;
+
     vector<Terrain*> terrains;
 
     vector<CubicPatch*> cubicPatches;
@@ -36,7 +38,7 @@ private:
 public:
     explicit Scene(Loader* loader);
 
-    virtual ~Scene() = default;
+    virtual ~Scene();
 
 // ===
 // Getters
@@ -47,6 +49,8 @@ public:
     void setCamera(Camera* camera);
 
     const vector<Mesh*>& getMeshes();
+
+    const map<const Material*, vector<Mesh*>> getMeshesByMaterial() const;
 
     const vector<Terrain*>& getTerrains();
 
@@ -73,6 +77,8 @@ public:
 
 protected:
     virtual void processHierarchy();
+
+    map<const Material*, vector<Mesh*>> processMeshesByMaterial() const;
 
 private:
     template<typename T>

@@ -163,12 +163,12 @@ GameObject* Hierarchy::getParent(int objectId) {
 void Hierarchy::setParent(GameObject* parent, GameObject* child) {
     // remove from old parent
     if(child->parent != nullptr) {
-        set<GameObject*> oldSiblings = child->parent->children;
+        set<GameObject*>* oldSiblings = &child->parent->children;
 
-        auto it = oldSiblings.find(child);
+        const auto it = oldSiblings->find(child);
 
-        if(it != oldSiblings.end()) {
-            oldSiblings.erase(child);
+        if(it != oldSiblings->end()) {
+            oldSiblings->erase(child);
         }
     }
 

@@ -190,6 +190,21 @@ void DeferredRenderer::initSphereVAO() {
 void DeferredRenderer::setScene(Scene *scene) {
     IRenderer::setScene(scene);
 
+    const map<const Material*, vector<Mesh*>> meshesByMaterial = scene->getMeshesByMaterial();
+
+    for(const auto& [material, meshes]: meshesByMaterial) {
+        vector<IRenderObject*> list;
+
+        for(Mesh* mesh: meshes) {
+            auto* object = new RenderObject(mesh);
+            list.push_back(object);
+        }
+
+        this->meshesByMaterial[material] = list;
+    }
+
+    // ===
+
     const vector<Mesh*> meshes = scene->getMeshes();
     const vector<Terrain*> terrains = scene->getTerrains();
     const vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
@@ -346,15 +361,18 @@ void DeferredRenderer::renderMeshes(const mat4& viewProjection) {
     meshShader.use();
     meshShader.setMat4("perspective", viewProjection);
 
-    for(auto* object: meshes) {
-        const Mesh* mesh = object->getMesh<Mesh>();
-        const Transform* transform = mesh->transform;
+    for(const auto& [material, meshes]: meshesByMaterial) {
+        meshShader.setMaterial(material);
 
-        meshShader.setMat4("transform", transform->getTransformMatrix());
-        meshShader.setMat3("normalTransform", transform->getNormalMatrix());
-        meshShader.setMaterial(mesh->material);
+        for(auto* object: meshes) {
+            const Mesh* mesh = object->getMesh<Mesh>();
+            const Transform* transform = mesh->transform;
 
-        object->render();
+            meshShader.setMat4("transform", transform->getTransformMatrix());
+            meshShader.setMat3("normalTransform", transform->getNormalMatrix());
+
+            object->render();
+        }
     }
 }
 

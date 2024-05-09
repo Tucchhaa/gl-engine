@@ -34,6 +34,7 @@ Features:
 1) Bloom
 2) Deferred + Forward renderings for transparency
 3) PBR
+4) Physics
 
 Other:
 Class with pre-defined meshes: cube, sphere, plane, etc.
