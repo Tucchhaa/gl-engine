@@ -11,15 +11,16 @@ void ManyLightsDemo::setupScene() {
     srand(time(nullptr));
 
     const int N = 20;
-    const int LIGHTS_NUM = 2000;
+    const int LIGHTS_NUM = 100;
 
     float distance = 4.0f;
 
     for(int i=-N; i < N; i++) {
         for(int j=-N; j < N; j++) {
-            GameObject* cube = createCube();
+            GameObject* cube = createCone();
 
             cube->transform->setPosition(vec3(distance * i, -3, distance * j));
+            cube->transform->setScale(1.5);
         }
     }
 
