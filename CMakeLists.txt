@@ -22,13 +22,18 @@ add_executable(gl_engine
         # base
         apis/base/iwindow.hpp
         apis/base/iresource-manager.hpp
+
         apis/base/irender-object.hpp
+        apis/base/irender-object.cpp
 
         apis/base/iinput.hpp
         apis/base/iinput.cpp
 
         apis/base/irenderer.hpp
         apis/base/irenderer.cpp
+
+        apis/base/iengine.hpp
+        apis/base/iengine.cpp
 
         # apis/opengl
         apis/opengl/include.hpp
@@ -41,6 +46,9 @@ add_executable(gl_engine
 
         apis/opengl/input.cpp
         apis/opengl/input.hpp
+
+        apis/opengl/gl-engine.cpp
+        apis/opengl/gl-engine.hpp
 
 #        apis/opengl/renderer.cpp
 #        apis/opengl/renderer.hpp
@@ -137,4 +145,5 @@ add_executable(gl_engine
 
         # other
         main.cpp
+        apis/base/iwindow.cpp
 )

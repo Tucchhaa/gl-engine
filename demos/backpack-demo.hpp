@@ -17,8 +17,6 @@ private:
 
     GameObject* createHelmet();
 
-    // GameObject* createCube();
-
     GameObject* createTerrain();
 
     GameObject* createCurvedSurface();

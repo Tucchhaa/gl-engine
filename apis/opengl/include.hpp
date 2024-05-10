@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gl-engine.hpp"
 #include "window.hpp"
 #include "resource-manager.hpp"
 #include "deferred-renderer.hpp"

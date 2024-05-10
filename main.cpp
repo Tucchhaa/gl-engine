@@ -12,13 +12,7 @@ using namespace std;
 constexpr int SCREEN_WIDTH = 1280;
 constexpr int SCREEN_HEIGHT = 720;
 
-GameObject* createCamera(Loader* loader);
-
-void setupTunnelScene(Loader* loader);
-void setupManyLightsScene(Loader* loader);
-
-int backpackId;
-vector<pair<GameObject*, vec3>> lightTranslate;
+GameObject* createCamera();
 
 /*
 TODO:
@@ -39,25 +33,25 @@ Features:
 Other:
 check for memory leaks
  */
+
+Loader* loader;
+IWindow* window;
+
 int main() {
-    IWindow* window = new Window();
-    window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    IInput* input = new Input(window);
-    IResourceManager* resourceManager = &ResourceManager::getInstance();
-    IRenderer* renderer = new DeferredRenderer();
-    Loader loader(resourceManager);
-
-    Hierarchy::initialize();
+    IEngine* engine = new GlEngine();
+    window = IEngine::Window;
+    IInput* input = IEngine::Input;
+    IRenderer* renderer = IEngine::Renderer;
+    loader = IEngine::Loader;
 
     // Scene scene(&loader);
-    BackpackDemo scene(&loader);
+    BackpackDemo scene(loader);
     // TunnelDemo scene(&loader);
     // ManyLightsDemo scene(&loader);
 
     // ===
 
-    GameObject* cameraObject = createCamera(&loader);
+    GameObject* cameraObject = createCamera();
 
     Camera* camera = Hierarchy::Components<Camera>::get(cameraObject);
     Transform* cameraTransform = cameraObject->transform;
@@ -112,7 +106,7 @@ int main() {
     return 0;
 }
 
-GameObject* createCamera(Loader* loader) {
+GameObject* createCamera() {
     auto* cameraObject = Hierarchy::createGameObject();
     Transform* cameraTransform = cameraObject->transform;
 
@@ -123,7 +117,7 @@ GameObject* createCamera(Loader* loader) {
     cameraTransform->translate(vec3(-10, 25, -30));
     cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
 
-    camera->setScreenSizes((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT);
+    camera->setScreenSizes(window->screenWidth, window->screenHeight);
 
     return cameraObject;
 }

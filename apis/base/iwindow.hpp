@@ -2,9 +2,12 @@
 
 class IWindow {
 public:
+    int screenWidth = 0;
+    int screenHeight = 0;
+
     virtual ~IWindow() = default;
 
-    virtual void create(int screenWidth, int screenHeight) = 0;
+    virtual void create(int screenWidth, int screenHeight);
 
     virtual bool isOpen() = 0;
 

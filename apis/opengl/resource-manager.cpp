@@ -7,16 +7,16 @@ ResourceManager::ResourceManager() = default;
 // Getters
 // ===
 unsigned int ResourceManager::getTextureId(Texture* texture) {
-    auto textureIt = getInstance().textures.find(texture->ID);
+    const auto textureIt = textures.find(texture->ID);
 
-    if(textureIt != getInstance().textures.end())
+    if(textureIt != textures.end())
         return textureIt->second;
 
     return 0;
 }
 
 unsigned int ResourceManager::getTextureId(const Material* material, TextureType textureType) {
-    map<int, unsigned int>* textures = &getInstance().textures;
+    map<int, unsigned int>* textures = &this->textures;
 
     switch(textureType) {
         case TEXTURE_DIFFUSE:
@@ -35,10 +35,9 @@ unsigned int ResourceManager::getTextureId(const Material* material, TextureType
 }
 
 CubeMap* ResourceManager::getCubeMap(const Texture* texture) {
-    ResourceManager* instance = &getInstance();
-    auto iterator = instance->cubeMaps.find(texture->ID);
+    const auto iterator = cubeMaps.find(texture->ID);
 
-    if(iterator == instance->cubeMaps.end())
+    if(iterator == cubeMaps.end())
         return nullptr;
 
     return &iterator->second;

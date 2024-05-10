@@ -29,7 +29,7 @@ private:
     void calculateDeltaTime();
 
 public:
-    explicit Input(IWindow* window);
+    explicit Input();
 
 public:
     void process() override;

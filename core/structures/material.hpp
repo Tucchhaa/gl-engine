@@ -3,8 +3,6 @@
 #include "texture.hpp"
 #include "vectors.hpp"
 
-using namespace std;
-
 struct Material {
 public:
     Texture specularTexture;

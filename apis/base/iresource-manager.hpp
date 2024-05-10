@@ -8,8 +8,6 @@ enum ResourceType {
     RESOURCE_CUBE_MAP,
 };
 
-using namespace std;
-
 class IResourceManager {
 public:
     virtual ~IResourceManager() = default;

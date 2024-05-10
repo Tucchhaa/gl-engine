@@ -16,6 +16,4 @@ Material::Material(
         normalTexture(std::move(normalTexture)),
         roughnessTexture(std::move(roughnessTexture)),
         aoTexture(std::move(aoTexture))
-{
-
-}
+{ }

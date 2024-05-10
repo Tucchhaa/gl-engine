@@ -3,15 +3,17 @@
 
 #include <iostream>
 
-#include "resource-manager.hpp"
+#include "../base/iengine.hpp"
 
 Shader::Shader(
-        const string& vertexShaderFile,
-        const string& fragmentShaderFile,
-        const string& tessControlShaderFile,
-        const string& tessEvalShaderFile
-        ) {
-    vector<const string*> shaders = {
+    const string& vertexShaderFile,
+    const string& fragmentShaderFile,
+    const string& tessControlShaderFile,
+    const string& tessEvalShaderFile
+) {
+    resourceManager = dynamic_cast<ResourceManager*>(IEngine::ResourceManager);
+
+    const vector shaders = {
         &vertexShaderFile,
         &fragmentShaderFile,
         &tessControlShaderFile,
@@ -109,11 +111,11 @@ void Shader::setTextureToSlot(const string& name, const unsigned int textureId, 
  * @param material
  */
 void Shader::setMaterial(const Material* material) {
-    setTextureToSlot("material.diffuse", ResourceManager::getTextureId(material, TEXTURE_DIFFUSE), 0);
-    setTextureToSlot("material.specular", ResourceManager::getTextureId(material, TEXTURE_SPECULAR), 1);
-    setTextureToSlot("material.normal", ResourceManager::getTextureId(material, TEXTURE_NORMAL), 2);
-    setTextureToSlot("material.roughness", ResourceManager::getTextureId(material, TEXTURE_ROUGHNESS), 3);
-    setTextureToSlot("material.ao", ResourceManager::getTextureId(material, TEXTURE_AO), 4);
+    setTextureToSlot("material.diffuse", resourceManager->getTextureId(material, TEXTURE_DIFFUSE), 0);
+    setTextureToSlot("material.specular", resourceManager->getTextureId(material, TEXTURE_SPECULAR), 1);
+    setTextureToSlot("material.normal", resourceManager->getTextureId(material, TEXTURE_NORMAL), 2);
+    setTextureToSlot("material.roughness", resourceManager->getTextureId(material, TEXTURE_ROUGHNESS), 3);
+    setTextureToSlot("material.ao", resourceManager->getTextureId(material, TEXTURE_AO), 4);
     
     setFloat("material.shininess", 32);
     setVec3("material.Kd", material->Kd);

@@ -5,11 +5,13 @@
 #include "shader.hpp"
 
 class DeferredRenderer : public IRenderer {
+private:
+    ResourceManager* resourceManager;
+
 public:
     DeferredRenderer();
 
     ~DeferredRenderer() override;
-
 
 private:
     void initGBuffer();

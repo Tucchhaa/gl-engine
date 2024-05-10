@@ -16,6 +16,8 @@ using namespace std;
 
 class Loader {
 private:
+    string resourcesPath;
+
     IResourceManager* resourceManager;
 
     /**
@@ -28,7 +30,7 @@ private:
     map<string, const aiScene*> models;
 
 public:
-    explicit Loader(IResourceManager* resourceManager);
+    explicit Loader();
 
     ~Loader();
 

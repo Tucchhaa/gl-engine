@@ -5,15 +5,16 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
 #include <assimp/postprocess.h>
 
 #include "model-parser.hpp"
 
-const string RESOURCES_PATH = "/Users/tucha/Repositories/gl-engine/resources";
+#include "../../apis/base/iengine.hpp"
 
-Loader::Loader(IResourceManager* resourceManager) : resourceManager(resourceManager)
-    {}
+Loader::Loader() {
+    resourcesPath = IEngine::RESOURCES_PATH;
+    resourceManager = IEngine::ResourceManager;
+}
 
 Loader::~Loader() {
     for(const auto& it: textures) {
@@ -40,7 +41,7 @@ Texture* Loader::loadTexture(const string &file) {
  */
 Texture* Loader::loadTexture(const string &file, const TextureOptions options) {
     const auto cachedTexture = textures.find(file);
-    const string fullPath = RESOURCES_PATH + "/" + file;
+    const string fullPath = resourcesPath + "/" + file;
 
     if(cachedTexture != textures.end())
         return cachedTexture->second;
@@ -74,7 +75,7 @@ Texture* Loader::loadCubeMap(const string &directoryPath) {
     if(cached != textures.end())
         return cached->second;
 
-    const string fullPath = RESOURCES_PATH + "/" + directoryPath;
+    const string fullPath = resourcesPath + "/" + directoryPath;
 
     const vector<string> textures_faces = {
         "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg"
@@ -120,7 +121,7 @@ GameObject *Loader::loadModel(const string &file, const string& texturesDirector
 }
 
 const aiScene* Loader::loadScene(const string &path) {
-    const string fullPath = RESOURCES_PATH + "/" + path;
+    const string fullPath = resourcesPath + "/" + path;
 
     if(const auto it = models.find(path); it != models.end()) {
         return it->second;

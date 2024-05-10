@@ -9,6 +9,8 @@
 #include <fstream>
 #include <string>
 
+#include "resource-manager.hpp"
+
 #include "../../core/hierarchy.hpp"
 
 #include "../../core/components/mesh.hpp"
@@ -22,6 +24,9 @@ using namespace glm;
 using uint = unsigned int;
 
 class Shader {
+private:
+    ResourceManager* resourceManager;
+
 public:
     uint ID;
 

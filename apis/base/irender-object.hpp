@@ -18,11 +18,7 @@ public:
     virtual void render() = 0;
 
     template<typename T>
-    T* getMesh() {
-        return dynamic_cast<T*>(mesh);
-    }
+    T* getMesh();
 };
 
-template Mesh* IRenderObject::getMesh<Mesh>();
-template CubicPatch* IRenderObject::getMesh<CubicPatch>();
-template Terrain* IRenderObject::getMesh<Terrain>();
+

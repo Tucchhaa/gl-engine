@@ -1,12 +1,14 @@
 #include "input.hpp"
 
 #include "window.hpp"
+#include "gl-engine.hpp"
 
-Input::Input(IWindow* window) {
+Input::Input() {
     lastFrameTime = static_cast<float>(glfwGetTime());
     deltaTime = 0;
 
-    glfwWindow = dynamic_cast<Window*>(window)->getGLFWWindow();
+    // glfwWindow = dynamic_cast<Window*>(window)->getGLFWWindow();
+    glfwWindow = dynamic_cast<Window*>(GlEngine::Window)->getGLFWWindow();
     instance = this;
 }
 

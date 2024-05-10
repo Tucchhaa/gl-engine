@@ -1,9 +1,10 @@
 #include "deferred-renderer.hpp"
 #include "gl-check-error.hpp"
 
+#include "../base/iengine.hpp"
+
 #include "render-object.hpp"
 #include "resource-manager.hpp"
-#include "../../../../../../Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h"
 
 DeferredRenderer::DeferredRenderer():
     meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
@@ -13,6 +14,8 @@ DeferredRenderer::DeferredRenderer():
     cubicPatchShader("deferred/cubic-patch.vert", "deferred/mesh.frag", "deferred/cubic-patch.tesc", "deferred/cubic-patch.tese"),
     screenShader("deferred/screen.vert", "deferred/screen.frag")
 {
+    resourceManager = dynamic_cast<ResourceManager*>(IEngine::ResourceManager);
+
     initGBuffer();
     initLightingBuffer();
 
@@ -307,7 +310,7 @@ void DeferredRenderer::renderLighting() {
 void DeferredRenderer::renderSkybox() {
     const Camera* camera = currentScene->getCamera();
 
-    const CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
+    const CubeMap* cubeMap = resourceManager->getCubeMap(camera->cubeMap);
 
     if(cubeMap != nullptr) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
