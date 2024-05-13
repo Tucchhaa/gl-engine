@@ -4,7 +4,7 @@
 
 class BackpackDemo : public Scene {
 public:
-    BackpackDemo(Loader* loader);
+    BackpackDemo() = default;
 
     void setupScene() override;
 

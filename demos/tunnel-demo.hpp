@@ -3,7 +3,7 @@
 
 class TunnelDemo : public Scene {
 public:
-    TunnelDemo(Loader* loader);
+    TunnelDemo() = default;
 
     void setupScene() override;
 

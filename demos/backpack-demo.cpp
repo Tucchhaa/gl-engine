@@ -1,10 +1,6 @@
 #include "backpack-demo.hpp"
 #include "../core/hierarchy.hpp"
 
-#include <iostream>
-
-BackpackDemo::BackpackDemo(Loader* loader): Scene(loader) { }
-
 void BackpackDemo::setupScene() {
     // GameObject* terrainObject = createTerrain();
     // GameObject* cubicPatchObject = createCurvedSurface();
@@ -16,7 +12,7 @@ void BackpackDemo::setupScene() {
     plane->transform->translate(vec3(0, -10, 0));
 
     // = light source =
-    auto* lightSource = Hierarchy::createGameObject();
+    auto* lightSource = Hierarchy::addGameObject();
 
     Transform* lightTransform = lightSource->transform;
     lightTransform->translate(vec3(-8, 15, -10));
@@ -26,8 +22,8 @@ void BackpackDemo::setupScene() {
     auto* directLight0 = new DirectLight();
     PointLight* pointLight0 = PointLight::D3250();
 
-    Hierarchy::addComponent(lightSource, directLight0);
-    Hierarchy::addComponent(lightSource, pointLight0);
+    lightSource->components.add(directLight0);
+    lightSource->components.add(pointLight0);
 
     // = Flashlight =
     // auto* flashlight = Hierarchy::createGameObject();
@@ -104,7 +100,7 @@ GameObject* BackpackDemo::createCurvedSurface() {
         1.5f, rand() % 3 - 1.0f, 1.5f,
     };
 
-    GameObject* cubicPatchObject = Hierarchy::createGameObject();
+    GameObject* cubicPatchObject = Hierarchy::addGameObject();
     Transform* patchTransform = cubicPatchObject->transform;
     patchTransform->scaleBy(vec3(10, 10, 10));
     patchTransform->translate(vec3(0, -3, 0));
@@ -118,18 +114,19 @@ GameObject* BackpackDemo::createCurvedSurface() {
     const Material patchMaterial(*patchSpecularTexture, *patchDiffuseTexture, *patchNormalTexture, *patchRoughnessTexture, *patchAOTexture);
 
     auto* cubicPatch = new CubicPatch(controlPoints, patchMaterial);
-    Hierarchy::addComponent(cubicPatchObject, cubicPatch);
+
+    cubicPatchObject->components.add(cubicPatch);
 
     return cubicPatchObject;
 }
 
 GameObject* BackpackDemo::createTerrain() {
-    GameObject* terrainObject = Hierarchy::createGameObject();
+    GameObject* terrainObject = Hierarchy::addGameObject();
 
     Texture* terrainTexture = loader->loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
     auto* terrain = new Terrain(terrainTexture, 20);
 
-    Hierarchy::addComponent(terrainObject, terrain);
+    terrainObject->components.add(terrain);
 
     return terrainObject;
 }

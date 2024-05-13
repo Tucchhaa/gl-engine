@@ -2,8 +2,14 @@
 
 #include "structures/material.hpp"
 
-GameObject::GameObject(Transform* transform): transform(transform) {
+GameObject::GameObject(Transform* transform): transform(transform), components(this) {
     ID = generateId();
+    components.add(transform);
+}
+
+GameObject::GameObject(): transform(new Transform()), components(this) {
+    ID = generateId();
+    components.add(transform);
 }
 
 template<typename T>

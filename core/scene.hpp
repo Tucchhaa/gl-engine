@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "../apis/base/iinput.hpp"
+
 #include "./loader/loader.hpp"
 #include "./components/camera.hpp"
 
@@ -16,6 +18,8 @@
 class Scene {
 protected:
     Loader* loader;
+
+    IInput* input;
 
     Camera* camera = nullptr;
 
@@ -36,7 +40,7 @@ private:
 
 
 public:
-    explicit Scene(Loader* loader);
+    explicit Scene();
 
     virtual ~Scene();
 
@@ -88,13 +92,13 @@ private:
 // Basic shapes
 // ===
 public:
-    GameObject* createCube();
+    static GameObject* createCube();
 
-    GameObject* createSphere();
+    static GameObject* createSphere();
 
-    GameObject* createPlane();
+    static GameObject* createPlane();
 
-    GameObject* createCylinder();
+    static GameObject* createCylinder();
 
-    GameObject* createCone();
+    static GameObject* createCone();
 };

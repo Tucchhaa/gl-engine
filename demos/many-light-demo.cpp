@@ -1,11 +1,9 @@
 #include "many-light-demo.hpp"
 
 #include <ctime>
-#include "../core/hierarchy.hpp"
 
-ManyLightsDemo::ManyLightsDemo(Loader* loader): Scene(loader) {
-    input = IInput::getInstance();
-}
+#include "../apis/base/iengine.hpp"
+#include "../core/hierarchy.hpp"
 
 void ManyLightsDemo::setupScene() {
     srand(time(nullptr));
@@ -24,12 +22,12 @@ void ManyLightsDemo::setupScene() {
         }
     }
 
-    GameObject* lights = Hierarchy::createGameObject();
+    GameObject* lights = Hierarchy::addGameObject();
 
     // Hierarchy::addComponent(lights, PointLight::D3250());
 
     for(int i=0; i < LIGHTS_NUM; i++) {
-        GameObject* lightSource = Hierarchy::createGameObject();
+        GameObject* lightSource = Hierarchy::addGameObject();
         PointLight* pointLight = PointLight::D20();
 
         float x = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);
@@ -46,7 +44,7 @@ void ManyLightsDemo::setupScene() {
 
         lightTranslate.emplace_back(lightSource, vec3(r, 0, 1-b));
 
-        Hierarchy::addComponent(lightSource, pointLight);
+        lightSource->components.add(pointLight);
         Hierarchy::setParent(lights, lightSource);
     }
 

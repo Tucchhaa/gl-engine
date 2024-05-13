@@ -21,6 +21,8 @@ endif ()
 add_executable(gl_engine
         # base
         apis/base/iwindow.hpp
+        apis/base/iwindow.cpp
+
         apis/base/iresource-manager.hpp
 
         apis/base/irender-object.hpp
@@ -120,6 +122,9 @@ add_executable(gl_engine
         core/components/transform.cpp
         core/components/transform.hpp
 
+        core/components/components-manager.cpp
+        core/components/components-manager.hpp
+
         core/game-object.cpp
         core/game-object.hpp
 
@@ -145,5 +150,4 @@ add_executable(gl_engine
 
         # other
         main.cpp
-        apis/base/iwindow.cpp
 )

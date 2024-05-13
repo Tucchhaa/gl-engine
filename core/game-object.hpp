@@ -2,6 +2,7 @@
 
 #include <set>
 
+#include "components/components-manager.hpp"
 #include "components/transform.hpp"
 
 using namespace std;
@@ -23,12 +24,15 @@ public:
 
     Transform* transform = nullptr;
 
+    ComponentsManager components;
+
     /**
      * Contains pointers to data, that children use. It has Materials.
      */
     vector<void*> data;
 
 public:
+    GameObject();
     explicit GameObject(Transform* transform);
 
 public:

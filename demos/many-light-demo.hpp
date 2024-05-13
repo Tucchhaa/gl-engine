@@ -5,7 +5,7 @@
 
 class ManyLightsDemo: public Scene {
 public:
-    explicit ManyLightsDemo(Loader* loader);
+    ManyLightsDemo() = default;
 
     void setupScene() override;
 
@@ -14,7 +14,6 @@ public:
 private:
     vector<pair<GameObject*, vec3>> lightTranslate;
 
-    IInput* input;
 };
 
 

@@ -23,12 +23,14 @@ Optimizations:
 4) instancing for meshes
 5) instancing for light volumes
 6) use stencil pass for light volumes: https://ogldev.org/www/tutorial37/tutorial37.html
+7) use uniform buffer objects
 
 Features:
 1) Bloom
 2) Deferred + Forward renderings for transparency
 3) PBR
 4) Physics
+5) Compatibility with Windows
 
 Other:
 check for memory leaks
@@ -44,16 +46,16 @@ int main() {
     IRenderer* renderer = IEngine::Renderer;
     loader = IEngine::Loader;
 
-    // Scene scene(&loader);
-    BackpackDemo scene(loader);
-    // TunnelDemo scene(&loader);
-    // ManyLightsDemo scene(&loader);
+    // Scene scene;
+    BackpackDemo scene;
+    // TunnelDemo scene;
+    // ManyLightsDemo scene;
 
     // ===
 
     GameObject* cameraObject = createCamera();
 
-    Camera* camera = Hierarchy::Components<Camera>::get(cameraObject);
+    auto* camera = cameraObject->components.get<Camera>();
     Transform* cameraTransform = cameraObject->transform;
 
     // ===
@@ -107,12 +109,12 @@ int main() {
 }
 
 GameObject* createCamera() {
-    auto* cameraObject = Hierarchy::createGameObject();
+    auto* cameraObject = Hierarchy::addGameObject();
     Transform* cameraTransform = cameraObject->transform;
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
     camera->cubeMap = loader->loadCubeMap("textures/skybox");
-    Hierarchy::addComponent(cameraObject, camera);
+    cameraObject->components.add(camera);
 
     cameraTransform->translate(vec3(-10, 25, -30));
     cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));

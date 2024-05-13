@@ -2,8 +2,12 @@
 
 #include "./hierarchy.hpp"
 #include "./game-object.hpp"
+#include "../apis/base/iengine.hpp"
 
-Scene::Scene(Loader* loader): loader(loader) {}
+Scene::Scene() {
+    loader = IEngine::Loader;
+    input = IEngine::Input;
+}
 
 Scene::~Scene() = default;
 
@@ -96,9 +100,9 @@ void Scene::loadComponents(vector<T*>* array) {
     map<int, GameObject*>::iterator iterator;
     
     for(iterator = gameObjects->begin(); iterator != gameObjects->end(); iterator++) {
-        int objectId = iterator->second->ID;
+        GameObject* gameObject = iterator->second;
         
-        vector<T*> components = Hierarchy::Components<T>::getAll(objectId);
+        vector<T*> components = gameObject->components.getAll<T>();
         
         array->insert(array->end(), components.begin(), components.end());
     }
@@ -109,21 +113,21 @@ void Scene::loadComponents(vector<T*>* array) {
 // ===
 
 GameObject* Scene::createCube() {
-    return loader->loadModel("models/shapes/cube.obj");
+    return IEngine::Loader->loadModel("models/shapes/cube.obj");
 }
 
 GameObject* Scene::createSphere() {
-    return loader->loadModel("models/shapes/sphere.obj");
+    return IEngine::Loader->loadModel("models/shapes/sphere.obj");
 }
 
 GameObject* Scene::createPlane() {
-    return loader->loadModel("models/shapes/plane.obj");
+    return IEngine::Loader->loadModel("models/shapes/plane.obj");
 }
 
 GameObject* Scene::createCylinder() {
-    return loader->loadModel("models/shapes/cylinder.obj");
+    return IEngine::Loader->loadModel("models/shapes/cylinder.obj");
 }
 
 GameObject* Scene::createCone() {
-    return loader->loadModel("models/shapes/cone.obj");
+    return IEngine::Loader->loadModel("models/shapes/cone.obj");
 }
