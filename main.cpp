@@ -109,7 +109,7 @@ int main() {
 }
 
 GameObject* createCamera() {
-    auto* cameraObject = Hierarchy::addGameObject();
+    auto* cameraObject = Hierarchy::createGameObjectInTree();
     Transform* cameraTransform = cameraObject->transform;
 
     auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
@@ -120,6 +120,8 @@ GameObject* createCamera() {
     cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
 
     camera->setScreenSizes(window->screenWidth, window->screenHeight);
+
+    Hierarchy::addToHierarchy(cameraObject);
 
     return cameraObject;
 }

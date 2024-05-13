@@ -11,8 +11,10 @@ void BackpackDemo::setupScene() {
     plane->transform->scaleBy(vec3(100, 1, 100));
     plane->transform->translate(vec3(0, -10, 0));
 
+    Hierarchy::addToHierarchy(plane);
+
     // = light source =
-    auto* lightSource = Hierarchy::addGameObject();
+    auto* lightSource = Hierarchy::createGameObjectInTree();
 
     Transform* lightTransform = lightSource->transform;
     lightTransform->translate(vec3(-8, 15, -10));
@@ -60,6 +62,8 @@ GameObject* BackpackDemo::createBackpack() {
     objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
     objectTransform->translate(vec3(-5, -3, 0));
 
+    Hierarchy::addToHierarchy(object);
+
     return object;
 }
 
@@ -69,6 +73,8 @@ GameObject* BackpackDemo::createHelmet() {
     Transform* objectTransform = object->transform;
 
     objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
+
+    Hierarchy::addToHierarchy(object);
 
     return object;
 }
@@ -100,7 +106,7 @@ GameObject* BackpackDemo::createCurvedSurface() {
         1.5f, rand() % 3 - 1.0f, 1.5f,
     };
 
-    GameObject* cubicPatchObject = Hierarchy::addGameObject();
+    GameObject* cubicPatchObject = Hierarchy::createGameObjectInTree();
     Transform* patchTransform = cubicPatchObject->transform;
     patchTransform->scaleBy(vec3(10, 10, 10));
     patchTransform->translate(vec3(0, -3, 0));
@@ -121,7 +127,7 @@ GameObject* BackpackDemo::createCurvedSurface() {
 }
 
 GameObject* BackpackDemo::createTerrain() {
-    GameObject* terrainObject = Hierarchy::addGameObject();
+    GameObject* terrainObject = Hierarchy::createGameObjectInTree();
 
     Texture* terrainTexture = loader->loadTexture("textures/iceland_heightmap.png", TERRAIN_OPTIONS);
     auto* terrain = new Terrain(terrainTexture, 20);

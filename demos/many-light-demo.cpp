@@ -22,12 +22,12 @@ void ManyLightsDemo::setupScene() {
         }
     }
 
-    GameObject* lights = Hierarchy::addGameObject();
+    GameObject* lights = Hierarchy::createGameObjectInTree();
 
     // Hierarchy::addComponent(lights, PointLight::D3250());
 
     for(int i=0; i < LIGHTS_NUM; i++) {
-        GameObject* lightSource = Hierarchy::addGameObject();
+        GameObject* lightSource = Hierarchy::createGameObjectInTree();
         PointLight* pointLight = PointLight::D20();
 
         float x = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);
@@ -45,7 +45,7 @@ void ManyLightsDemo::setupScene() {
         lightTranslate.emplace_back(lightSource, vec3(r, 0, 1-b));
 
         lightSource->components.add(pointLight);
-        Hierarchy::setParent(lights, lightSource);
+        Hierarchy::setParent(lightSource, lights);
     }
 
     Scene::setupScene();

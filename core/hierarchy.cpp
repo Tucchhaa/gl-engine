@@ -16,7 +16,7 @@ map<int, GameObject*>* Hierarchy::getGameObjects() {
     return &gameObjects;
 }
 
-GameObject* Hierarchy::addGameObject() {
+GameObject* Hierarchy::createGameObjectInTree() {
     auto* gameObject = new GameObject();
 
     addToHierarchy(gameObject);
@@ -36,16 +36,28 @@ GameObject* Hierarchy::createRoot() {
 // === Hierarchy tree operations ===
 
 void Hierarchy::addToHierarchy(GameObject* gameObject) {
-    gameObjects[gameObject->ID] = gameObject;
+    setParent(gameObject, root);
 
-    setParent(root, gameObject);
+    queue<GameObject*> q;
+    q.push(gameObject);
+
+    while(!q.empty()) {
+        GameObject* current = q.front();
+        q.pop();
+
+        gameObjects[current->ID] = current;
+
+        for(auto* child: current->children) {
+            q.push(child);
+        }
+    }
 }
 
 GameObject* Hierarchy::getParent(const GameObject* gameObject) {
     return gameObject->parent;
 }
 
-void Hierarchy::setParent(GameObject* parent, GameObject* child) {
+void Hierarchy::setParent(GameObject* child, GameObject* parent) {
     // remove from old parent
     if(child->parent != nullptr) {
         set<GameObject*>* oldSiblings = &child->parent->children;

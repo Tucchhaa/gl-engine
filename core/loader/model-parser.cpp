@@ -9,19 +9,19 @@ ModelParser::ModelParser(Loader *loader, string texturesDirectory):
 { }
 
 GameObject* ModelParser::parse(const aiScene* scene) {
-    GameObject* result = Hierarchy::addGameObject();
+    auto* wrapper = new GameObject();
 
-    processMaterials(scene, result);
+    processMaterials(scene, wrapper);
 
     GameObject* mesh = nodeToGameObject(scene, scene->mRootNode);
 
-    Hierarchy::setParent(result, mesh);
+    Hierarchy::setParent(mesh, wrapper);
 
-    return result;
+    return wrapper;
 }
 
 GameObject* ModelParser::nodeToGameObject(const aiScene* scene, const aiNode* node) {
-    auto* result = Hierarchy::addGameObject();
+    auto* result = new GameObject();
 
     // decomposeNodeTransform(node, *result);
 
@@ -35,7 +35,7 @@ GameObject* ModelParser::nodeToGameObject(const aiScene* scene, const aiNode* no
     for(unsigned int i = 0; i < node->mNumChildren; i++) {
         GameObject* child = nodeToGameObject(scene, node->mChildren[i]);
 
-        Hierarchy::setParent(result, child);
+        Hierarchy::setParent(child, result);
     }
 
     return result;

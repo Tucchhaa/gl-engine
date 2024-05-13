@@ -27,7 +27,7 @@ void TunnelDemo::setupScene() {
     bottomCube->transform->rotate(vec3(0, 0, radians(180.0f)));
 
     // = light source =
-    auto* lightSource = Hierarchy::addGameObject();
+    auto* lightSource = Hierarchy::createGameObjectInTree();
     auto* pointLight = PointLight::D3250();
     auto* pointLight3 = PointLight::D3250();
     auto* pointLight4 = PointLight::D3250();
@@ -35,12 +35,12 @@ void TunnelDemo::setupScene() {
     // pointLight->quadratic = 0.000007;
     cube->transform->setPosition(lightSource->transform->getPosition());
 
-    auto* redLightSource = Hierarchy::addGameObject();
+    auto* redLightSource = Hierarchy::createGameObjectInTree();
     auto* pointLight1 = PointLight::D3250();
     pointLight1->diffuse = vec3(0.3, 0, 0);
     redLightSource->transform->translate(vec3(0, -3, -20));
 
-    auto* blueLightSource = Hierarchy::addGameObject();
+    auto* blueLightSource = Hierarchy::createGameObjectInTree();
     auto* pointLight2 = PointLight::D6();
     pointLight2->diffuse = vec3(0, 0, 0.3);
     blueLightSource->transform->translate(vec3(0, -3.5, -25));

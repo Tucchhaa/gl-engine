@@ -36,17 +36,20 @@ public:
      * Creates new game object and adds it to the hierarchy tree
      * @return created game object
      */
-    static GameObject* addGameObject();
+    static GameObject* createGameObjectInTree();
 
     static GameObject* createRoot();
 
     // === Hierarchy tree operations ===
 
+    /**
+    * Adds game object and its children to the hierarchy tree.
+    */
     static void addToHierarchy(GameObject* gameObject);
 
     static GameObject* getParent(const GameObject* gameObject);
 
-    static void setParent(GameObject* parent, GameObject* child);
+    static void setParent(GameObject* child, GameObject* parent);
 
     static void updateTransformTree();
     static void updateTransformTree(GameObject* transform);
