@@ -10,9 +10,9 @@ public:
 
     void beforeRender() override;
 
-private:
     GameObject* backpack;
 
+private:
     GameObject* createBackpack();
 
     GameObject* createHelmet();

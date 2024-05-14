@@ -34,6 +34,7 @@ Features:
 
 Other:
 check for memory leaks
+use absolute path for includes
  */
 
 Loader* loader;
@@ -61,8 +62,7 @@ int main() {
     // ===
 
     scene.setCamera(camera);
-    scene.setupScene();
-    renderer->setScene(&scene);
+    IEngine::setScene(&scene);
     input->process();
 
     int frameCnt = 0;

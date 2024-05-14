@@ -37,6 +37,9 @@ add_executable(gl_engine
         apis/base/iengine.hpp
         apis/base/iengine.cpp
 
+        apis/base/ieditor-view-renderer.hpp
+        apis/base/ieditor-view-renderer.cpp
+
         # apis/opengl
         apis/opengl/include.hpp
 
@@ -78,6 +81,9 @@ add_executable(gl_engine
 
         core/scene.cpp
         core/scene.hpp
+
+        core/editor.cpp
+        core/editor.hpp
 
         core/imesh.hpp
 

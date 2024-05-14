@@ -2,9 +2,10 @@
 
 #include "scene.hpp"
 #include "hierarchy.hpp"
-#include "loader/loader.hpp"
-
+#include "editor.hpp"
 #include "game-object.hpp"
+
+#include "loader/loader.hpp"
 
 #include "components/transform.hpp"
 #include "components/camera.hpp"

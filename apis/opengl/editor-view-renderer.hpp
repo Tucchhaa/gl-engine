@@ -1,12 +1,11 @@
 #pragma once
 
 #include "deferred-renderer.hpp"
+#include "../base/ieditor-view-renderer.hpp"
 
-class EditorViewRenderer: public DeferredRenderer {
+class EditorViewRenderer: public DeferredRenderer, public IEditorViewRenderer {
 private:
     Shader editorShader;
-
-    GameObject* selectedObject = nullptr;
 
     GameObject* positionHandle = nullptr;
 
@@ -18,7 +17,10 @@ public:
     void render() override;
 
 private:
-    static GameObject* createPositionHandle(vector<IRenderObject*>& editorMeshes);
+    void beforeRender();
 
     void renderEditorTools();
+
+protected:
+    GameObject* createPositionHandle();
 };

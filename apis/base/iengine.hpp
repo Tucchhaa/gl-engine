@@ -6,6 +6,7 @@
 #include "iinput.hpp"
 #include "iresource-manager.hpp"
 #include "irenderer.hpp"
+#include "../../core/editor.hpp"
 
 class IEngine {
 public:
@@ -14,11 +15,15 @@ public:
     static Loader* Loader;
     static IResourceManager* ResourceManager;
     static IRenderer* Renderer;
+    static Editor* Editor;
+    static Scene* CurrentScene;
 
     static const string RESOURCES_PATH;
 
 public:
-    IEngine() = default;
+    IEngine();
 
     virtual ~IEngine() = default;
+
+    static void setScene(Scene* scene);
 };

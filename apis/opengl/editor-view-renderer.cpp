@@ -2,71 +2,24 @@
 
 #include "render-object.hpp"
 
-EditorViewRenderer::EditorViewRenderer(): DeferredRenderer(),
+EditorViewRenderer::EditorViewRenderer(): DeferredRenderer(), IEditorViewRenderer(),
     editorShader("editor/mesh.vert", "editor/mesh.frag")
 {
-    positionHandle = createPositionHandle(editorMeshes);
+    positionHandle = createPositionHandle();
 }
 
 void EditorViewRenderer::render() {
+    beforeRender();
+
     DeferredRenderer::render();
 
     renderEditorTools();
 }
 
-GameObject* EditorViewRenderer::createPositionHandle(vector<IRenderObject*>& editorMeshes) {
-    auto* positionHandle = new GameObject();
+void EditorViewRenderer::beforeRender() {
+    positionHandle->transform->setPosition(selectedObject->transform->getPosition());
 
-    GameObject* axisXCylinder = Scene::createCylinder();
-    GameObject* axisYCylinder = Scene::createCylinder();
-    GameObject* axisZCylinder = Scene::createCylinder();
-
-    GameObject* axisXCone = Scene::createCone();
-    GameObject* axisYCone = Scene::createCone();
-    GameObject* axisZCone = Scene::createCone();
-
-    float handleScale = 0.05;
-
-    axisXCylinder->addDataItem(new Vec3(1.0, 0.0, 0.0));
-    axisXCylinder->transform->setScale(handleScale, 1.0, handleScale);
-    axisXCylinder->transform->rotate(quat(vec3(0.0, 0.0, radians(-90.0))));
-    axisXCylinder->transform->setPosition(1.0, 0.0, 0.0);
-
-    axisYCylinder->addDataItem(new Vec3(0.0, 1.0, 0.0));
-    axisYCylinder->transform->setScale(handleScale, 1.0, handleScale);
-    axisYCylinder->transform->setPosition(0, 1.0, 0);
-
-    axisZCylinder->addDataItem(new Vec3(0.0, 0.0, 1.0));
-    axisZCylinder->transform->setScale(handleScale, 1.0, handleScale);
-    axisZCylinder->transform->rotate(quat(vec3(radians(90.0), 0.0, 0)));
-    axisZCylinder->transform->setPosition(0.0, 0.0, 1.0);
-
-    axisXCone->addDataItem(new Vec3(1.0, 0.0, 0.0));
-    axisXCone->transform->setScale(2*handleScale);
-    axisXCone->transform->setPosition(2.0, 0.0, 0.0);
-    axisXCone->transform->rotate(quat(vec3(0.0, 0.0, radians(-90.0))));
-
-    axisYCone->addDataItem(new Vec3(0.0, 1.0, 0.0));
-    axisYCone->transform->setScale(2*handleScale);
-    axisYCone->transform->setPosition(0.0, 2.0, 0.0);
-
-    axisZCone->addDataItem(new Vec3(0.0, 0.0, 1.0));
-    axisZCone->transform->setScale(2*handleScale);
-    axisZCone->transform->setPosition(0.0, 0.0, 2.0);
-    axisZCone->transform->rotate(quat(vec3(radians(90.0), 0.0, 0)));
-
-    const vector children = { axisXCylinder, axisYCylinder, axisZCylinder, axisXCone, axisYCone, axisZCone };
-
-    Hierarchy::setParent(children, positionHandle);
     Hierarchy::updateTransformTree(positionHandle);
-
-    for(GameObject* object: children) {
-        Mesh* mesh = object->components.getAllFromChildren<Mesh>()[0];
-
-        editorMeshes.push_back(new RenderObject(mesh));
-    }
-
-    return positionHandle;
 }
 
 void EditorViewRenderer::renderEditorTools() {
@@ -92,4 +45,18 @@ void EditorViewRenderer::renderEditorTools() {
 
         object->render();
     }
+}
+
+GameObject* EditorViewRenderer::createPositionHandle() {
+    vector<Mesh*> handleMeshes;
+
+    GameObject* result = IEditorViewRenderer::createPositionHandle(&handleMeshes);
+
+    for(const auto mesh: handleMeshes) {
+        const auto object = new RenderObject(mesh);
+
+        editorMeshes.push_back(object);
+    }
+
+    return result;
 }
