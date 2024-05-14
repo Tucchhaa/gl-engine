@@ -49,7 +49,8 @@ void BackpackDemo::beforeRender() {
 GameObject* BackpackDemo::createBackpack() {
     GameObject* object = loader->loadModel("models/backpack/backpack.fbx");
 
-    auto* material = object->getData<Material>();
+    auto* material = object->getDataItem<Material>();
+    // auto* material = (*object->getDataList<Material>())[0];
 
     material->diffuseTexture = *loader->loadTexture("models/backpack/albedo.jpg");
     material->normalTexture = *loader->loadTexture("models/backpack/normal.png");

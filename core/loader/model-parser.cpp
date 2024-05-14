@@ -95,7 +95,7 @@ void ModelParser::processMaterials(const aiScene* scene, GameObject* result) {
 
         materials[i] = material;
 
-        result->data.push_back(material);
+        result->addDataItem(material);
     }
 }
 

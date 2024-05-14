@@ -28,6 +28,9 @@ public:
     template<typename T>
     vector<T*> getAll();
 
+    template<typename T>
+    vector<T*> getAllFromChildren();
+
     void add(ObjectComponent* component);
 
 private:

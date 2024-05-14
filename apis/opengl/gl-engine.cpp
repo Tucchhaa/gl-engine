@@ -1,6 +1,7 @@
 #include "gl-engine.hpp"
 
 #include "deferred-renderer.hpp"
+#include "editor-view-renderer.hpp"
 #include "window.hpp"
 #include "input.hpp"
 #include "resource-manager.hpp"
@@ -10,24 +11,25 @@ GlEngine::GlEngine(): IEngine() {
     constexpr int SCREEN_WIDTH = 1280;
     constexpr int SCREEN_HEIGHT = 720;
 
-    IEngine::Window = new ::Window();
+    Window = new ::Window();
 
     Window->create(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    IEngine::Input = new ::Input();
-    IEngine::ResourceManager = new ::ResourceManager();
-    IEngine::Loader = new ::Loader();
-    IEngine::Renderer = new ::DeferredRenderer();
+    Input = new ::Input();
+    ResourceManager = new ::ResourceManager();
+    Loader = new ::Loader();
+    // Renderer = new ::DeferredRenderer();
+    Renderer = new EditorViewRenderer();
 
     init();
 }
 
 GlEngine::~GlEngine() {
-    delete IEngine::Renderer;
-    delete IEngine::Loader;
-    delete IEngine::ResourceManager;
-    delete IEngine::Input;
-    delete IEngine::Window;
+    delete Renderer;
+    delete Loader;
+    delete ResourceManager;
+    delete Input;
+    delete Window;
 }
 
 void GlEngine::init() {

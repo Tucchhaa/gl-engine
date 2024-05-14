@@ -1,11 +1,11 @@
 #include "components-manager.hpp"
 
+#include "../game-object.hpp"
 #include "transform.hpp"
 #include "camera.hpp"
 #include "terrain.hpp"
 #include "cubic-patch.hpp"
 #include "mesh.hpp"
-#include "../game-object.hpp"
 #include "lights/direct-light.hpp"
 #include "lights/point-light.hpp"
 #include "lights/spot-light.hpp"
@@ -60,6 +60,21 @@ vector<T*> ComponentsManager::getAll() {
     return _get<T>(true);
 }
 
+template<typename T>
+vector<T*> ComponentsManager::getAllFromChildren() {
+    vector<T*> result;
+
+    auto callback = [&](GameObject* gameObject) {
+        vector<T*> components = gameObject->components.getAll<T>();
+
+        result.insert(result.end(), components.begin(), components.end());
+    };
+
+    gameObject->traverseChildren(callback);
+
+    return result;
+}
+
 void ComponentsManager::add(ObjectComponent* component) {
     components.push_back(component);
 
@@ -71,7 +86,8 @@ void ComponentsManager::add(ObjectComponent* component) {
 #define INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(T) \
 template T* ComponentsManager::get<T>(); \
 template T* ComponentsManager::getRequired<T>(); \
-template vector<T*> ComponentsManager::getAll<T>();
+template vector<T*> ComponentsManager::getAll<T>(); \
+template vector<T*> ComponentsManager::getAllFromChildren<T>();
 
 INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(Transform);
 INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(Camera);

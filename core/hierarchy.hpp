@@ -3,9 +3,7 @@
 #include <vector>
 #include <map>
 
-#include "./game-object.hpp"
-
-#include "./components/component.hpp"
+#include "game-object.hpp"
 
 using namespace std;
 
@@ -50,7 +48,20 @@ public:
     static GameObject* getParent(const GameObject* gameObject);
 
     static void setParent(GameObject* child, GameObject* parent);
+    static void setParent(const vector<GameObject*>& children, GameObject* parent);
 
     static void updateTransformTree();
     static void updateTransformTree(GameObject* transform);
+
+private:
+    /**
+     * Used in traverse game object's children
+     */
+    static void updateTransform(GameObject* gameObject);
+
+    /**
+     * Used in traverse game object's children
+     */
+    static void addToGameObjects(GameObject* gameObject);
 };
+

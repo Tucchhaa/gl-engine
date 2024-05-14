@@ -67,6 +67,9 @@ add_executable(gl_engine
         apis/opengl/deferred-renderer.cpp
         apis/opengl/deferred-renderer.hpp
 
+        apis/opengl/editor-view-renderer.cpp
+        apis/opengl/editor-view-renderer.hpp
+
         # core
         core/include.hpp
 

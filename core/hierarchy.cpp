@@ -38,19 +38,7 @@ GameObject* Hierarchy::createRoot() {
 void Hierarchy::addToHierarchy(GameObject* gameObject) {
     setParent(gameObject, root);
 
-    queue<GameObject*> q;
-    q.push(gameObject);
-
-    while(!q.empty()) {
-        GameObject* current = q.front();
-        q.pop();
-
-        gameObjects[current->ID] = current;
-
-        for(auto* child: current->children) {
-            q.push(child);
-        }
-    }
+    gameObject->traverseChildren(addToGameObjects);
 }
 
 GameObject* Hierarchy::getParent(const GameObject* gameObject) {
@@ -73,28 +61,27 @@ void Hierarchy::setParent(GameObject* child, GameObject* parent) {
     child->parent = parent;
 }
 
+void Hierarchy::setParent(const vector<GameObject*>& children, GameObject* parent) {
+    for(auto* child: children) {
+        setParent(child, parent);
+    }
+}
+
 void Hierarchy::updateTransformTree() {
-    updateTransformTree(root);
+    root->traverseChildren(updateTransform);
 }
 
 void Hierarchy::updateTransformTree(GameObject* gameObject) {
-    // update transform of itself
-    if(gameObject != root) {
-        gameObject->transform->updateAbsoluteValues(gameObject->parent->transform);
-    }
+    gameObject->traverseChildren(updateTransform);
+}
 
-    queue<GameObject*> q;
-    q.push(gameObject);
+void Hierarchy::updateTransform(GameObject* gameObject) {
+    if(gameObject == root || gameObject->parent == nullptr)
+        return;
 
-    while(!q.empty()) {
-        const GameObject* parent = q.front();
+    gameObject->transform->updateAbsoluteValues(gameObject->parent->transform);
+}
 
-        q.pop();
-
-        for(const auto child: parent->children) {
-            child->transform->updateAbsoluteValues(parent->transform);
-
-            q.push(child);
-        }
-    }
+void Hierarchy::addToGameObjects(GameObject* gameObject) {
+    gameObjects[gameObject->ID] = gameObject;
 }

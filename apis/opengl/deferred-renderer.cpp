@@ -213,18 +213,15 @@ void DeferredRenderer::setScene(Scene *scene) {
     const vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
 
     for(Mesh* mesh: meshes) {
-        auto* object = new RenderObject(mesh);
-        this->meshes.push_back(object);
+        this->meshes.push_back(new RenderObject(mesh));
     }
 
     for(Terrain* terrain: terrains) {
-        auto* object = new RenderObject(terrain);
-        this->terrains.push_back(object);
+        this->terrains.push_back(new RenderObject(terrain));
     }
 
     for(CubicPatch* cubicPatch: cubicPatches) {
-        auto* object = new RenderObject(cubicPatch);
-        this->cubicPatches.push_back(object);
+        this->cubicPatches.push_back(new RenderObject(cubicPatch));
     }
 }
 
@@ -237,7 +234,7 @@ void DeferredRenderer::render() {
     renderLighting();
 
     renderScreen();
-    renderSkybox();
+    // renderSkybox();
 
     glCheckError();
 
