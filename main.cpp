@@ -1,5 +1,4 @@
 #include <iostream>
-#include <ctime>
 
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
