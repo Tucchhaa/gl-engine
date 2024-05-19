@@ -11,6 +11,6 @@ void Editor::setScene(Scene* scene) {
 
     const auto editorRenderer = dynamic_cast<IEditorViewRenderer*>(IEngine::Renderer);
 
-    editorRenderer->selectObject(demo->backpack);
+    // editorRenderer->selectObject(demo->backpack);
 }
 

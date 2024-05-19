@@ -9,6 +9,10 @@ function(get_demos_source_files)
 
             demos/many-light-demo.cpp
             demos/many-light-demo.hpp
+
+            demos/collision-demo.cpp
+            demos/collision-demo.hpp
+
             PARENT_SCOPE
     )
 
@@ -35,6 +39,12 @@ function(get_core_source_files)
 
             core/imesh.hpp
 
+            core/igame-events-listener.hpp
+            core/igame-events-listener.cpp
+
+            core/physics-engine.cpp
+            core/physics-engine.hpp
+
             # core/loader
             core/loader/loader.cpp
             core/loader/loader.hpp
@@ -59,6 +69,24 @@ function(get_core_source_files)
 
     return()
 endfunction(get_core_source_files)
+
+function(get_colliders_source_files)
+    set(CORE_COMPONENTS_COLLIDERS_SOURCE_FILES
+            core/components/colliders/collider.cpp
+            core/components/colliders/collider.hpp
+
+            core/components/colliders/sphere-collider.cpp
+            core/components/colliders/sphere-collider.hpp
+
+            core/components/colliders/box-collider.cpp
+            core/components/colliders/box-collider.hpp
+
+            PARENT_SCOPE
+    )
+
+    return()
+
+endfunction(get_colliders_source_files)
 
 function(get_core_components_source_files)
     set(CORE_COMPONENTS_SOURCE_FILES
@@ -175,12 +203,14 @@ endfunction(get_apis_opengl_source_files)
 function(get_source_files)
     get_core_source_files()
     get_core_components_source_files()
+    get_colliders_source_files()
     get_apis_base_source_files()
     get_apis_opengl_source_files()
 
     set(SOURCE_FILES
             ${CORE_SOURCE_FILES}
             ${CORE_COMPONENTS_SOURCE_FILES}
+            ${CORE_COMPONENTS_COLLIDERS_SOURCE_FILES}
             ${APIS_BASE_SOURCE_FILES}
             ${APIS_OPENGL_SOURCE_FILES}
             PARENT_SCOPE

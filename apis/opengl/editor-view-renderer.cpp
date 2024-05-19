@@ -17,12 +17,18 @@ void EditorViewRenderer::render() {
 }
 
 void EditorViewRenderer::beforeRender() {
+    if(selectedObject == nullptr)
+        return;
+
     positionHandle->transform->setPosition(selectedObject->transform->getPosition());
 
     Hierarchy::updateTransformTree(positionHandle);
 }
 
 void EditorViewRenderer::renderEditorTools() {
+    if(selectedObject == nullptr)
+        return;
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glClear(GL_DEPTH_BUFFER_BIT);

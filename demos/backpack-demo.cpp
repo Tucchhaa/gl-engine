@@ -17,7 +17,7 @@ void BackpackDemo::setupScene() {
     auto* lightSource = Hierarchy::createGameObjectInTree();
 
     Transform* lightTransform = lightSource->transform;
-    lightTransform->translate(vec3(-8, 15, -10));
+    lightTransform->translate(vec3(-8, 10, -10));
     lightTransform->rotate(vec3(0, radians(180.0), 0));
     lightTransform->rotate(vec3(radians(-30.0), 0, 0));
 

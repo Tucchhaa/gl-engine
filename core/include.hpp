@@ -18,4 +18,6 @@
 #include "components/lights/point-light.hpp"
 #include "components/lights/spot-light.hpp"
 
+#include "components/colliders/sphere-collider.hpp"
+
 #include "structures/material.hpp"

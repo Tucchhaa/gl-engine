@@ -79,7 +79,7 @@ vec3 calculatePointLight(PointLight lightSource, vec3 normal, vec3 position, vec
 
     float distance = length(lightVec);
     float attenuation = 1.0 /  (distance * distance);
-    vec3 radiance = lightSource.colors.diffuse * attenuation * 600;
+    vec3 radiance = lightSource.colors.diffuse * attenuation * 1000;
 
     vec3 cameraDir = normalize(cameraPos - position);
     vec3 halfway = normalize(lightDir + cameraDir);

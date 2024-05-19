@@ -16,6 +16,9 @@ link_libraries(glfw)
 find_package(assimp CONFIG REQUIRED)
 link_libraries(assimp::assimp)
 
+find_package(Bullet CONFIG REQUIRED)
+link_libraries(${BULLET_LIBRARIES})
+
 if(APPLE)
     link_libraries("-framework OpenGL")
 

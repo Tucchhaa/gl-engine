@@ -3,6 +3,7 @@
 #include "apis/opengl/include.hpp"
 #include "core/include.hpp"
 #include "demos/backpack-demo.hpp"
+#include "demos/collision-demo.hpp"
 #include "demos/many-light-demo.hpp"
 #include "demos/tunnel-demo.hpp"
 
@@ -47,7 +48,8 @@ int main() {
     loader = IEngine::Loader;
 
     // Scene scene;
-    BackpackDemo scene;
+    // BackpackDemo scene;
+    CollisionDemo scene;
     // TunnelDemo scene;
     // ManyLightsDemo scene;
 
@@ -96,6 +98,7 @@ int main() {
             cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
         }
 
+        IEngine::invokeBeforeRender();
         renderer->render();
 
         window->onRendered();

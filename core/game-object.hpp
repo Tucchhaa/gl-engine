@@ -6,7 +6,6 @@
 #include "components/components-manager.hpp"
 #include "components/transform.hpp"
 
-using namespace std;
 
 class GameObject {
     friend class Hierarchy;

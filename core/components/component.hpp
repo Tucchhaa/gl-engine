@@ -1,9 +1,10 @@
 #pragma once
+#include "../igame-events-listener.hpp"
 
 class GameObject;
 class Transform;
 
-class ObjectComponent {
+class ObjectComponent: public IGameEventsListener {
 private:
     static inline int componentId = 1;
     
@@ -21,6 +22,16 @@ public:
 
     ObjectComponent();
 
-    // === Need this to make ObjectComponent polymorphic, so the dynamic_cast will work ===
-    virtual void func() {}
+public:
+    virtual void onGameObjectSet();
+
+// ===
+// implement IGameEventsListener
+// ===
+public:
+    void setupScene() override;
+
+    void beforeRender() override;
+
+    void afterRender() override;
 };

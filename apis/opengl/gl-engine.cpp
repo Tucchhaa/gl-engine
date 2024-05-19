@@ -6,7 +6,6 @@
 #include "input.hpp"
 #include "resource-manager.hpp"
 
-
 GlEngine::GlEngine(): IEngine() {
     constexpr int SCREEN_WIDTH = 1280;
     constexpr int SCREEN_HEIGHT = 720;

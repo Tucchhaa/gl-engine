@@ -1,6 +1,7 @@
 #include "components-manager.hpp"
 
 #include "../game-object.hpp"
+
 #include "transform.hpp"
 #include "camera.hpp"
 #include "terrain.hpp"
@@ -81,6 +82,8 @@ void ComponentsManager::add(ObjectComponent* component) {
     component->gameObject = gameObject;
     component->GameObjectID = gameObject->ID;
     component->transform = gameObject->transform;
+
+    component->onGameObjectSet();
 }
 
 #define INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(T) \

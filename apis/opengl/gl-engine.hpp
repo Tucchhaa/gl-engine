@@ -9,5 +9,5 @@ public:
     ~GlEngine() override;
 
 private:
-    void init();
+    static void init();
 };

@@ -61,7 +61,7 @@ void Scene::setupScene() {
 }
 
 void Scene::beforeRender() {
-    Hierarchy::updateTransformTree(camera->gameObject);
+    Hierarchy::updateTransformTree();
 }
 
 void Scene::afterRender() { }
