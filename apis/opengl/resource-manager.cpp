@@ -29,6 +29,8 @@ unsigned int ResourceManager::getTextureId(const Material* material, TextureType
             return (*textures)[material->roughnessTexture.ID];
         case TEXTURE_AO:
             return (*textures)[material->aoTexture.ID];
+        case TEXTURE_HEIGHT:
+            return (*textures)[material->heightTexture.ID];
         default:
             throw runtime_error("can not get texture");
     }

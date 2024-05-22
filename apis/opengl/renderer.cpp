@@ -1,19 +1,25 @@
-// WARNING: Obsolote file
+// WARNING: Obsolete file
 
 #include "renderer.hpp"
 
 #include "gl-check-error.hpp"
+#include "render-object.hpp"
+#include "../../demos/parallax-demo.hpp"
+#include "../base/iengine.hpp"
 
 const string shaderDir = "forward/";
 
 Renderer::Renderer() :
     baseShader(shaderDir+"vertex.vert", shaderDir+"fragment.frag"),
+    parallaxShader(shaderDir+"parallax.vert", shaderDir+"parallax.frag"),
     depthShader(shaderDir+"depth-vertex.vert", shaderDir+"depth-fragment.frag"),
     screenShader(shaderDir+"screen-vertex.vert", shaderDir+"screen-fragment.frag"),
     skyboxShader(shaderDir+"skybox-vertex.vert", shaderDir+"skybox-fragment.frag"),
     terrainShader(shaderDir+"terrain-vertex.vert", shaderDir+"terrain-fragment.frag", shaderDir+"terrain-tess-control.tesc", shaderDir+"terrain-tess-eval.tese"),
     cubicPatchShader(shaderDir+"cubic-vertex.vert", shaderDir+"fragment.frag", shaderDir+"cubic-tess-control.tesc", shaderDir+"cubic-tess-eval.tese")
 {
+    resourceManager = dynamic_cast<ResourceManager*>(IEngine::ResourceManager);
+
     initScreenFrameBuffer();
     initScreenVAO();
 
@@ -114,12 +120,12 @@ void Renderer::initScreenVAO() {
     glBindVertexArray(0);
 }
 
-void Renderer::setScene(Scene *scene) {
-    IRenderer::setScene(scene);
+void Renderer::afterSceneSetup() {
+    IRenderer::afterSceneSetup();
 
-    vector<Mesh*> meshes = scene->getMeshes();
-    vector<Terrain*> terrains = scene->getTerrains();
-    vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
+    const vector<Mesh*> meshes = currentScene->getMeshes();
+    const vector<Terrain*> terrains = currentScene->getTerrains();
+    const vector<CubicPatch*> cubicPatches = currentScene->getCubicPatches();
 
     for(Mesh* mesh: meshes) {
         auto* object = new RenderObject(mesh);
@@ -158,7 +164,7 @@ void Renderer::renderShadowMap() {
 
     DirectLight* light = currentScene->getDirectLights()[0];
     mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
+    mat4 viewMatrix = mat4_cast(conjugate(light->transform->getAbsoluteRotation()));
     mat4 perspective = lightProjection * viewMatrix;
 
     depthShader.use();
@@ -166,7 +172,7 @@ void Renderer::renderShadowMap() {
 
     for(auto &meshData : meshes) {
         Mesh* mesh = meshData->getMesh<Mesh>();
-        Transform* transform = Hierarchy::getTransform(mesh);
+        Transform* transform = mesh->transform;
 
         depthShader.setMat4("transform", transform->getTransformMatrix());
 
@@ -177,46 +183,49 @@ void Renderer::renderShadowMap() {
 }
 
 void Renderer::renderMeshes() {
-    DirectLight* light = currentScene->getDirectLights()[0];
-    mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-    mat4 viewMatrix = mat4_cast(conjugate(Hierarchy::getTransform(light)->getAbsoluteRotation()));
-    mat4 lightPerspective = lightProjection * viewMatrix;
+    // DirectLight* light = currentScene->getDirectLights()[0];
+    // mat4 lightProjection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
+    // mat4 viewMatrix = mat4_cast(conjugate(light->transform->getAbsoluteRotation()));
+    // mat4 lightPerspective = lightProjection * viewMatrix;
 
     Camera* camera = currentScene->getCamera();
 
-    cubicPatchShader.use();
-    cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
-    cubicPatchShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    cubicPatchShader.setMat4("lightPerspective", lightPerspective);
-    cubicPatchShader.setTexture("shadowMap", shadowMap);
-
-    setLights(&cubicPatchShader);
-
-    for(auto* cubicPatch : cubicPatches) {
-        drawCubicPatch(cubicPatch);
-    }
-
-    // draw terrain
-    terrainShader.use();
-    terrainShader.setMat4("perspective", camera->getViewProjectionMatrix());
-    terrainShader.setMat4("rotationMatrix", camera->getViewMatrix());
-
-    for(auto* terrain: terrains) {
-        drawTerrain(terrain);
-    }
+    // cubicPatchShader.use();
+    // cubicPatchShader.setMat4("perspective", camera->getViewProjectionMatrix());
+    // cubicPatchShader.setVec3("cameraPos", camera->transform->getAbsolutePosition());
+    // // cubicPatchShader.setMat4("lightPerspective", lightPerspective);
+    // cubicPatchShader.setTexture("shadowMap", shadowMap);
+    //
+    // setLights(&cubicPatchShader);
+    //
+    // for(auto* cubicPatch : cubicPatches) {
+    //     drawCubicPatch(cubicPatch);
+    // }
+    //
+    // // draw terrain
+    // terrainShader.use();
+    // terrainShader.setMat4("perspective", camera->getViewProjectionMatrix());
+    // terrainShader.setMat4("rotationMatrix", camera->getViewMatrix());
+    //
+    // for(auto* terrain: terrains) {
+    //     drawTerrain(terrain);
+    // }
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     // ===
 
-    baseShader.use();
-    baseShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
-    baseShader.setVec3("cameraPos", Hierarchy::getTransform(camera)->getAbsolutePosition());
-    baseShader.setMat4("lightPerspective", lightPerspective);
-    baseShader.setTexture("shadowMap", shadowMap);
+    parallaxShader.use();
+    parallaxShader.setMat4("perspective", currentScene->getCamera()->getViewProjectionMatrix());
+    parallaxShader.setVec3("cameraPos", camera->transform->getAbsolutePosition());
+    // baseShader.setMat4("lightPerspective", lightPerspective);
+    parallaxShader.setTexture("shadowMap", shadowMap);
 
-    setLights(&baseShader);
+    float heightScale = static_cast<ParallaxDemo*>(currentScene)->heightScale;
+    parallaxShader.setFloat("height_scale", heightScale);
+
+    setLights(&parallaxShader);
 
     for(auto* mesh : meshes) {
         drawMesh(mesh);
@@ -226,7 +235,7 @@ void Renderer::renderMeshes() {
 void Renderer::renderCubeMap() {
     Camera* camera = currentScene->getCamera();
 
-    CubeMap* cubeMap = ResourceManager::getCubeMap(camera->cubeMap);
+    CubeMap* cubeMap = resourceManager->getCubeMap(camera->cubeMap);
 
     if(cubeMap != nullptr) {
         skyboxShader.use();
@@ -244,7 +253,7 @@ void Renderer::renderCubeMap() {
 }
 
 void Renderer::render() {
-    renderShadowMap();
+    // renderShadowMap();
 
     glViewport(0, 0, screenWidth, screenHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, screenFrameBuffer);
@@ -280,7 +289,7 @@ void Renderer::render() {
     glCheckError();
 }
 
-void Renderer::setLights(const Shader* shader) const {
+void Renderer::setLights(Shader* shader) const {
     // TODO: size of lights exceed 5 then shader will not work
 
     for(int i=0; i < currentScene->getSpotLights().size(); i++) {
@@ -288,7 +297,8 @@ void Renderer::setLights(const Shader* shader) const {
     }
 
     for(int i=0; i < currentScene->getPointLights().size(); i++) {
-        shader->setPointLight(i, currentScene->getPointLights()[i]);
+        string name = "pointLights["+to_string(i)+"]";
+        shader->setPointLight(name, currentScene->getPointLights()[i]);
     }
 
     for(int i=0; i < currentScene->getDirectLights().size(); i++) {
@@ -298,19 +308,19 @@ void Renderer::setLights(const Shader* shader) const {
 
 void Renderer::drawMesh(IRenderObject* object) {
     const Mesh* mesh = object->getMesh<Mesh>();
-    const Transform* transform = Hierarchy::getTransform(mesh);
+    const Transform* transform = mesh->transform;
 
-    baseShader.setMat4("transform", transform->getTransformMatrix());
-    baseShader.setMat3("normalTransform", transform->getNormalMatrix());
+    parallaxShader.setMat4("transform", transform->getTransformMatrix());
+    parallaxShader.setMat3("normalTransform", transform->getNormalMatrix());
 
-    baseShader.setMaterial(&mesh->material);
+    parallaxShader.setMaterial(mesh->material);
 
     object->render();
 }
 
 void Renderer::drawTerrain(IRenderObject* object) {
     auto* terrain = object->getMesh<Terrain>();
-    const unsigned int heightMapTextureId = ResourceManager::getTextureId(terrain->getTexture());
+    const unsigned int heightMapTextureId = resourceManager->getTextureId(terrain->getTexture());
 
     terrainShader.setTexture("heightMap", heightMapTextureId);
 
@@ -319,7 +329,7 @@ void Renderer::drawTerrain(IRenderObject* object) {
 
 void Renderer::drawCubicPatch(IRenderObject* object) {
     auto* patch = object->getMesh<CubicPatch>();
-    const Transform* transform = Hierarchy::getTransform(patch);
+    const Transform* transform = patch->transform;
 
     cubicPatchShader.setMat4("transform", transform->getTransformMatrix());
     cubicPatchShader.setMat3("normalTransform", transform->getNormalMatrix());

@@ -27,4 +27,10 @@ public:
     virtual bool isShiftPressed() = 0;
 
     virtual float getDeltaTime() = 0;
+
+    // ===
+    virtual bool isArrowUpPressed() = 0;
+    virtual bool isArrowDownPressed() = 0;
+    virtual bool isArrowRightPressed() = 0;
+    virtual bool isArrowLeftPressed() = 0;
 };

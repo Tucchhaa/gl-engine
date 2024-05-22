@@ -26,6 +26,11 @@ void Input::process() {
 
     _isShiftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 
+    _arrowUpPressed = glfwGetKey(glfwWindow, GLFW_KEY_UP) == GLFW_PRESS;
+    _arrowDownPressed = glfwGetKey(glfwWindow, GLFW_KEY_DOWN) == GLFW_PRESS;
+    _arrowLeftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT) == GLFW_PRESS;
+    _arrowRightPressed = glfwGetKey(glfwWindow, GLFW_KEY_RIGHT) == GLFW_PRESS;
+
     calculateDeltaTime();
 }
 
@@ -54,6 +59,14 @@ bool Input::isShiftPressed() {
 float Input::getDeltaTime() {
     return deltaTime;
 }
+
+bool Input::isArrowUpPressed() { return _arrowUpPressed; }
+
+bool Input::isArrowDownPressed() { return _arrowDownPressed; }
+
+bool Input::isArrowRightPressed() { return _arrowRightPressed; }
+
+bool Input::isArrowLeftPressed() { return _arrowLeftPressed; }
 
 // ===
 // Private functions

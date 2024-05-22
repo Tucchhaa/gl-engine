@@ -115,8 +115,9 @@ void Shader::setMaterial(const Material* material) {
     setTextureToSlot("material.specular", resourceManager->getTextureId(material, TEXTURE_SPECULAR), 1);
     setTextureToSlot("material.normal", resourceManager->getTextureId(material, TEXTURE_NORMAL), 2);
     setTextureToSlot("material.roughness", resourceManager->getTextureId(material, TEXTURE_ROUGHNESS), 3);
-    setTextureToSlot("material.ao", resourceManager->getTextureId(material, TEXTURE_AO), 4);
-    
+    // setTextureToSlot("material.ao", resourceManager->getTextureId(material, TEXTURE_AO), 4);
+    setTextureToSlot("material.height", resourceManager->getTextureId(material, TEXTURE_HEIGHT), 4);
+
     setFloat("material.shininess", 32);
     setVec3("material.Kd", material->Kd);
     setVec3("material.Ks", material->Ks);

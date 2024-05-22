@@ -1,7 +1,13 @@
+/*
+ * Student ID: 112550085
+ * Name: Eldar Iusupzhanov
+ */
+
 #include "apis/opengl/include.hpp"
 #include "demos/backpack-demo.hpp"
 #include "demos/collision-demo.hpp"
 #include "demos/many-light-demo.hpp"
+#include "demos/parallax-demo.hpp"
 #include "demos/tunnel-demo.hpp"
 
 /*
@@ -24,7 +30,6 @@ check for memory leaks
 use absolute path for includes
 
 Plan:
-0) complete HW
 1) Rewrite PBR.
 2) Create camera controller
 3) Create a FPS demo
@@ -35,7 +40,9 @@ Plan:
 int main() {
     IEngine* engine = new GlEngine();
 
-    CollisionDemo scene;
+    // CollisionDemo scene;
+    ParallaxDemo scene;
+
     engine->setScene(&scene);
 
     engine->start();

@@ -177,8 +177,8 @@ function(get_apis_opengl_source_files)
             apis/opengl/engine.cpp
             apis/opengl/engine.hpp
 
-            # apis/opengl/renderer.cpp
-            # apis/opengl/renderer.hpp
+             apis/opengl/renderer.cpp
+             apis/opengl/renderer.hpp
 
             apis/opengl/shader.cpp
             apis/opengl/shader.hpp

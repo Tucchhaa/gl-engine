@@ -6,6 +6,8 @@
 #include "input.hpp"
 #include "resource-manager.hpp"
 
+#include "renderer.hpp"
+
 GlEngine::GlEngine(): IEngine() {
     constexpr int SCREEN_WIDTH = 1280;
     constexpr int SCREEN_HEIGHT = 720;
@@ -17,8 +19,10 @@ GlEngine::GlEngine(): IEngine() {
     Input = new ::Input();
     ResourceManager = new ::ResourceManager();
     Loader = new ::Loader();
+
     // Renderer = new ::DeferredRenderer();
-    Renderer = new EditorViewRenderer();
+    // Renderer = new EditorViewRenderer();
+    Renderer = new ::Renderer();
 
     init();
 }

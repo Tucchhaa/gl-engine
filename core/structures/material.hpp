@@ -8,6 +8,7 @@ public:
     Texture specularTexture;
     Texture diffuseTexture;
     Texture normalTexture;
+    Texture heightTexture;
     Texture roughnessTexture;
     Texture aoTexture;
 

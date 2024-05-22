@@ -280,7 +280,6 @@ void DeferredRenderer::renderLighting() {
     lightingShader.use();
     lightingShader.setTexture("gDepth", gDepthStencil);
     lightingShader.setTexture("gNormal", gNormal);
-    // lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
     lightingShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
     lightingShader.setTexture("gAORoughness", gAORoughness);
 

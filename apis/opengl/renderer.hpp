@@ -2,19 +2,12 @@
 
 #define GL_SILENCE_DEPRECATION
 
-#include <OpenGL/gl3.h>
 
 #include <vector>
-
-#include "render-object.hpp"
-#include "../../core/components/mesh.hpp"
-#include "../../core/components/terrain.hpp"
-#include "../../core/components/cubic-patch.hpp"
 
 #include "../base/irenderer.hpp"
 
 #include "shader.hpp"
-#include "resource-manager.hpp"
 
 using namespace std;
 
@@ -28,12 +21,16 @@ public:
 // Overrode methods
 // ===
 public:
-    void setScene(Scene* scene) override;
+    void afterSceneSetup() override;
     
     void render() override;
     
 private:
+    ResourceManager* resourceManager;
+
     Shader baseShader;
+
+    Shader parallaxShader;
 
     Shader depthShader;
     
@@ -75,7 +72,7 @@ private:
     
     void initScreenVAO();
 
-    void setLights(const Shader* shader) const;
+    void setLights(Shader* shader) const;
 
     void drawMesh(IRenderObject* object);
 

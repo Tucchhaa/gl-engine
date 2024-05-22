@@ -48,4 +48,15 @@ public:
     bool isShiftPressed() override;
 
     float getDeltaTime() override;
+
+    // ===
+    bool _arrowUpPressed = false;
+    bool _arrowDownPressed = false;
+    bool _arrowLeftPressed = false;
+    bool _arrowRightPressed = false;
+
+    bool isArrowUpPressed() override;
+    bool isArrowDownPressed() override;
+    bool isArrowRightPressed() override;
+    bool isArrowLeftPressed() override;
 };

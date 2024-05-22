@@ -18,7 +18,8 @@ enum TextureType {
     TEXTURE_SPECULAR,
     TEXTURE_NORMAL,
     TEXTURE_ROUGHNESS,
-    TEXTURE_AO
+    TEXTURE_AO,
+    TEXTURE_HEIGHT
 };
 
 struct Texture {

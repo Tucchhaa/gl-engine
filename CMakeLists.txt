@@ -33,4 +33,7 @@ add_executable(gl_engine
         main.cpp
         ${DEMOS_SOURCE_FILES}
         ${SOURCE_FILES}
+
+        demos/parallax-demo.cpp
+        demos/parallax-demo.hpp
 )
