@@ -23,15 +23,15 @@ void Window::create(int screenWidth, int screenHeight) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 
-    window = glfwCreateWindow(screenWidth, screenHeight, "Hello World", nullptr, nullptr);
+    glfwWindow = glfwCreateWindow(screenWidth, screenHeight, "Hello World", nullptr, nullptr);
 
-    if (!window)
+    if (!glfwWindow)
     {
         glfwTerminate();
         exit(-1);
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(glfwWindow);
 
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
@@ -39,12 +39,12 @@ void Window::create(int screenWidth, int screenHeight) {
 }
 
 bool Window::isOpen() {
-    return !glfwWindowShouldClose(window);
+    return !glfwWindowShouldClose(glfwWindow);
 }
 
 
-void Window::onRendered() {
-    glfwSwapBuffers(window);
+void Window::pollEvents() {
+    glfwSwapBuffers(glfwWindow);
     glfwPollEvents();
 }
 
@@ -55,12 +55,12 @@ void Window::terminate() {
 // ===
 
 GLFWwindow* Window::getGLFWWindow() {
-    return window;
+    return glfwWindow;
 }
 
 // ===
 
 void Window::getFrameBufferSize() {
-    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
+    glfwGetFramebufferSize(glfwWindow, &frameWidth, &frameHeight);
     glViewport(0, 0, frameWidth, frameHeight);
 }

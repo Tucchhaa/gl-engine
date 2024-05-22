@@ -10,7 +10,6 @@ void Hierarchy::initialize() {
     root = createRoot();
 }
 
-
 // ===
 map<int, GameObject*>* Hierarchy::getGameObjects() {
     return &gameObjects;

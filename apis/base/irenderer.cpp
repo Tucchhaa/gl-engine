@@ -1,7 +1,9 @@
 #include "irenderer.hpp"
 
-void IRenderer::setScene(Scene* scene) {
-    currentScene = scene;
+#include "iengine.hpp"
+
+void IRenderer::afterSceneSetup() {
+    currentScene = IEngine::CurrentScene;
 }
 
 void IRenderer::setScreenSize(const int width, const int height) {

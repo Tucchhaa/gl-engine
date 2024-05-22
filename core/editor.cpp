@@ -4,13 +4,12 @@
 #include "../apis/base/iengine.hpp"
 #include "../demos/backpack-demo.hpp"
 
-void Editor::setScene(Scene* scene) {
-    currentScene = scene;
+void Editor::afterSceneSetup() {
+    currentScene = IEngine::CurrentScene;
 
-    const auto demo = dynamic_cast<BackpackDemo*>(scene);
+    const auto demo = dynamic_cast<BackpackDemo*>(currentScene);
 
     const auto editorRenderer = dynamic_cast<IEditorViewRenderer*>(IEngine::Renderer);
 
     // editorRenderer->selectObject(demo->backpack);
 }
-

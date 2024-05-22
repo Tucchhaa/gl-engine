@@ -54,7 +54,7 @@ const vector<SpotLight*> &Scene::getSpotLights() {
 // Events
 // ===
 
-void Scene::setupScene() {
+void Scene::setup() {
     processHierarchy();
 
     Hierarchy::updateTransformTree();
@@ -67,6 +67,24 @@ void Scene::beforeRender() {
 void Scene::afterRender() { }
 
 void Scene::finish() { }
+
+void Scene::createCamera() {
+    IWindow* window = IEngine::Window;
+
+    auto* cameraObject = Hierarchy::createGameObjectInTree();
+    Transform* cameraTransform = cameraObject->transform;
+
+    camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
+    camera->cubeMap = loader->loadCubeMap("textures/skybox");
+    cameraObject->components.add(camera);
+
+    cameraTransform->translate(vec3(-10, 25, -30));
+    cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
+
+    camera->setScreenSizes(window->screenWidth, window->screenHeight);
+
+    Hierarchy::addToHierarchy(cameraObject);
+}
 
 // ===
 
@@ -96,12 +114,8 @@ void Scene::loadComponents(vector<T*>* array) {
     array->clear();
 
     map<int, GameObject*>* gameObjects = Hierarchy::getGameObjects();
-    
-    map<int, GameObject*>::iterator iterator;
-    
-    for(iterator = gameObjects->begin(); iterator != gameObjects->end(); iterator++) {
-        GameObject* gameObject = iterator->second;
-        
+
+    for(auto & [id, gameObject] : *gameObjects) {
         vector<T*> components = gameObject->components.getAll<T>();
         
         array->insert(array->end(), components.begin(), components.end());

@@ -4,7 +4,7 @@
 
 #include "../../core/scene.hpp"
 
-class IRenderer {
+class IRenderer: public IGameEventsListener {
 protected:
     int screenWidth = 2560;
     int screenHeight = 1440;
@@ -21,8 +21,8 @@ protected:
 
 public:
     virtual ~IRenderer() = default;
-    
-    virtual void setScene(Scene* scene) = 0;
+
+    void afterSceneSetup() override;
     
     /**
      * Renders current scene

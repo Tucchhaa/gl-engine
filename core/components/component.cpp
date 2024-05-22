@@ -10,7 +10,7 @@ void ObjectComponent::onGameObjectSet() { }
 // ===
 // implement IGameEventsListener
 // ===
-void ObjectComponent::setupScene() { }
+void ObjectComponent::afterSceneSetup() { }
 
 void ObjectComponent::beforeRender() { }
 

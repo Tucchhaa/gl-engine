@@ -6,7 +6,7 @@ class BackpackDemo : public Scene {
 public:
     BackpackDemo() = default;
 
-    void setupScene() override;
+    void setup() override;
 
     void beforeRender() override;
 

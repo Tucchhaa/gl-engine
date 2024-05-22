@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../core/loader/loader.hpp"
-
 #include "iwindow.hpp"
 #include "iinput.hpp"
 #include "iresource-manager.hpp"
 #include "irenderer.hpp"
+
+#include "../../core/loader/loader.hpp"
 #include "../../core/editor.hpp"
 #include "../../core/physics-engine.hpp"
 
@@ -32,9 +32,13 @@ public:
 
     virtual ~IEngine() = default;
 
-    static void setScene(Scene* scene);
+    void setScene(Scene* scene);
 
+    void start();
 public:
-    // TODO: move all game cycle from main.cpp to IEngine
-    static void invokeBeforeRender(); 
+    // TODO: remove this method
+    static void cameraController();
+
+    // TODO: remove this method
+    static void fpsDisplay();
 };

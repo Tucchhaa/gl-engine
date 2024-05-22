@@ -7,7 +7,7 @@ class ManyLightsDemo: public Scene {
 public:
     ManyLightsDemo() = default;
 
-    void setupScene() override;
+    void setup() override;
 
     void beforeRender() override;
 

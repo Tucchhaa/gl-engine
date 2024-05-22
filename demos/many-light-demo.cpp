@@ -5,7 +5,7 @@
 #include "../apis/base/iengine.hpp"
 #include "../core/hierarchy.hpp"
 
-void ManyLightsDemo::setupScene() {
+void ManyLightsDemo::setup() {
     srand(time(nullptr));
 
     const int N = 20;
@@ -48,7 +48,7 @@ void ManyLightsDemo::setupScene() {
         Hierarchy::setParent(lightSource, lights);
     }
 
-    Scene::setupScene();
+    Scene::setup();
 }
 
 void ManyLightsDemo::beforeRender() {

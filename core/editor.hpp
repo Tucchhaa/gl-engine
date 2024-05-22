@@ -2,12 +2,12 @@
 
 #include "scene.hpp"
 
-class Editor {
+class Editor: public IGameEventsListener {
 private:
     Scene* currentScene = nullptr;
 
 public:
     Editor() = default;
 
-    void setScene(Scene* scene);
+    void afterSceneSetup() override;
 };

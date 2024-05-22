@@ -190,10 +190,10 @@ void DeferredRenderer::initSphereVAO() {
 // Overrode methods
 // ===
 
-void DeferredRenderer::setScene(Scene *scene) {
-    IRenderer::setScene(scene);
+void DeferredRenderer::afterSceneSetup() {
+    IRenderer::afterSceneSetup();
 
-    const map<const Material*, vector<Mesh*>> meshesByMaterial = scene->getMeshesByMaterial();
+    const map<const Material*, vector<Mesh*>> meshesByMaterial = currentScene->getMeshesByMaterial();
 
     for(const auto& [material, meshes]: meshesByMaterial) {
         vector<IRenderObject*> list;
@@ -208,21 +208,18 @@ void DeferredRenderer::setScene(Scene *scene) {
 
     // ===
 
-    const vector<Mesh*> meshes = scene->getMeshes();
-    const vector<Terrain*> terrains = scene->getTerrains();
-    const vector<CubicPatch*> cubicPatches = scene->getCubicPatches();
+    const vector<Mesh*> meshes = currentScene->getMeshes();
+    const vector<Terrain*> terrains = currentScene->getTerrains();
+    const vector<CubicPatch*> cubicPatches = currentScene->getCubicPatches();
 
-    for(Mesh* mesh: meshes) {
+    for(Mesh* mesh: meshes)
         this->meshes.push_back(new RenderObject(mesh));
-    }
 
-    for(Terrain* terrain: terrains) {
+    for(Terrain* terrain: terrains)
         this->terrains.push_back(new RenderObject(terrain));
-    }
 
-    for(CubicPatch* cubicPatch: cubicPatches) {
+    for(CubicPatch* cubicPatch: cubicPatches)
         this->cubicPatches.push_back(new RenderObject(cubicPatch));
-    }
 }
 
 void DeferredRenderer::render() {

@@ -6,7 +6,7 @@
 
 class Window : public IWindow {
 private:
-    GLFWwindow* window = nullptr;
+    GLFWwindow* glfwWindow = nullptr;
 
     int frameWidth = 0;
     int frameHeight = 0;
@@ -21,7 +21,7 @@ public:
 
     bool isOpen() override;
 
-    void onRendered() override;
+    void pollEvents() override;
 
     void terminate() override;
 

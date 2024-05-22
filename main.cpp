@@ -1,18 +1,8 @@
-#include <iostream>
-
 #include "apis/opengl/include.hpp"
-#include "core/include.hpp"
 #include "demos/backpack-demo.hpp"
 #include "demos/collision-demo.hpp"
 #include "demos/many-light-demo.hpp"
 #include "demos/tunnel-demo.hpp"
-
-using namespace std;
-
-constexpr int SCREEN_WIDTH = 1280;
-constexpr int SCREEN_HEIGHT = 720;
-
-GameObject* createCamera();
 
 /*
 TODO:
@@ -37,93 +27,13 @@ check for memory leaks
 use absolute path for includes
  */
 
-Loader* loader;
-IWindow* window;
-
 int main() {
     IEngine* engine = new GlEngine();
-    window = IEngine::Window;
-    IInput* input = IEngine::Input;
-    IRenderer* renderer = IEngine::Renderer;
-    loader = IEngine::Loader;
 
-    // Scene scene;
-    // BackpackDemo scene;
     CollisionDemo scene;
-    // TunnelDemo scene;
-    // ManyLightsDemo scene;
+    engine->setScene(&scene);
 
-    // ===
-
-    GameObject* cameraObject = createCamera();
-
-    auto* camera = cameraObject->components.get<Camera>();
-    Transform* cameraTransform = cameraObject->transform;
-
-    // ===
-
-    scene.setCamera(camera);
-    IEngine::setScene(&scene);
-    input->process();
-
-    int frameCnt = 0;
-    time_t lastTime = time(nullptr);
-
-    while (window->isOpen()) {
-        frameCnt++;
-
-        time_t now = time(nullptr);
-        time_t diff = difftime(now, lastTime);
-        if(diff >= 1) {
-            cout << "FPS: " << frameCnt << endl;
-            frameCnt = 0;
-            lastTime = now;
-        }
-
-        // = Input =
-        input->process();
-
-        if(input->isShiftPressed()) {
-            float rotationSpeed = 1.0f;
-
-            quat horizontalRotation = quat(vec3(0, -input->axisHorizontal() * rotationSpeed * input->getDeltaTime(), 0));
-            quat verticalRotation   = quat(vec3(-input->axisVertical() * rotationSpeed * input->getDeltaTime(), 0, 0));
-
-            cameraTransform->rotate(horizontalRotation, &Transform::World);
-            cameraTransform->rotate(verticalRotation);
-        }
-        else {
-            float speed = 15.0f;
-
-            cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
-        }
-
-        IEngine::invokeBeforeRender();
-        renderer->render();
-
-        window->onRendered();
-    }
-
-    scene.finish();
-    window->terminate();
+    engine->start();
 
     return 0;
-}
-
-GameObject* createCamera() {
-    auto* cameraObject = Hierarchy::createGameObjectInTree();
-    Transform* cameraTransform = cameraObject->transform;
-
-    auto* camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
-    camera->cubeMap = loader->loadCubeMap("textures/skybox");
-    cameraObject->components.add(camera);
-
-    cameraTransform->translate(vec3(-10, 25, -30));
-    cameraTransform->rotate(quat(vec3(0, radians(-15.0), 0)));
-
-    camera->setScreenSizes(window->screenWidth, window->screenHeight);
-
-    Hierarchy::addToHierarchy(cameraObject);
-
-    return cameraObject;
 }

@@ -5,7 +5,7 @@ class TunnelDemo : public Scene {
 public:
     TunnelDemo() = default;
 
-    void setupScene() override;
+    void setup() override;
 
     void beforeRender() override;
 };

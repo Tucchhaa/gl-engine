@@ -26,7 +26,7 @@ private:
 // Overrode methods
 // ===
 public:
-    void setScene(Scene* scene) override;
+    void afterSceneSetup() override;
 
     void render() override;
 

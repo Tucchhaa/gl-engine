@@ -11,7 +11,7 @@ public:
 
     virtual bool isOpen() = 0;
 
-    virtual void onRendered() = 0;
+    virtual void pollEvents() = 0;
 
     virtual void terminate() = 0;
 };

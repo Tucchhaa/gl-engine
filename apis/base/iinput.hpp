@@ -3,15 +3,14 @@
 #include <glm/glm.hpp>
 
 class IInput {
-protected:
-    static IInput* instance;
-
 public:
+    IInput() = default;
+
     virtual ~IInput() = default;
 
-    static IInput* getInstance();
-
     // ===
+
+    virtual void resetDeltaTime() = 0;
 
     virtual void process() = 0;
 

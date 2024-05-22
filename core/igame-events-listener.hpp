@@ -6,9 +6,9 @@ public:
 
     virtual ~IGameEventsListener() = default;
 
-    virtual void setupScene() = 0;
+    virtual void afterSceneSetup();
 
-    virtual void beforeRender() = 0;
+    virtual void beforeRender();
 
-    virtual void afterRender() = 0;
+    virtual void afterRender();
 };

@@ -1,7 +1,7 @@
 #include "backpack-demo.hpp"
 #include "../core/hierarchy.hpp"
 
-void BackpackDemo::setupScene() {
+void BackpackDemo::setup() {
     // GameObject* terrainObject = createTerrain();
     // GameObject* cubicPatchObject = createCurvedSurface();
     backpack = createBackpack();
@@ -35,7 +35,7 @@ void BackpackDemo::setupScene() {
     //
     // Hierarchy::setParent(cameraObject, flashlight);
 
-    Scene::setupScene();
+    Scene::setup();
 }
 
 void BackpackDemo::beforeRender() {

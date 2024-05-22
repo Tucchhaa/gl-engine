@@ -5,7 +5,7 @@
 #include "../core/components/colliders/sphere-collider.hpp"
 #include "../core/components/colliders/box-collider.hpp"
 
-void CollisionDemo::setupScene() {
+void CollisionDemo::setup() {
     GameObject* ground = createCube();
     ground->transform->scaleBy(100, 1, 100);
     Hierarchy::addToHierarchy(ground);
@@ -19,7 +19,7 @@ void CollisionDemo::setupScene() {
     light->transform->translate(vec3(0, 20, 0));
 
     const int N = 5;
-    const float distance = 1;
+    const float distance = 2;
     float bias = static_cast<float>(N) / 2 * distance;
     int verticalBias = 20;
 
@@ -39,9 +39,7 @@ void CollisionDemo::setupScene() {
         }
     }
 
-    initPhysics();
-
-    Scene::setupScene();
+    Scene::setup();
 }
 
 void CollisionDemo::beforeRender() {

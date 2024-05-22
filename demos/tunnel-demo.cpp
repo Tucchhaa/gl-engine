@@ -2,7 +2,7 @@
 
 #include "../core/hierarchy.hpp"
 
-void TunnelDemo::setupScene() {
+void TunnelDemo::setup() {
     GameObject* topCube = createCube();
     GameObject* rightCube = createCube();
     GameObject* bottomCube = createCube();
@@ -52,7 +52,7 @@ void TunnelDemo::setupScene() {
     lightSource->components.add(pointLight1);
     lightSource->components.add(pointLight2);
 
-    Scene::setupScene();
+    Scene::setup();
 }
 
 void TunnelDemo::beforeRender() {

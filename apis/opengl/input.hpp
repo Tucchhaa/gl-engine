@@ -6,7 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../base/iwindow.hpp"
 #include "../base/iinput.hpp"
 
 using namespace glm;
@@ -21,17 +20,19 @@ private:
     float xPositivePressed = 0;
     float xNegativePressed = 0;
 
-    float lastFrameTime;
-    float deltaTime;
+    float lastFrameTime = 0;
+    float deltaTime = 0;
 
     bool _isShiftPressed = false;
 
     void calculateDeltaTime();
 
 public:
-    explicit Input();
+    Input();
 
 public:
+    void resetDeltaTime() override;
+
     void process() override;
 
     // ===

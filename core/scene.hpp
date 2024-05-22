@@ -15,7 +15,7 @@
 #include "./components/lights/point-light.hpp"
 #include "./components/lights/spot-light.hpp"
 
-class Scene {
+class Scene: public IGameEventsListener {
 protected:
     Loader* loader;
 
@@ -70,14 +70,16 @@ public:
 // Events
 // ===
 public:
+    void beforeRender() override;
 
-    virtual void beforeRender();
+    void afterRender() override;
 
-    virtual void afterRender();
-
-    virtual void setupScene();
+    virtual void setup();
 
     virtual void finish();
+
+    // TODO: remove later
+    void createCamera();
 
 protected:
     virtual void processHierarchy();

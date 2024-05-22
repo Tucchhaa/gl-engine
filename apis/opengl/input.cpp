@@ -3,16 +3,16 @@
 #include "window.hpp"
 #include "gl-engine.hpp"
 
-Input::Input() {
-    lastFrameTime = static_cast<float>(glfwGetTime());
-    deltaTime = 0;
-
-    // glfwWindow = dynamic_cast<Window*>(window)->getGLFWWindow();
+Input::Input(): IInput() {
     glfwWindow = dynamic_cast<Window*>(GlEngine::Window)->getGLFWWindow();
-    instance = this;
 }
 
 // ===
+
+void Input::resetDeltaTime() {
+    lastFrameTime = static_cast<float>(glfwGetTime());
+    deltaTime = 0;
+}
 
 void Input::process() {
     if (glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)

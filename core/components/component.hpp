@@ -29,7 +29,7 @@ public:
 // implement IGameEventsListener
 // ===
 public:
-    void setupScene() override;
+    void afterSceneSetup() override;
 
     void beforeRender() override;
 

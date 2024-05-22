@@ -4,7 +4,7 @@
 
 class CollisionDemo: public Scene {
 public:
-    void setupScene() override;
+    void setup() override;
 
     void beforeRender() override;
 };
