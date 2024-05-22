@@ -18,13 +18,18 @@ Optimizations:
 Features:
 1) Bloom
 2) Deferred + Forward renderings for transparency
-3) PBR
-4) Physics
-5) Compatibility with Windows
 
 Other:
 check for memory leaks
 use absolute path for includes
+
+Plan:
+0) complete HW
+1) Rewrite PBR.
+2) Create camera controller
+3) Create a FPS demo
+4) Port to Windows
+5) Create scene editor
  */
 
 int main() {
