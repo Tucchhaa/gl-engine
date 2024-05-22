@@ -1,7 +1,7 @@
 #include "input.hpp"
 
 #include "window.hpp"
-#include "gl-engine.hpp"
+#include "engine.hpp"
 
 Input::Input(): IInput() {
     glfwWindow = dynamic_cast<Window*>(GlEngine::Window)->getGLFWWindow();

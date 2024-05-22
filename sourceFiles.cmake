@@ -174,8 +174,8 @@ function(get_apis_opengl_source_files)
             apis/opengl/input.cpp
             apis/opengl/input.hpp
 
-            apis/opengl/gl-engine.cpp
-            apis/opengl/gl-engine.hpp
+            apis/opengl/engine.cpp
+            apis/opengl/engine.hpp
 
             # apis/opengl/renderer.cpp
             # apis/opengl/renderer.hpp
