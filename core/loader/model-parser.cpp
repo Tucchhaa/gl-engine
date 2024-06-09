@@ -100,10 +100,14 @@ void ModelParser::processMaterials(const aiScene* scene, GameObject* result) {
 }
 
 Material* ModelParser::processMaterial(const aiMaterial* material) const {
-    auto* result = new Material();
-
     auto materialInfo = MaterialInfo(material);
-    materialInfo.print();
+
+    auto* result = loader->getCachedMaterial(materialInfo);
+
+    if(result != nullptr)
+        return result;
+
+    result = new Material();
 
     result->Kd = materialInfo.diffuseColor;
     result->Ks = materialInfo.specularColor;
@@ -113,6 +117,9 @@ Material* ModelParser::processMaterial(const aiMaterial* material) const {
     result->normalTexture = loadTextureByType(material, aiTextureType_NORMALS);
     result->roughnessTexture = loadTextureByType(material, aiTextureType_DIFFUSE_ROUGHNESS);
     result->aoTexture = loadTextureByType(material, aiTextureType_AMBIENT);
+
+    loader->cacheMaterial(materialInfo, result);
+    materialInfo.print();
 
     return result;
 }

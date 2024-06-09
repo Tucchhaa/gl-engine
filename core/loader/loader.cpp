@@ -104,6 +104,19 @@ Texture* Loader::loadCubeMap(const string &directoryPath) {
     return texture;
 }
 
+Material* Loader::getCachedMaterial(const MaterialInfo& info) {
+    const auto result = materials.find(info);
+
+    if(result == materials.end())
+        return nullptr;
+
+    return result->second;
+}
+
+void Loader::cacheMaterial(const MaterialInfo &info, Material* material) {
+    materials[info] = material;
+}
+
 GameObject *Loader::loadModel(const string &file) {
     const string directory = file.substr(0, file.find_last_of('/'));
 

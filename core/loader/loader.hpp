@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 
+#include "material-info.hpp"
 #include "../../apis/base/iresource-manager.hpp"
 
 #include "../game-object.hpp"
@@ -29,6 +30,8 @@ private:
 
     map<string, const aiScene*> models;
 
+    map<const MaterialInfo, Material*> materials;
+
 public:
     explicit Loader();
 
@@ -41,6 +44,9 @@ public:
     Texture* loadTexture(const string &file, TextureOptions options);
 
     Texture* loadCubeMap(const string &directoryPath);
+
+    Material* getCachedMaterial(const MaterialInfo& info);
+    void cacheMaterial(const MaterialInfo &info, Material* material);
 
 private:
     const aiScene* loadScene(const string &path);

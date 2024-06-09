@@ -36,6 +36,45 @@ Vec3 MaterialInfo::getProperty(const char* key, unsigned int type, unsigned int 
     }
 }
 
+bool MaterialInfo::operator==(const MaterialInfo& other) const {
+    if(textures.size() != other.textures.size())
+        return false;
+
+    for(auto [key, texturePath] : textures) {
+        auto otherIt = other.textures.find(key);
+
+        if(otherIt == other.textures.end() || otherIt->second != texturePath)
+            return false;
+    }
+
+    return
+        diffuseColor == other.diffuseColor &&
+        specularColor == other.specularColor &&
+        ambientColor == other.ambientColor &&
+        emissiveColor == other.emissiveColor &&
+        reflectiveColor == other.reflectiveColor;
+}
+
+bool MaterialInfo::operator<(const MaterialInfo& other) const {
+    if(textures.size() < other.textures.size())
+        return true;
+
+    for(int type=aiTextureType_NONE; type <= aiTextureType_TRANSMISSION; type++) {
+        auto it1 = textures.find(static_cast<aiTextureType>(type));
+        auto it2 = other.textures.find(static_cast<aiTextureType>(type));
+
+        if(it1 == textures.end() && it2 != other.textures.end())
+            return true;
+    }
+
+    return
+        diffuseColor < other.diffuseColor ||
+        specularColor < other.specularColor ||
+        ambientColor < other.ambientColor ||
+        emissiveColor < other.emissiveColor ||
+        reflectiveColor < other.reflectiveColor;
+}
+
 void MaterialInfo::collectTextures() {
     for(int type=aiTextureType_NONE; type <= aiTextureType_TRANSMISSION; type++) {
         auto aiType = static_cast<aiTextureType>(type);

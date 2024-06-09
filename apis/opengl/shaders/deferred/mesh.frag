@@ -42,11 +42,11 @@ vec3 calculateNormal() {
     vec3 bitangent = cross(normal, tangent);
 
     mat3 TBN = mat3(tangent, bitangent, normal);
-    vec3 normalMap = texture(material.normal, data.texCoord).rgb;
+    vec3 normalTangentSpace = texture(material.normal, data.texCoord).rgb;
 
-    normalMap = normalize(normalMap * 2.0 - 1.0);
+    normalTangentSpace = normalize(normalTangentSpace * 2.0 - 1.0);
 
-    vec3 result = normalize(TBN * normalMap);
+    vec3 result = TBN * normalTangentSpace;
 
     return result;
 }

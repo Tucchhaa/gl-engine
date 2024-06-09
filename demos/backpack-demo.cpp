@@ -41,8 +41,6 @@ void BackpackDemo::setup() {
 void BackpackDemo::beforeRender() {
     // backpack->transform->rotate(quat(vec3(0, radians(0.15f), 0)));
 
-    Hierarchy::updateTransformTree();
-
     Scene::beforeRender();
 }
 

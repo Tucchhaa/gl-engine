@@ -43,10 +43,12 @@ private:
 
     template<>
     Vec3 getProperty(const char* key, unsigned int type, unsigned int idx);
-
 public:
     void print();
 
+    bool operator==(const MaterialInfo& other) const;
+
+    bool operator<(const MaterialInfo& other) const;
 private:
     void printTextures();
 

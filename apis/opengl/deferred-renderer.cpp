@@ -223,19 +223,16 @@ void DeferredRenderer::afterSceneSetup() {
 }
 
 void DeferredRenderer::render() {
-    currentScene->beforeRender();
-
     glViewport(0, 0, screenWidth, screenHeight);
 
     renderGBuffer();
     renderLighting();
 
     renderScreen();
+    // TODO: Skybox must be rendered to lightedColor texture, so post-processing will work
     // renderSkybox();
 
     glCheckError();
-
-    currentScene->afterRender();
 }
 
 // ===
