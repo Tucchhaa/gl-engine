@@ -19,9 +19,9 @@ void BackpackDemo::setup() {
     Transform* lightTransform = lightSource->transform;
     lightTransform->translate(vec3(-8, 10, -10));
     lightTransform->rotate(vec3(0, radians(180.0), 0));
-    lightTransform->rotate(vec3(radians(-30.0), 0, 0));
+    lightTransform->rotate(vec3(radians(30.0), 0, 0));
 
-    auto* directLight0 = new DirectLight();
+    auto* directLight0 = new DirectLight(1.5);
     PointLight* pointLight0 = PointLight::I1000();
 
     lightSource->components.add(directLight0);

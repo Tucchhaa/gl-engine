@@ -9,7 +9,8 @@
 DeferredRenderer::DeferredRenderer():
     meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
     // lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
-    lightingShader("deferred/lighting.vert", "deferred/pbr.frag"),
+    pointLightShader("deferred/lighting.vert", "deferred/pbr-point-light.frag"),
+    directLightShader("deferred/lighting.vert", "deferred/pbr-direct-light.frag"),
     skyboxShader("deferred/skybox.vert", "deferred/skybox.frag"),
     cubicPatchShader("deferred/cubic-patch.vert", "deferred/mesh.frag", "deferred/cubic-patch.tesc", "deferred/cubic-patch.tese"),
     screenShader("deferred/screen.vert", "deferred/screen.frag")
@@ -272,30 +273,55 @@ void DeferredRenderer::renderLighting() {
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const Camera* camera = currentScene->getCamera();
-
-    lightingShader.use();
-    lightingShader.setTexture("gDepth", gDepthStencil);
-    lightingShader.setTexture("gNormal", gNormal);
-    // lightingShader.setTexture("gAlbedoSpec", gAlbedoSpec);
-    lightingShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
-    lightingShader.setTexture("gAORoughness", gAORoughness);
-
-    lightingShader.setMat4("perspective", camera->getViewProjectionMatrix());
-    lightingShader.setVec3("cameraPos", camera->transform->getPosition());
-
-    for(const auto* pointLight: currentScene->getPointLights()) {
-        lightingShader.setPointLight("light", pointLight);
-        lightingShader.setMat4("transform", calculateLightVolumeMatrix(pointLight));
-
-        glBindVertexArray(sphereVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    renderPointLighting();
+    renderDirectLighting();
 
     // === Reset to default
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
+}
+
+void DeferredRenderer::renderPointLighting() {
+    const Camera* camera = currentScene->getCamera();
+
+    pointLightShader.use();
+    pointLightShader.setTexture("gDepth", gDepthStencil);
+    pointLightShader.setTexture("gNormal", gNormal);
+    pointLightShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
+    pointLightShader.setTexture("gAORoughness", gAORoughness);
+
+    pointLightShader.setMat4("perspective", camera->getViewProjectionMatrix());
+    pointLightShader.setVec3("cameraPos", camera->transform->getPosition());
+
+    for(const auto* pointLight: currentScene->getPointLights()) {
+        pointLightShader.setPointLight("light", pointLight);
+        pointLightShader.setMat4("transform", calculatePointLightVolumeTransform(pointLight));
+
+        glBindVertexArray(sphereVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+}
+
+void DeferredRenderer::renderDirectLighting() {
+    const Camera* camera = currentScene->getCamera();
+
+    directLightShader.use();
+    directLightShader.setTexture("gDepth", gDepthStencil);
+    directLightShader.setTexture("gNormal", gNormal);
+    directLightShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
+    directLightShader.setTexture("gAORoughness", gAORoughness);
+
+    directLightShader.setMat4("perspective", mat4(1.));
+    directLightShader.setVec3("cameraPos", camera->transform->getPosition());
+
+    for(const auto* directLight: currentScene->getDirectLights()) {
+        directLightShader.setDirectLight("light", directLight);
+        directLightShader.setMat4("transform", mat4(1.0f));
+
+        glBindVertexArray(sphereVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 }
 
 void DeferredRenderer::renderSkybox() {
@@ -395,22 +421,7 @@ void DeferredRenderer::renderCubicPatches(const mat4& viewProjection) {
 // Private methods
 // ===
 
-void DeferredRenderer::setLights(Shader* shader) const {
-    for(int i=0; i < currentScene->getSpotLights().size(); i++) {
-        shader->setSpotLight(i, currentScene->getSpotLights()[i]);
-    }
-
-    // for(int i=0; i < currentScene->getPointLights().size(); i++) {
-    //     shader->setPointLight(i, currentScene->getPointLights()[i]);
-    // }
-
-    for(int i=0; i < currentScene->getDirectLights().size(); i++) {
-        shader->setDirectLight(i, currentScene->getDirectLights()[i]);
-    }
-}
-
-// TODO: refactor
-mat4 DeferredRenderer::calculateLightVolumeMatrix(const PointLight* light) {
+mat4 DeferredRenderer::calculatePointLightVolumeTransform(const PointLight* light) {
     auto lightVolumeMatrix = mat4(1.0f);
 
     lightVolumeMatrix = translate(lightVolumeMatrix, light->transform->getPosition());

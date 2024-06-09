@@ -126,14 +126,14 @@ void Shader::setMaterial(const Material* material) {
 // Light components
 // ===
 
-void Shader::setDirectLight(uint index, const DirectLight* lightSource) {
-    string _index = to_string(index);
-    
-    setVec3("directLights[" + _index + "].direction", lightSource->transform->getDirectionVector());
-    
-    setVec3("directLights[" + _index + "].colors.ambient",  lightSource->ambient);
-    setVec3("directLights[" + _index + "].colors.diffuse",  lightSource->diffuse);
-    setVec3("directLights[" + _index + "].colors.specular", lightSource->specular);
+void Shader::setDirectLight(const string& name, const DirectLight* lightSource) {
+    setVec3(name+".direction", lightSource->transform->getDirectionVector());
+
+    setFloat(name + ".intensity", lightSource->intensity);
+
+    setVec3(name+".colors.ambient",  lightSource->ambient);
+    setVec3(name+".colors.diffuse",  lightSource->diffuse);
+    setVec3(name+".colors.specular", lightSource->specular);
 }
 
 void Shader::setPointLight(const string& name, const PointLight* lightSource) {

@@ -87,7 +87,7 @@ public:
     // Light components
     // ===
 
-    void setDirectLight(uint index, const DirectLight* lightSource);
+    void setDirectLight(const string& name, const DirectLight* lightSource);
 
     void setPointLight(const string& name, const PointLight* lightSource);
 

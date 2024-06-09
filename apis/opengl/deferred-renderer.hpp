@@ -39,7 +39,9 @@ private:
     /**
      * Computes lighting for gBuffer textures
      */
-    Shader lightingShader;
+    Shader pointLightShader;
+
+    Shader directLightShader;
 
     Shader skyboxShader;
 
@@ -68,6 +70,10 @@ private:
 
     void renderLighting();
 
+    void renderPointLighting();
+
+    void renderDirectLighting();
+
     void renderSkybox();
 
     void renderScreen();
@@ -80,7 +86,5 @@ private:
 // Private methods
 // ===
 private:
-    void setLights(Shader* shader) const;
-
-    static mat4 calculateLightVolumeMatrix(const PointLight* light) ;
+    static mat4 calculatePointLightVolumeTransform(const PointLight* light) ;
 };
