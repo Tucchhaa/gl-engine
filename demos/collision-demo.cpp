@@ -14,7 +14,7 @@ void CollisionDemo::setup() {
     ground->components.add(groundCollider);
 
     auto light = Hierarchy::createGameObjectInTree();
-    auto pointLight = PointLight::D3250();
+    auto pointLight = PointLight::I1000();
     light->components.add(pointLight);
     light->transform->translate(vec3(0, 20, 0));
 

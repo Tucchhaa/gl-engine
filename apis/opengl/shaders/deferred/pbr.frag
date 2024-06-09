@@ -9,6 +9,7 @@ struct LightColors {
 struct PointLight {
     vec3 position;
 
+    float intensity;
     float linear;
     float quadratic;
 
@@ -35,6 +36,7 @@ in mat4 inversePerspective;
 out vec4 color;
 
 void main() {
+    // TODO: move resolution to uniform
     vec2 texCoord = gl_FragCoord.xy / vec2(2560, 1440);
     vec3 position = calculatePosition(texCoord);
     vec3 normal = texture(gNormal, texCoord).xyz;
@@ -68,7 +70,6 @@ vec3 calculatePointLight(PointLight lightSource, vec3 normal, vec3 position, vec
     vec4 albedoMetal = texture(gAlbedoMetallic, texCoord);
     vec2 aoRoughness = texture(gAORoughness, texCoord).rg;
 
-//    vec3 albedo = pow(albedoMetal.rgb, vec3(2.2));
     vec3 albedo = albedoMetal.rgb;
     float metallness = albedoMetal.a;
     float ao = aoRoughness.r;
@@ -79,7 +80,7 @@ vec3 calculatePointLight(PointLight lightSource, vec3 normal, vec3 position, vec
 
     float distance = length(lightVec);
     float attenuation = 1.0 /  (distance * distance);
-    vec3 radiance = lightSource.colors.diffuse * attenuation * 1000;
+    vec3 radiance = lightSource.colors.diffuse * attenuation * light.intensity;
 
     vec3 cameraDir = normalize(cameraPos - position);
     vec3 halfway = normalize(lightDir + cameraDir);
@@ -99,10 +100,7 @@ vec3 calculatePointLight(PointLight lightSource, vec3 normal, vec3 position, vec
     vec3 kS = F;
     vec3 kD = (vec3(1.0) - kS) * (1.0 - metallness);
 
-    vec3 result = (kD * albedo / PI + specular) * radiance * NdotL;
-    // TODO: change to IBL
-    result += kS * vec3(0.5);
-    result *= ao;
+    vec3 result = (kD * albedo / PI + specular) * radiance * NdotL * ao;
 
     return result;
 }

@@ -24,7 +24,6 @@ check for memory leaks
 use absolute path for includes
 
 Plan:
-0) complete HW
 1) Rewrite PBR.
 2) Create camera controller
 3) Create a FPS demo
@@ -35,7 +34,11 @@ Plan:
 int main() {
     IEngine* engine = new GlEngine();
 
-    CollisionDemo scene;
+    // CollisionDemo scene;
+    ManyLightsDemo scene;
+    // TunnelDemo scene;
+    // BackpackDemo scene;
+
     engine->setScene(&scene);
 
     engine->start();

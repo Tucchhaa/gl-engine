@@ -139,6 +139,8 @@ void Shader::setDirectLight(uint index, const DirectLight* lightSource) {
 void Shader::setPointLight(const string& name, const PointLight* lightSource) {
     setVec3(name + ".position", lightSource->transform->getAbsolutePosition());
 
+    setFloat(name + ".intensity", lightSource->intensity);
+
     setFloat(name + ".linear", lightSource->linear);
     setFloat(name + ".quadratic", lightSource->quadratic);
 

@@ -19,8 +19,11 @@ void ManyLightsDemo::setup() {
 
             cube->transform->setPosition(vec3(distance * i, -3, distance * j));
             cube->transform->setScale(1.5);
+
+            Hierarchy::addToHierarchy(cube);
         }
     }
+
 
     GameObject* lights = Hierarchy::createGameObjectInTree();
 
@@ -28,7 +31,7 @@ void ManyLightsDemo::setup() {
 
     for(int i=0; i < LIGHTS_NUM; i++) {
         GameObject* lightSource = Hierarchy::createGameObjectInTree();
-        PointLight* pointLight = PointLight::D20();
+        PointLight* pointLight = PointLight::I100();
 
         float x = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);
         float z = N * 2.5f * ((float)rand()/RAND_MAX * 2 - 1);

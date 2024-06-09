@@ -4,21 +4,31 @@
 
 class PointLight : public Light {
 public:
-    const float lightVolumeMinAttenuation = 0.001;
+    const float lightVolumeMinAttenuation = 0.1;
 
     float linear = 0.22;
     float quadratic = 0.20;
 
     PointLight();
-    
+
+    PointLight(float intensity);
+
     PointLight(float linear, float quadratic);
     
-    PointLight(float linear, float quadratic, vec3 ambient, vec3 diffuse, vec3 specular);
+    PointLight(float intensity, float linear, float quadratic, vec3 ambient, vec3 diffuse, vec3 specular);
 
 public:
     float getRadius() const;
 
 public:
+    static PointLight* I100() {
+        return new PointLight(100);
+    }
+
+    static PointLight* I1000() {
+        return new PointLight(1000);
+    }
+
     static PointLight* D6() {
         return new PointLight(0.7, 1.8);
     }

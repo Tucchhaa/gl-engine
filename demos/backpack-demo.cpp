@@ -22,7 +22,7 @@ void BackpackDemo::setup() {
     lightTransform->rotate(vec3(radians(-30.0), 0, 0));
 
     auto* directLight0 = new DirectLight();
-    PointLight* pointLight0 = PointLight::D3250();
+    PointLight* pointLight0 = PointLight::I1000();
 
     lightSource->components.add(directLight0);
     lightSource->components.add(pointLight0);
@@ -70,6 +70,10 @@ GameObject* BackpackDemo::createBackpack() {
 
 GameObject* BackpackDemo::createHelmet() {
     GameObject* object = loader->loadModel("models/helmet/source/helmet.fbx", "models/helmet/textures");
+    auto* material = object->getDataItem<Material>(2);
+
+    material->specularTexture = *loader->loadTexture("models/helmet/textures/Metalness.png");
+    material->roughnessTexture = *loader->loadTexture("models/helmet/textures/Roughness.png");
 
     Transform* objectTransform = object->transform;
 

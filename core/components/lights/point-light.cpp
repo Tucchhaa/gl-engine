@@ -2,17 +2,21 @@
 
 PointLight::PointLight() = default;
 
+PointLight::PointLight(float intensity): Light(intensity) { }
+
 PointLight::PointLight(float linear, float quadratic)
     : Light(), linear(linear), quadratic(quadratic)
     {}
 
-PointLight::PointLight(float linear, float quadratic, vec3 ambient, vec3 diffuse, vec3 specular)
-    :  linear(linear), quadratic(quadratic), Light(ambient, diffuse, specular)
+PointLight::PointLight(float intensity, float linear, float quadratic, vec3 ambient, vec3 diffuse, vec3 specular)
+    :  Light(intensity, ambient, diffuse, specular), linear(linear), quadratic(quadratic)
     {}
 
 // TODO: cache the radius
 float PointLight::getRadius() const {
-    return sqrt(1 / lightVolumeMinAttenuation);
+    float maxColor = max(max(diffuse.r, diffuse.g), diffuse.b);
+
+    return sqrt(maxColor * intensity / lightVolumeMinAttenuation);
 
     // const float a = quadratic;
     // const float b = linear;
