@@ -8,6 +8,7 @@
 
 DeferredRenderer::DeferredRenderer():
     meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
+    shadowMapShader("forward/depth-vertex.vert", "forward/depth-fragment.frag"),
     // lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
     pointLightShader("deferred/lighting.vert", "deferred/pbr-point-light.frag"),
     directLightShader("deferred/lighting.vert", "deferred/pbr-direct-light.frag"),
@@ -19,6 +20,7 @@ DeferredRenderer::DeferredRenderer():
 
     initGBuffer();
     initLightingBuffer();
+    initShadowFrameBuffer();
 
     initScreenVAO();
     initSphereVAO();
@@ -89,6 +91,32 @@ void DeferredRenderer::initLightingBuffer() {
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         throw std::runtime_error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
     }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void DeferredRenderer::initShadowFrameBuffer() {
+    glGenFramebuffers(1, &shadowMapBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
+
+    glGenTextures(1, &shadowMap);
+    glBindTexture(GL_TEXTURE_2D, shadowMap);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -224,7 +252,7 @@ void DeferredRenderer::afterSceneSetup() {
 }
 
 void DeferredRenderer::render() {
-    glViewport(0, 0, screenWidth, screenHeight);
+    renderShadowMap();
 
     renderGBuffer();
     renderLighting();
@@ -242,6 +270,7 @@ void DeferredRenderer::render() {
 
 void DeferredRenderer::renderGBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+    glViewport(0,0, screenWidth, screenHeight);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -260,6 +289,7 @@ void DeferredRenderer::renderGBuffer() {
 
 void DeferredRenderer::renderLighting() {
     glBindFramebuffer(GL_FRAMEBUFFER, lightingBuffer);
+    glViewport(0, 0, screenWidth, screenHeight);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
@@ -280,6 +310,44 @@ void DeferredRenderer::renderLighting() {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
+}
+
+void DeferredRenderer::renderShadowMap() {
+    if(currentScene->getDirectLights().empty())
+        return;
+
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glViewport(0, 0, screenWidth, screenHeight);
+    // glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT);
+    //
+    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    const DirectLight* light = currentScene->getDirectLights()[0];
+    const mat4 lightPerspective = calculateShadowMapperPerspective(light);
+
+    shadowMapShader.use();
+    shadowMapShader.setMat4("perspective", lightPerspective);
+
+    for(auto* object: meshes) {
+        const Mesh* mesh = object->getMesh<Mesh>();
+
+        shadowMapShader.setMat4("transform", mesh->transform->getTransformMatrix());
+
+        object->render();
+    }
 }
 
 void DeferredRenderer::renderPointLighting() {
@@ -304,7 +372,15 @@ void DeferredRenderer::renderPointLighting() {
 }
 
 void DeferredRenderer::renderDirectLighting() {
+    if(currentScene->getDirectLights().empty())
+        return;
+
     const Camera* camera = currentScene->getCamera();
+    const DirectLight* directLight = currentScene->getDirectLights()[0];
+
+    const mat4 cameraPerspective = camera->getViewProjectionMatrix();
+    const mat4 lightPerspective = calculateShadowMapperPerspective(directLight);
+    const mat4 lightVolumeTransform = calculateDirectLightVolumeTransform();
 
     directLightShader.use();
     directLightShader.setTexture("gDepth", gDepthStencil);
@@ -312,16 +388,18 @@ void DeferredRenderer::renderDirectLighting() {
     directLightShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
     directLightShader.setTexture("gAORoughness", gAORoughness);
 
-    directLightShader.setMat4("perspective", mat4(1.));
+    directLightShader.setTexture("shadowMap", shadowMap);
+    directLightShader.setMat4("lightPerspective", lightPerspective);
+
+    directLightShader.setMat4("perspective", cameraPerspective);
     directLightShader.setVec3("cameraPos", camera->transform->getPosition());
 
-    for(const auto* directLight: currentScene->getDirectLights()) {
-        directLightShader.setDirectLight("light", directLight);
-        directLightShader.setMat4("transform", mat4(1.0f));
+    // TODO: supposed there is only one direct light, which also casts shadows
+    directLightShader.setDirectLight("light", directLight);
+    directLightShader.setMat4("transform", lightVolumeTransform);
 
-        glBindVertexArray(sphereVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    glBindVertexArray(sphereVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void DeferredRenderer::renderSkybox() {
@@ -356,6 +434,7 @@ void DeferredRenderer::renderSkybox() {
 
 void DeferredRenderer::renderScreen() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, screenWidth, screenHeight);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
@@ -422,10 +501,28 @@ void DeferredRenderer::renderCubicPatches(const mat4& viewProjection) {
 // ===
 
 mat4 DeferredRenderer::calculatePointLightVolumeTransform(const PointLight* light) {
-    auto lightVolumeMatrix = mat4(1.0f);
+    auto transform = mat4(1.0f);
 
-    lightVolumeMatrix = translate(lightVolumeMatrix, light->transform->getPosition());
-    lightVolumeMatrix = scale(lightVolumeMatrix, vec3(light->getRadius()));
+    transform = translate(transform, light->transform->getPosition());
+    transform = scale(transform, vec3(light->getRadius()));
 
-    return lightVolumeMatrix;
+    return transform;
+}
+
+mat4 DeferredRenderer::calculateDirectLightVolumeTransform() const {
+    const Camera* camera = currentScene->getCamera();
+    const mat4 transform = translate(mat4(1.0f), camera->transform->getPosition());
+
+    return transform;
+}
+
+mat4 DeferredRenderer::calculateShadowMapperPerspective(const DirectLight* light) {
+    const mat4 projection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.f, 70.5f);
+
+    mat4 viewMatrix = mat4_cast(conjugate(light->transform->getAbsoluteRotation()));
+    viewMatrix = translate(viewMatrix, vec3(0, 0, -5));
+
+    const mat4 perspective = projection * viewMatrix;
+
+    return perspective;
 }

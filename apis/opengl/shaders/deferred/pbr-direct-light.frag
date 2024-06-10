@@ -16,6 +16,7 @@ struct DirectLight {
 const float PI = 3.14159265359;
 
 vec3 calculatePosition(vec2 texCoord);
+float isFragLit(vec3 normal, vec3 position);
 vec3 calculateDirectLight(DirectLight lightSource, vec3 _normal, vec3 position, vec2 texCoord);
 
 LightColors getLightingColors(LightColors colors, vec2 texCoord);
@@ -24,6 +25,9 @@ uniform sampler2D gDepth;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoMetallic;
 uniform sampler2D gAORoughness;
+
+uniform sampler2D shadowMap;
+uniform mat4 lightPerspective;
 
 uniform vec3 cameraPos;
 uniform DirectLight light;
@@ -40,7 +44,7 @@ void main() {
 
     vec3 lighting = calculateDirectLight(light, normal, position, texCoord);
 
-    color = vec4(lighting, 1.0);
+    color = vec4(lighting, 1.0) * isFragLit(normal, position);
 }
 
 // === Data getters ===
@@ -52,6 +56,20 @@ vec3 calculatePosition(vec2 texCoord) {
     vec4 viewSpacePosition = inversePerspective * clipSpacePosition;
 
     return viewSpacePosition.xyz / viewSpacePosition.w;
+}
+
+float isFragLit(vec3 normal, vec3 position) {
+    vec4 posLightSpace = lightPerspective * vec4(position, 1);
+
+    vec3 coords = (posLightSpace.xyz / posLightSpace.w) * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMap, coords.xy).r;
+    float currentDepth = coords.z;
+
+    float bias =  max(0.035 * (1.0 - dot(normal, -light.direction)), 0.005);
+    float lit = currentDepth <= closestDepth  ? 1.0 : 0.0;
+
+    return lit;
 }
 
 // ===
@@ -72,7 +90,7 @@ vec3 calculateDirectLight(DirectLight lightSource, vec3 normal, vec3 position, v
     float ao = aoRoughness.r;
     float roughness = aoRoughness.g;
 
-    vec3 lightDir = normalize(lightSource.direction);
+    vec3 lightDir = normalize(-lightSource.direction);
     vec3 radiance = lightSource.colors.diffuse * light.intensity;
 
     vec3 cameraDir = normalize(cameraPos - position);

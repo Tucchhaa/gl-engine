@@ -18,10 +18,9 @@ void BackpackDemo::setup() {
 
     Transform* lightTransform = lightSource->transform;
     lightTransform->translate(vec3(-8, 10, -10));
-    lightTransform->rotate(vec3(0, radians(180.0), 0));
-    lightTransform->rotate(vec3(radians(30.0), 0, 0));
+    lightTransform->rotate(vec3(radians(-15.0), 0, 0));
 
-    auto* directLight0 = new DirectLight(1.5);
+    auto* directLight0 = new DirectLight(3.5);
     PointLight* pointLight0 = PointLight::I1000();
 
     lightSource->components.add(directLight0);
@@ -39,7 +38,7 @@ void BackpackDemo::setup() {
 }
 
 void BackpackDemo::beforeRender() {
-    // backpack->transform->rotate(quat(vec3(0, radians(0.15f), 0)));
+    backpack->transform->rotate(quat(vec3(0, radians(0.15f), 0)));
 
     Scene::beforeRender();
 }
@@ -59,7 +58,7 @@ GameObject* BackpackDemo::createBackpack() {
     Transform* objectTransform = object->transform;
 
     objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
-    objectTransform->translate(vec3(-5, -3, 0));
+    objectTransform->translate(vec3(-5, -6, 0));
 
     Hierarchy::addToHierarchy(object);
 
@@ -76,6 +75,7 @@ GameObject* BackpackDemo::createHelmet() {
     Transform* objectTransform = object->transform;
 
     objectTransform->scaleBy(vec3(0.01, 0.01, 0.01));
+    objectTransform->translate(vec3(0, 0, 0));
 
     Hierarchy::addToHierarchy(object);
 

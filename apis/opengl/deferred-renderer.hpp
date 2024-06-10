@@ -18,6 +18,8 @@ private:
 
     void initLightingBuffer();
 
+    void initShadowFrameBuffer();
+
     void initScreenVAO();
 
     void initSphereVAO();
@@ -35,6 +37,8 @@ private:
      * Computes gBuffer textures
      */
     Shader meshShader;
+
+    Shader shadowMapShader;
 
     /**
      * Computes lighting for gBuffer textures
@@ -59,6 +63,11 @@ private:
     unsigned int lightingBuffer = 0;
     unsigned int lightedColor = 0;
 
+    unsigned int shadowMapBuffer = 0;
+    unsigned int shadowMap = 0;
+    const int SHADOW_WIDTH = 1024;
+    const int SHADOW_HEIGHT = 1024;
+
     unsigned int screenVAO = 0;
     unsigned int sphereVAO = 0;
 
@@ -69,6 +78,8 @@ private:
     void renderGBuffer();
 
     void renderLighting();
+
+    void renderShadowMap();
 
     void renderPointLighting();
 
@@ -86,5 +97,9 @@ private:
 // Private methods
 // ===
 private:
-    static mat4 calculatePointLightVolumeTransform(const PointLight* light) ;
+    static mat4 calculatePointLightVolumeTransform(const PointLight* light);
+
+    mat4 calculateDirectLightVolumeTransform() const;
+
+    static mat4 calculateShadowMapperPerspective(const DirectLight* light);
 };
