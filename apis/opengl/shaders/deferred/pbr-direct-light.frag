@@ -66,10 +66,12 @@ float isFragLit(vec3 normal, vec3 position) {
     float closestDepth = texture(shadowMap, coords.xy).r;
     float currentDepth = coords.z;
 
-    float bias =  max(0.035 * (1.0 - dot(normal, -light.direction)), 0.005);
-    float lit = currentDepth <= closestDepth  ? 1.0 : 0.0;
+    float lit = step(currentDepth, closestDepth);
 
-    return lit;
+    // result = closesDepth >= 1.0
+    float result = step(1.0, closestDepth);
+
+    return mix(lit, 1.0, result);
 }
 
 // ===

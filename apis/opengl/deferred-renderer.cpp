@@ -516,11 +516,18 @@ mat4 DeferredRenderer::calculateDirectLightVolumeTransform() const {
     return transform;
 }
 
-mat4 DeferredRenderer::calculateShadowMapperPerspective(const DirectLight* light) {
-    const mat4 projection = ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.f, 70.5f);
+mat4 DeferredRenderer::calculateShadowMapperPerspective(const DirectLight* light) const {
+    constexpr float size = 25.;
+    constexpr float delta_z = -50.;
 
-    mat4 viewMatrix = mat4_cast(conjugate(light->transform->getAbsoluteRotation()));
-    viewMatrix = translate(viewMatrix, vec3(0, 0, -5));
+    const Camera* camera = currentScene->getCamera();
+    const mat4 projection = ortho(-size, size, -size, size, 1.f, 100.f);
+
+    const mat4 translation = translate(mat4(1.0f), -camera->transform->getPosition());
+    const mat4 rotation = mat4_cast(conjugate(light->transform->getAbsoluteRotation()));
+    const mat4 delta = translate(mat4(1.0f), vec3(0, 0, delta_z));
+
+    const mat4 viewMatrix = delta * rotation * translation;
 
     const mat4 perspective = projection * viewMatrix;
 

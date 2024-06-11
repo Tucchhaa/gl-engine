@@ -65,8 +65,8 @@ private:
 
     unsigned int shadowMapBuffer = 0;
     unsigned int shadowMap = 0;
-    const int SHADOW_WIDTH = 1024;
-    const int SHADOW_HEIGHT = 1024;
+    const int SHADOW_WIDTH = 2048;
+    const int SHADOW_HEIGHT = 2048;
 
     unsigned int screenVAO = 0;
     unsigned int sphereVAO = 0;
@@ -101,5 +101,5 @@ private:
 
     mat4 calculateDirectLightVolumeTransform() const;
 
-    static mat4 calculateShadowMapperPerspective(const DirectLight* light);
+    mat4 calculateShadowMapperPerspective(const DirectLight* light) const;
 };
