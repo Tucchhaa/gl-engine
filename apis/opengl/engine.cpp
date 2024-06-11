@@ -17,8 +17,8 @@ GlEngine::GlEngine(): IEngine() {
     Input = new ::Input();
     ResourceManager = new ::ResourceManager();
     Loader = new ::Loader();
-    // Renderer = new ::DeferredRenderer();
-    Renderer = new EditorViewRenderer();
+    Renderer = new ::DeferredRenderer();
+    // Renderer = new EditorViewRenderer();
 
     init();
 }
@@ -33,4 +33,8 @@ GlEngine::~GlEngine() {
 
 void GlEngine::init() {
     Hierarchy::initialize();
+
+    int frameWidth, frameHeight;
+    Window->getFrameBufferSize(frameWidth, frameHeight);
+    Renderer->setFrameSize(frameWidth, frameHeight);
 }

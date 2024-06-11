@@ -14,4 +14,6 @@ public:
     virtual void pollEvents() = 0;
 
     virtual void terminate() = 0;
+
+    virtual void getFrameBufferSize(int &width, int &height) = 0;
 };

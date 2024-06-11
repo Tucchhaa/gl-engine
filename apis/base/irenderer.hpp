@@ -6,8 +6,8 @@
 
 class IRenderer: public IGameEventsListener {
 protected:
-    int screenWidth = 2560;
-    int screenHeight = 1440;
+    int frameWidth = 1280;
+    int frameHeight = 720;
 
     Scene* currentScene = nullptr;
 
@@ -32,5 +32,5 @@ public:
     /**
      *  Updates size of frame
      */
-    virtual void setScreenSize(int width, int height);
+    virtual void setFrameSize(int width, int height);
 };

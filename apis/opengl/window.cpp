@@ -35,13 +35,13 @@ void Window::create(int screenWidth, int screenHeight) {
 
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    getFrameBufferSize();
+    getFrameBufferSize(frameWidth, frameHeight);
+    glViewport(0, 0, frameWidth, frameHeight);
 }
 
 bool Window::isOpen() {
     return !glfwWindowShouldClose(glfwWindow);
 }
-
 
 void Window::pollEvents() {
     glfwSwapBuffers(glfwWindow);
@@ -60,7 +60,6 @@ GLFWwindow* Window::getGLFWWindow() {
 
 // ===
 
-void Window::getFrameBufferSize() {
-    glfwGetFramebufferSize(glfwWindow, &frameWidth, &frameHeight);
-    glViewport(0, 0, frameWidth, frameHeight);
+void Window::getFrameBufferSize(int &width, int &height) {
+    glfwGetFramebufferSize(glfwWindow, &width, &height);
 }

@@ -13,6 +13,7 @@ public:
 
     ~DeferredRenderer() override;
 
+    void setFrameSize(int width, int height) override;
 private:
     void initGBuffer();
 

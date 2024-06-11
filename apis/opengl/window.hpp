@@ -28,6 +28,5 @@ public:
 public:
     GLFWwindow* getGLFWWindow();
 
-private:
-    void getFrameBufferSize();
+    void getFrameBufferSize(int &width, int &height) override;
 };

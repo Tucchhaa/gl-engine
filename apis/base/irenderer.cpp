@@ -6,7 +6,7 @@ void IRenderer::afterSceneSetup() {
     currentScene = IEngine::CurrentScene;
 }
 
-void IRenderer::setScreenSize(const int width, const int height) {
-    screenWidth = width;
-    screenHeight = height;
+void IRenderer::setFrameSize(const int width, const int height) {
+    frameWidth = width;
+    frameHeight = height;
 }

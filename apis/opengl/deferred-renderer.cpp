@@ -28,6 +28,40 @@ DeferredRenderer::DeferredRenderer():
 
 DeferredRenderer::~DeferredRenderer() {
     meshShader.deleteShader();
+    shadowMapShader.deleteShader();
+    // lightingShader.deleteShader();
+    pointLightShader.deleteShader();
+    directLightShader.deleteShader();
+    skyboxShader.deleteShader();
+    cubicPatchShader.deleteShader();
+    screenShader.deleteShader();
+
+    glDeleteFramebuffers(1, &gBuffer);
+    glDeleteFramebuffers(1, &lightingBuffer);
+    glDeleteFramebuffers(1, &shadowMapBuffer);
+
+    glDeleteTextures(1, &gDepthStencil);
+    glDeleteTextures(1, &gNormal);
+    glDeleteTextures(1, &gAlbedoMetal);
+    glDeleteTextures(1, &gAORoughness);
+    glDeleteTextures(1, &lightedColor);
+    glDeleteTextures(1, &shadowMap);
+}
+
+void DeferredRenderer::setFrameSize(int width, int height) {
+    IRenderer::setFrameSize(width, height);
+
+    glDeleteFramebuffers(1, &gBuffer);
+    glDeleteFramebuffers(1, &lightingBuffer);
+
+    glDeleteTextures(1, &gDepthStencil);
+    glDeleteTextures(1, &gNormal);
+    glDeleteTextures(1, &gAlbedoMetal);
+    glDeleteTextures(1, &gAORoughness);
+    glDeleteTextures(1, &lightedColor);
+
+    initGBuffer();
+    initLightingBuffer();
 }
 
 void DeferredRenderer::initGBuffer() {
@@ -37,7 +71,7 @@ void DeferredRenderer::initGBuffer() {
     // - Normal color buffer
     glGenTextures(1, &gNormal);
     glBindTexture(GL_TEXTURE_2D, gNormal);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, frameWidth, frameHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gNormal, 0);
@@ -45,7 +79,7 @@ void DeferredRenderer::initGBuffer() {
     // - Albedo + Specular/Metallic buffer
     glGenTextures(1, &gAlbedoMetal);
     glBindTexture(GL_TEXTURE_2D, gAlbedoMetal);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frameWidth, frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedoMetal, 0);
@@ -53,7 +87,7 @@ void DeferredRenderer::initGBuffer() {
     // - AO + Rougness buffer
     glGenTextures(1, &gAORoughness);
     glBindTexture(GL_TEXTURE_2D, gAORoughness);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frameWidth, frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAORoughness, 0);
@@ -61,7 +95,7 @@ void DeferredRenderer::initGBuffer() {
     // - Depth buffer
     glGenTextures(1, &gDepthStencil);
     glBindTexture(GL_TEXTURE_2D, gDepthStencil);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, screenWidth, screenHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, frameWidth, frameHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, gDepthStencil, 0);
@@ -80,7 +114,7 @@ void DeferredRenderer::initLightingBuffer() {
 
     glGenTextures(1, &lightedColor);
     glBindTexture(GL_TEXTURE_2D, lightedColor);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, frameWidth, frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightedColor, 0);
@@ -270,7 +304,7 @@ void DeferredRenderer::render() {
 
 void DeferredRenderer::renderGBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    glViewport(0,0, screenWidth, screenHeight);
+    glViewport(0,0, frameWidth, frameHeight);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -289,7 +323,7 @@ void DeferredRenderer::renderGBuffer() {
 
 void DeferredRenderer::renderLighting() {
     glBindFramebuffer(GL_FRAMEBUFFER, lightingBuffer);
-    glViewport(0, 0, screenWidth, screenHeight);
+    glViewport(0, 0, frameWidth, frameHeight);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
@@ -410,7 +444,7 @@ void DeferredRenderer::renderSkybox() {
     if(cubeMap != nullptr) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(0, 0, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -434,7 +468,7 @@ void DeferredRenderer::renderSkybox() {
 
 void DeferredRenderer::renderScreen() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, screenWidth, screenHeight);
+    glViewport(0, 0, frameWidth, frameHeight);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
