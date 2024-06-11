@@ -10,17 +10,35 @@ public:
 
     // ===
 
-    virtual void resetDeltaTime() = 0;
+    /**
+     * Reset input state
+     */
+    virtual void reset() = 0;
 
+    virtual void calculateDeltaTime() = 0;
+
+    /**
+     * Process input events
+     */
     virtual void process() = 0;
 
     // ===
 
-    virtual glm::vec3 axisVec3() = 0;
+    virtual glm::vec2 axisVec2() = 0;
 
+    /**
+     *
+     * @return 1.0 if D is pressed, -1.0 if A is pressed, 0 otherwise
+     */
     virtual float axisHorizontal() = 0;
 
+    /**
+     *
+     * @return 1.0 if W is pressed, -1.0 if S is pressed, 0 otherwise
+     */
     virtual float axisVertical() = 0;
+
+    virtual glm::vec2 mouseDelta() = 0;
 
     // ===
 

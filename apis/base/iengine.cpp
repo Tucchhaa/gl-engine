@@ -35,10 +35,11 @@ void IEngine::setScene(Scene* scene) {
 }
 
 void IEngine::start() {
-    Input->resetDeltaTime();
+    Input->reset();
 
     while(Window->isOpen()) {
         Input->process();
+        Input->calculateDeltaTime();
 
         fpsDisplay();
         cameraController();
@@ -62,20 +63,21 @@ void IEngine::cameraController() {
     IInput* input = IEngine::Input;
     Transform* cameraTransform = CurrentScene->getCamera()->transform;
 
-    if(input->isShiftPressed()) {
-        float rotationSpeed = 1.0f;
+    constexpr float rotationSpeed = 1.0f;
+    constexpr float speed = 15.0f;
 
-        quat horizontalRotation = quat(vec3(0, -input->axisHorizontal() * rotationSpeed * input->getDeltaTime(), 0));
-        quat verticalRotation   = quat(vec3(-input->axisVertical() * rotationSpeed * input->getDeltaTime(), 0, 0));
+    const float deltaX = -input->mouseDelta().x;
+    const float deltaY = -input->mouseDelta().y;
 
-        cameraTransform->rotate(horizontalRotation, &Transform::World);
-        cameraTransform->rotate(verticalRotation);
-    }
-    else {
-        float speed = 15.0f;
+    const auto horizontalRotation = quat(vec3(0,  deltaX * rotationSpeed * input->getDeltaTime(), 0));
+    const auto verticalRotation   = quat(vec3(deltaY * rotationSpeed * input->getDeltaTime(), 0, 0));
 
-        cameraTransform->translate(input->axisVec3() * speed * input->getDeltaTime());
-    }
+    const vec2 translation = input->axisVec2() * speed * input->getDeltaTime();
+
+    cameraTransform->rotate(horizontalRotation, &Transform::World);
+    cameraTransform->rotate(verticalRotation);
+
+    cameraTransform->translate(vec3(translation.x, 0, translation.y));
 }
 
 void IEngine::fpsDisplay() {

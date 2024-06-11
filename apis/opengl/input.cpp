@@ -9,14 +9,34 @@ Input::Input(): IInput() {
 
 // ===
 
-void Input::resetDeltaTime() {
+void Input::reset() {
     lastFrameTime = static_cast<float>(glfwGetTime());
     deltaTime = 0;
+
+    // ===
+
+    yPositivePressed = yNegativePressed = xPositivePressed = xNegativePressed = 0;
+    shiftPressed = false;
+
+    // ===
+
+    glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
 }
 
 void Input::process() {
+    isWindowFocused = glfwGetWindowAttrib(glfwWindow, GLFW_FOCUSED) == GLFW_TRUE;
+
+    if(isWindowFocused == false) {
+        reset();
+        return;
+    }
+
+    // ===
+
     if (glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(glfwWindow, true);
+
+    // ===
 
     yPositivePressed = glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS;
     yNegativePressed = glfwGetKey(glfwWindow, GLFW_KEY_S) == GLFW_PRESS;
@@ -24,19 +44,21 @@ void Input::process() {
     xPositivePressed = glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS;
     xNegativePressed = glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS;
 
-    _isShiftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+    shiftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 
-    calculateDeltaTime();
+    // ===
+
+    glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
+    setCursorPositionToCenter();
 }
-
 
 // ===
 // Getters
 // ===
-vec3 Input::axisVec3() {
-    return vec3(
-        axisHorizontal(), 0, axisVertical()
-    );
+vec2 Input::axisVec2() {
+    return {
+        axisHorizontal(), axisVertical()
+    };
 }
 
 float Input::axisHorizontal() {
@@ -47,12 +69,26 @@ float Input::axisVertical() {
     return yPositivePressed - yNegativePressed;
 }
 
+vec2 Input::mouseDelta() {
+    return {
+        static_cast<float>(mouseX - GlEngine::Window->screenWidth/2.0),
+        static_cast<float>(mouseY - GlEngine::Window->screenHeight/2.0)
+    };
+}
+
 bool Input::isShiftPressed() {
-    return _isShiftPressed;
+    return shiftPressed;
 }
 
 float Input::getDeltaTime() {
     return deltaTime;
+}
+
+void Input::setCursorPositionToCenter() {
+    const int width = GlEngine::Window->screenWidth;
+    const int height = GlEngine::Window->screenHeight;
+
+    glfwSetCursorPos(glfwWindow, width / 2.0, height / 2.0);
 }
 
 // ===

@@ -446,7 +446,7 @@ void DeferredRenderer::renderSkybox() {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBlitFramebuffer(0, 0, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, lightingBuffer);
 
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_EQUAL, 0, 0xFF);
