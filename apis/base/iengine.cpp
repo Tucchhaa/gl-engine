@@ -63,7 +63,7 @@ void IEngine::cameraController() {
     IInput* input = IEngine::Input;
     Transform* cameraTransform = CurrentScene->getCamera()->transform;
 
-    constexpr float rotationSpeed = 1.0f;
+    constexpr float rotationSpeed = 0.3f;
     constexpr float speed = 15.0f;
 
     const float deltaX = -input->mouseDelta().x;
@@ -88,6 +88,7 @@ void IEngine::fpsDisplay() {
 
     time_t now = time(nullptr);
     time_t diff = difftime(now, lastTime);
+
     if(diff >= 1) {
         std::cout << "FPS: " << frameCnt << std::endl;
         frameCnt = 0;

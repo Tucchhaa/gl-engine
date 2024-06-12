@@ -58,7 +58,7 @@ private:
     Shader screenShader;
 
     unsigned int gBuffer = 0;
-    unsigned int gDepthStencil = 0;
+    unsigned int gDepth = 0;
     unsigned int gNormal = 0, gAlbedoMetal = 0, gAORoughness = 0;
 
     unsigned int lightingBuffer = 0;

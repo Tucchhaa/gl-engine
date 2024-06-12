@@ -10,5 +10,8 @@ out vec3 texCoords;
 void main()
 {
     texCoords = _position;
-    gl_Position = rotationMatrix * vec4(_position, 1);
+
+    vec4 pos = rotationMatrix * vec4(_position, 1);
+
+    gl_Position = pos.xyww;
 }
