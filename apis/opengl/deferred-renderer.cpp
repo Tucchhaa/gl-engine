@@ -9,7 +9,7 @@
 DeferredRenderer::DeferredRenderer():
     meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
     shadowMapShader("forward/depth-vertex.vert", "forward/depth-fragment.frag"),
-    // lightingShader("deferred/lighting.vert", "deferred/lighting.frag"),
+    cascadeShadowsShader("forward/cascade-depth.vert", "forward/depth-fragment.frag", "", "", "forward/cascade-depth.geom"),
     pointLightShader("deferred/lighting.vert", "deferred/pbr-point-light.frag"),
     directLightShader("deferred/lighting.vert", "deferred/pbr-direct-light.frag"),
     skyboxShader("deferred/skybox.vert", "deferred/skybox.frag"),
@@ -139,22 +139,25 @@ void DeferredRenderer::initShadowFrameBuffer() {
     glGenTextures(1, &shadowMap);
     glBindTexture(GL_TEXTURE_2D, shadowMap);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glGenTextures(1, &cascadeShadowMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, cascadeShadowMaps);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,
+        static_cast<int>(cascadeLevels.size()) - 1, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
     constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cascadeShadowMaps, 0);
+
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -287,6 +290,17 @@ void DeferredRenderer::afterSceneSetup() {
         this->cubicPatches.push_back(new RenderObject(cubicPatch));
 }
 
+void DeferredRenderer::beforeRender() {
+    IRenderer::beforeRender();
+
+    const vector<DirectLight*> directLights = currentScene->getDirectLights();
+
+    if(!directLights.empty()) {
+        cascadePerspectives = getCascadePerspectives(directLights[0]);
+        cascadePlanes = getCascadePlanes();
+    }
+}
+
 void DeferredRenderer::render() {
     renderShadowMap();
 
@@ -349,7 +363,7 @@ void DeferredRenderer::renderShadowMap() {
         return;
 
     // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // glViewport(0, 0, screenWidth, screenHeight);
+    // glViewport(0, 0, frameWidth, frameHeight);
     // glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_FRONT);
@@ -367,16 +381,13 @@ void DeferredRenderer::renderShadowMap() {
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    const DirectLight* light = currentScene->getDirectLights()[0];
-    const mat4 lightPerspective = calculateShadowMapperPerspective(light);
-
-    shadowMapShader.use();
-    shadowMapShader.setMat4("perspective", lightPerspective);
+    cascadeShadowsShader.use();
+    cascadeShadowsShader.setMat4Array("lightPerspectives", cascadePerspectives);
 
     for(auto* object: meshes) {
         const Mesh* mesh = object->getMesh<Mesh>();
 
-        shadowMapShader.setMat4("transform", mesh->transform->getTransformMatrix());
+        cascadeShadowsShader.setMat4("transform", mesh->transform->getTransformMatrix());
 
         object->render();
     }
@@ -411,7 +422,6 @@ void DeferredRenderer::renderDirectLighting() {
     const DirectLight* directLight = currentScene->getDirectLights()[0];
 
     const mat4 cameraPerspective = camera->getViewProjectionMatrix();
-    const mat4 lightPerspective = calculateShadowMapperPerspective(directLight);
     const mat4 lightVolumeTransform = calculateDirectLightVolumeTransform();
 
     directLightShader.use();
@@ -420,8 +430,10 @@ void DeferredRenderer::renderDirectLighting() {
     directLightShader.setTexture("gAlbedoMetallic", gAlbedoMetal);
     directLightShader.setTexture("gAORoughness", gAORoughness);
 
-    directLightShader.setTexture("shadowMap", shadowMap);
-    directLightShader.setMat4("lightPerspective", lightPerspective);
+    directLightShader.setInt("cascadeCount", static_cast<int>(cascadePlanes.size()));
+    directLightShader.setTexture("shadowMap", cascadeShadowMaps, GL_TEXTURE_2D_ARRAY);
+    directLightShader.setMat4Array("lightPerspectives", cascadePerspectives);
+    directLightShader.setFloatArray("cascadePlaneDistances", cascadePlanes);
 
     directLightShader.setMat4("perspective", cameraPerspective);
     directLightShader.setVec3("cameraPos", camera->transform->getPosition());
@@ -545,20 +557,96 @@ mat4 DeferredRenderer::calculateDirectLightVolumeTransform() const {
     return transform;
 }
 
-mat4 DeferredRenderer::calculateShadowMapperPerspective(const DirectLight* light) const {
-    constexpr float size = 25.;
-    constexpr float delta_z = -50.;
+vector<float> DeferredRenderer::getCascadePlanes() const {
+    vector<float> result(cascadeLevels.size() - 1);
 
     const Camera* camera = currentScene->getCamera();
-    const mat4 projection = ortho(-size, size, -size, size, 1.f, 100.f);
+    const float near = camera->near;
+    const float far = camera->far;
 
-    const mat4 translation = translate(mat4(1.0f), -camera->transform->getPosition());
-    const mat4 rotation = mat4_cast(conjugate(light->transform->getAbsoluteRotation()));
-    const mat4 delta = translate(mat4(1.0f), vec3(0, 0, delta_z));
+    for(int i=0; i < cascadeLevels.size() - 1; i++) {
+        const float cascadeFar = near + (far - near) * cascadeLevels[i+1];
 
-    const mat4 viewMatrix = delta * rotation * translation;
+        result[i] = cascadeFar;
+    }
 
-    const mat4 perspective = projection * viewMatrix;
+    return result;
+}
 
-    return perspective;
+vector<mat4> DeferredRenderer::getCascadePerspectives(const DirectLight* light) const {
+    Camera* camera = currentScene->getCamera();
+
+    const float originalNear = camera->near;
+    const float originalFar = camera->far;
+
+    vector<mat4> result;
+
+    for(int i=0; i < cascadePlanes.size(); i++) {
+        const float cascadeNear = i == 0 ? originalNear : cascadePlanes[i-1];
+        const float cascadeFar = cascadePlanes[i];
+
+        mat4 perspective = calculateCascadePerspective(light, cascadeNear, cascadeFar);
+
+        result.push_back(perspective);
+    }
+
+    camera->near = originalNear;
+    camera->far = originalFar;
+
+    return result;
+}
+
+mat4 DeferredRenderer::calculateCascadePerspective(const DirectLight* light, const float near, const float far) const {
+    Camera* camera = currentScene->getCamera();
+
+    camera->near = near;
+    camera->far = far;
+
+    const mat4 perspectiveInverse = inverse(camera->getViewProjectionMatrix());
+
+    // === Calculate light view
+    vector<vec4> frustumCorners;
+    auto center = vec3(0, 0, 0);
+
+    for(int x=-1; x <= 1; x+=2) {
+        for(int y=-1; y <= 1; y+=2) {
+            for(int z=-1; z <= 1; z+=2) {
+                vec4 point = perspectiveInverse * vec4(x, y, z, 1);
+                point = point / point.w;
+
+                frustumCorners.push_back(point);
+                center += vec3(point);
+            }
+        }
+    }
+
+    center /= frustumCorners.size();
+
+    const auto lightView = lookAt(center - light->transform->getDirectionVector(), center, vec3(0, 1, 0));
+
+    // === Calculate light projection
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::lowest();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::lowest();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::lowest();
+    for (const auto& v : frustumCorners)
+    {
+        const auto trf = lightView * v;
+        minX = std::min(minX, trf.x);
+        maxX = std::max(maxX, trf.x);
+        minY = std::min(minY, trf.y);
+        maxY = std::max(maxY, trf.y);
+        minZ = std::min(minZ, trf.z);
+        maxZ = std::max(maxZ, trf.z);
+    }
+
+    constexpr float zMult = 10.0f;
+    minZ = minZ < 0 ? minZ * zMult : minZ / zMult;
+    maxZ = maxZ < 0 ? maxZ / zMult : maxZ * zMult;
+
+    const auto lightProjection = ortho(minX, maxX, minY, maxY, minZ, maxZ);
+
+    return lightProjection * lightView;
 }

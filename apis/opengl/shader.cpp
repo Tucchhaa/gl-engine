@@ -9,7 +9,8 @@ Shader::Shader(
     const string& vertexShaderFile,
     const string& fragmentShaderFile,
     const string& tessControlShaderFile,
-    const string& tessEvalShaderFile
+    const string& tessEvalShaderFile,
+    const string& geometryShaderFile
 ) {
     resourceManager = dynamic_cast<ResourceManager*>(IEngine::ResourceManager);
 
@@ -17,7 +18,8 @@ Shader::Shader(
         &vertexShaderFile,
         &fragmentShaderFile,
         &tessControlShaderFile,
-        &tessEvalShaderFile
+        &tessEvalShaderFile,
+        &geometryShaderFile
     };
 
     this->ID = this->createShaderProgram(shaders);
@@ -53,8 +55,20 @@ void Shader::setFloat(const string &name, float value)  {
     glUniform1f(getLocation(name), value);
 }
 
+void Shader::setFloatArray(const string& name, const vector<float>& array) {
+    for(int i=0; i < array.size(); i++) {
+        setFloat(name + "[" + to_string(i) + "]", array[i]);
+    }
+}
+
 void Shader::setMat4(const string& name, const mat4& matrix)  {
     glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, value_ptr(matrix));
+}
+
+void Shader::setMat4Array(const string& name, const vector<mat4>& matrices) {
+    for(int i=0; i < matrices.size(); i++) {
+        setMat4(name + "[" + to_string(i) + "]", matrices[i]);
+    }
 }
 
 void Shader::setMat3(const string& name, const mat3& matrix)  {
@@ -209,8 +223,8 @@ uint Shader::compileShader(uint type, string& code) {
     return shaderId;
 }
 
-uint Shader::createShaderProgram(vector<const string*> shaderFiles) {
-    uint programId = glCreateProgram();
+uint Shader::createShaderProgram(const vector<const string*>& shaderFiles) {
+    const uint programId = glCreateProgram();
     vector<uint> shaderIds;
 
     const string SHADERS_DIR = "/Users/tucha/Repositories/gl-engine/apis/opengl/shaders";
@@ -229,6 +243,7 @@ uint Shader::createShaderProgram(vector<const string*> shaderFiles) {
         else if(extension == "frag") shaderType = GL_FRAGMENT_SHADER;
         else if(extension == "tesc") shaderType = GL_TESS_CONTROL_SHADER;
         else if(extension == "tese") shaderType = GL_TESS_EVALUATION_SHADER;
+        else if(extension == "geom") shaderType = GL_GEOMETRY_SHADER;
         else throw std::runtime_error("unsupported shader extension");
 
         uint shaderId = compileShader(shaderType, shaderCode);

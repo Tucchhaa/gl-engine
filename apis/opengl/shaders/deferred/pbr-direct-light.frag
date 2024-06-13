@@ -15,26 +15,28 @@ struct DirectLight {
 
 const float PI = 3.14159265359;
 
-vec3 calculatePosition(vec2 texCoord);
-float isFragLit(vec3 normal, vec3 position);
-vec3 calculateDirectLight(DirectLight lightSource, vec3 _normal, vec3 position, vec2 texCoord);
-
-LightColors getLightingColors(LightColors colors, vec2 texCoord);
-
 uniform sampler2D gDepth;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoMetallic;
 uniform sampler2D gAORoughness;
 
-uniform sampler2D shadowMap;
-uniform mat4 lightPerspective;
+uniform float cascadePlaneDistances[16];
+uniform int cascadeCount;
 
-uniform vec3 cameraPos;
 uniform DirectLight light;
+uniform mat4 lightPerspectives[16];
+uniform sampler2DArray shadowMap;
+
+uniform mat4 perspective;
+uniform vec3 cameraPos;
 
 in mat4 inversePerspective;
 
 out vec4 color;
+
+vec3 calculatePosition(vec2 texCoord);
+float calculateShadow(vec3 position, vec3 normal);
+vec3 calculateDirectLight(DirectLight lightSource, vec3 _normal, vec3 position, vec2 texCoord);
 
 void main() {
     // TODO: move resolution to uniform
@@ -44,7 +46,7 @@ void main() {
 
     vec3 lighting = calculateDirectLight(light, normal, position, texCoord);
 
-    color = vec4(lighting, 1.0) * isFragLit(normal, position);
+    color = vec4(lighting, 1.0) * (1.0 - calculateShadow(position, normal));
 }
 
 // === Data getters ===
@@ -58,20 +60,64 @@ vec3 calculatePosition(vec2 texCoord) {
     return viewSpacePosition.xyz / viewSpacePosition.w;
 }
 
-float isFragLit(vec3 normal, vec3 position) {
-    vec4 posLightSpace = lightPerspective * vec4(position, 1);
+// ===
+// Shadow mapping
+// ===
 
-    vec3 coords = (posLightSpace.xyz / posLightSpace.w) * 0.5 + 0.5;
+int getCascadeLayer(vec3 position);
+float calculateShadowBias(vec3 normal, int layer);
 
-    float closestDepth = texture(shadowMap, coords.xy).r;
+float calculateShadow(vec3 position, vec3 normal) {
+    int layer = getCascadeLayer(position);
+
+    vec4 positionLightSpace = lightPerspectives[layer] * vec4(position, 1.0);
+    vec3 coords = (positionLightSpace.xyz / positionLightSpace.w) * 0.5 + 0.5;
+
     float currentDepth = coords.z;
 
-    float lit = step(currentDepth, closestDepth);
+    if (currentDepth  > 1.0)
+        return 0.0;
 
-    // result = closesDepth >= 1.0
-    float result = step(1.0, closestDepth);
+    float bias = calculateShadowBias(normal, layer);
 
-    return mix(lit, 1.0, result);
+    // Percentage-Closer Filtering
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(shadowMap, 0));
+
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(
+                shadowMap, vec3(coords.xy + vec2(x, y) * texelSize, layer)
+            ).r;
+            shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+
+    shadow /= 9.0;
+
+    return shadow;
+}
+
+int getCascadeLayer(vec3 position) {
+    vec4 positionViewSpace = perspective * vec4(position, 1.0);
+    float depthValue = abs(positionViewSpace.z);
+
+    for (int i = 0; i < cascadeCount; ++i) {
+        if (depthValue < cascadePlaneDistances[i])
+            return i;
+    }
+
+    return cascadeCount-1;
+}
+
+float calculateShadowBias(vec3 normal, int layer) {
+    return 0.0;
+
+    float bias = max(0.05 * (1.0 - dot(normal, -light.direction)), 0.005);
+
+    bias *= 1 / (cascadePlaneDistances[layer] * 0.5f);
+
+    return bias;
 }
 
 // ===

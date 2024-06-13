@@ -74,7 +74,7 @@ void Scene::createCamera() {
     auto* cameraObject = Hierarchy::createGameObjectInTree();
     Transform* cameraTransform = cameraObject->transform;
 
-    camera = new Camera(radians(45.0f), 0.1f, 3000.0f);
+    camera = new Camera(radians(45.0f), 0.1f, 1000.0f);
     camera->cubeMap = loader->loadCubeMap("textures/skybox");
     cameraObject->components.add(camera);
 

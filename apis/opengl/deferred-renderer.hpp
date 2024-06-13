@@ -31,6 +31,8 @@ private:
 public:
     void afterSceneSetup() override;
 
+    void beforeRender() override;
+
     void render() override;
 
 private:
@@ -40,6 +42,8 @@ private:
     Shader meshShader;
 
     Shader shadowMapShader;
+
+    Shader cascadeShadowsShader;
 
     /**
      * Computes lighting for gBuffer textures
@@ -66,11 +70,24 @@ private:
 
     unsigned int shadowMapBuffer = 0;
     unsigned int shadowMap = 0;
+    unsigned int cascadeShadowMaps = 0;
     const int SHADOW_WIDTH = 2048;
     const int SHADOW_HEIGHT = 2048;
 
     unsigned int screenVAO = 0;
     unsigned int sphereVAO = 0;
+
+    vector<float> cascadeLevels = { 0, 0.01, 0.02, 0.05, 0.25, 0.5, 1.0 };
+
+    /**
+     * Calculated every frame
+     */
+    vector<float> cascadePlanes;
+
+    /**
+     * Calculated every frame
+     */
+    vector<mat4> cascadePerspectives;
 
 // ===
 // Render functions
@@ -102,5 +119,9 @@ private:
 
     mat4 calculateDirectLightVolumeTransform() const;
 
-    mat4 calculateShadowMapperPerspective(const DirectLight* light) const;
+    vector<float> getCascadePlanes() const;
+
+    vector<mat4> getCascadePerspectives(const DirectLight* light) const;
+
+    mat4 calculateCascadePerspective(const DirectLight* light, float near, float far) const;
 };

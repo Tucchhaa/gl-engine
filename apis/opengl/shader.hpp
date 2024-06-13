@@ -32,7 +32,8 @@ public:
 
     Shader(
             const string& vertexShaderFile, const string& fragmentShaderFile,
-            const string& tessControlShaderFile = "", const string& tessEvalShaderFile = "");
+            const string& tessControlShaderFile = "", const string& tessEvalShaderFile = "",
+            const string& geometryShaderFile = "");
 
 // ===
 // Basic methods
@@ -61,9 +62,13 @@ private:
 public:
     void setBool(const string &name, bool value);
     void setInt(const string &name, int value);
+
     void setFloat(const string &name, float value);
-    
+    void setFloatArray(const string &name, const vector<float>& array);
+
     void setMat4(const string& name, const mat4& matrix);
+    void setMat4Array(const string& name, const vector<mat4>& matrices);
+
     void setMat3(const string& name, const mat3& matrix);
 
     void setVec3(const string& name, const Vec3& vector);
@@ -99,7 +104,7 @@ public:
 private:
     string readShader(const string& filepath);
     uint compileShader(uint type, string& code);
-    uint createShaderProgram(vector<const string*> shaderFiles);
+    uint createShaderProgram(const vector<const string*>& shaderFiles);
 
 // ===
 // Private methods
