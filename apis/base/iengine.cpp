@@ -63,19 +63,24 @@ void IEngine::cameraController() {
     IInput* input = IEngine::Input;
     Transform* cameraTransform = CurrentScene->getCamera()->transform;
 
+    static float yaw = 0;
+    static float pitch = 0;
+
     constexpr float rotationSpeed = 0.3f;
     constexpr float speed = 15.0f;
 
     const float deltaX = -input->mouseDelta().x;
     const float deltaY = -input->mouseDelta().y;
 
-    const auto horizontalRotation = quat(vec3(0,  deltaX * rotationSpeed * input->getDeltaTime(), 0));
-    const auto verticalRotation   = quat(vec3(deltaY * rotationSpeed * input->getDeltaTime(), 0, 0));
+    yaw = yaw + deltaX * rotationSpeed * input->getDeltaTime();
+
+    pitch = pitch + deltaY * rotationSpeed * input->getDeltaTime();
+    pitch = std::max(std::min(pitch, radians(80.f)), radians(-80.f));
+
+    const auto rotation = quat(vec3(pitch, yaw, 0));
+    cameraTransform->setRotation(rotation);
 
     const vec2 translation = input->axisVec2() * speed * input->getDeltaTime();
-
-    cameraTransform->rotate(horizontalRotation, &Transform::World);
-    cameraTransform->rotate(verticalRotation);
 
     cameraTransform->translate(vec3(translation.x, 0, translation.y));
 }
