@@ -9,7 +9,6 @@
 DeferredRenderer::DeferredRenderer():
     meshShader("deferred/mesh.vert", "deferred/mesh.frag"),
     shadowMapShader("forward/depth-vertex.vert", "forward/depth-fragment.frag"),
-    cascadeShadowsShader("forward/cascade-depth.vert", "forward/depth-fragment.frag", "", "", "forward/cascade-depth.geom"),
     pointLightShader("deferred/lighting.vert", "deferred/pbr-point-light.frag"),
     directLightShader("deferred/lighting.vert", "deferred/pbr-direct-light.frag"),
     skyboxShader("deferred/skybox.vert", "deferred/skybox.frag"),
@@ -29,7 +28,6 @@ DeferredRenderer::DeferredRenderer():
 DeferredRenderer::~DeferredRenderer() {
     meshShader.deleteShader();
     shadowMapShader.deleteShader();
-    // lightingShader.deleteShader();
     pointLightShader.deleteShader();
     directLightShader.deleteShader();
     skyboxShader.deleteShader();
@@ -38,14 +36,16 @@ DeferredRenderer::~DeferredRenderer() {
 
     glDeleteFramebuffers(1, &gBuffer);
     glDeleteFramebuffers(1, &lightingBuffer);
-    glDeleteFramebuffers(1, &shadowMapBuffer);
+
+    for(unsigned int &shadowMapBuffer : shadowMapBuffers)
+        glDeleteFramebuffers(1, &shadowMapBuffer);
 
     glDeleteTextures(1, &gDepth);
     glDeleteTextures(1, &gNormal);
     glDeleteTextures(1, &gAlbedoMetal);
     glDeleteTextures(1, &gAORoughness);
     glDeleteTextures(1, &lightedColor);
-    glDeleteTextures(1, &shadowMap);
+    glDeleteTextures(1, &cascadeShadowMaps);
 }
 
 void DeferredRenderer::setFrameSize(int width, int height) {
@@ -133,12 +133,7 @@ void DeferredRenderer::initLightingBuffer() {
 }
 
 void DeferredRenderer::initShadowFrameBuffer() {
-    glGenFramebuffers(1, &shadowMapBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
-
-    glGenTextures(1, &shadowMap);
-    glBindTexture(GL_TEXTURE_2D, shadowMap);
-
+    // === Generate list of textures of cascade shadow maps
     glGenTextures(1, &cascadeShadowMaps);
     glBindTexture(GL_TEXTURE_2D_ARRAY, cascadeShadowMaps);
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT,
@@ -151,11 +146,17 @@ void DeferredRenderer::initShadowFrameBuffer() {
     constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cascadeShadowMaps, 0);
+    shadowMapBuffers.resize(cascadeLevels.size() - 1);
 
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+    for(int i=0; i < cascadeLevels.size() - 1; i++) {
+        glGenFramebuffers(1, &shadowMapBuffers[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffers[i]);
+
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cascadeShadowMaps, 0, i);
+
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+    }
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -296,8 +297,8 @@ void DeferredRenderer::beforeRender() {
     const vector<DirectLight*> directLights = currentScene->getDirectLights();
 
     if(!directLights.empty()) {
-        cascadePerspectives = getCascadePerspectives(directLights[0]);
         cascadePlanes = getCascadePlanes();
+        cascadePerspectives = getCascadePerspectives(directLights[0]);
     }
 }
 
@@ -372,24 +373,36 @@ void DeferredRenderer::renderShadowMap() {
     //
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    // glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffer);
+    // glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    //
+    // glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT);
+    //
+    // glClear(GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    shadowMapShader.use();
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    for(int i=0; i < cascadeLevels.size(); i++) {
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowMapBuffers[i]);
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 
-    cascadeShadowsShader.use();
-    cascadeShadowsShader.setMat4Array("lightPerspectives", cascadePerspectives);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
 
-    for(auto* object: meshes) {
-        const Mesh* mesh = object->getMesh<Mesh>();
+        glClear(GL_DEPTH_BUFFER_BIT);
 
-        cascadeShadowsShader.setMat4("transform", mesh->transform->getTransformMatrix());
+        shadowMapShader.setMat4("perspective", cascadePerspectives[i]);
 
-        object->render();
+        for(auto* object: meshes) {
+            const Mesh* mesh = object->getMesh<Mesh>();
+
+            shadowMapShader.setMat4("transform", mesh->transform->getTransformMatrix());
+
+            object->render();
+        }
     }
 }
 

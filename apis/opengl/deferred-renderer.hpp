@@ -43,8 +43,6 @@ private:
 
     Shader shadowMapShader;
 
-    Shader cascadeShadowsShader;
-
     /**
      * Computes lighting for gBuffer textures
      */
@@ -68,8 +66,7 @@ private:
     unsigned int lightingBuffer = 0;
     unsigned int lightedColor = 0;
 
-    unsigned int shadowMapBuffer = 0;
-    unsigned int shadowMap = 0;
+    vector<unsigned int> shadowMapBuffers;
     unsigned int cascadeShadowMaps = 0;
     const int SHADOW_WIDTH = 2048;
     const int SHADOW_HEIGHT = 2048;
