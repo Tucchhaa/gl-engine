@@ -74,7 +74,7 @@ private:
     unsigned int screenVAO = 0;
     unsigned int sphereVAO = 0;
 
-    vector<float> cascadeLevels = { 0, 0.01, 0.02, 0.05, 0.25, 0.5, 1.0 };
+    vector<float> cascadeLevels = { 0, 0.01, 0.03, 0.3, 1.0 };
 
     /**
      * Calculated every frame

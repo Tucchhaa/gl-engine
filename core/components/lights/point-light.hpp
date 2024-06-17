@@ -21,6 +21,18 @@ public:
     float getRadius() const;
 
 public:
+    static PointLight* I1() {
+        return new PointLight(1);
+    }
+
+    static PointLight* I5() {
+        return new PointLight(5);
+    }
+
+    static PointLight* I10() {
+        return new PointLight(10);
+    }
+
     static PointLight* I100() {
         return new PointLight(100);
     }

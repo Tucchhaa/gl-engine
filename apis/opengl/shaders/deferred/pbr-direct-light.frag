@@ -46,7 +46,7 @@ void main() {
 
     vec3 lighting = calculateDirectLight(light, normal, position, texCoord);
 
-    color = vec4(lighting, 1.0) * (1.0 - calculateShadow(position, normal));
+    color = vec4(lighting, 1.0);
 }
 
 // === Data getters ===
@@ -113,11 +113,11 @@ int getCascadeLayer(vec3 position) {
 float calculateShadowBias(vec3 normal, int layer) {
     return 0.0;
 
-    float bias = max(0.05 * (1.0 - dot(normal, -light.direction)), 0.005);
-
-    bias *= 1 / (cascadePlaneDistances[layer] * 0.5f);
-
-    return bias;
+//    float bias = max(0.05 * (1.0 - dot(normal, -light.direction)), 0.005);
+//
+//    bias *= 1 / (cascadePlaneDistances[layer] * 0.5f);
+//
+//    return bias;
 }
 
 // ===
@@ -159,8 +159,13 @@ vec3 calculateDirectLight(DirectLight lightSource, vec3 normal, vec3 position, v
     vec3 kS = F;
     vec3 kD = (vec3(1.0) - kS) * (1.0 - metallness);
 
+    float shadow = calculateShadow(position, normal);
+
     vec3 result = (kD * albedo / PI + specular) * radiance * NdotL * ao;
 
+    result = result * (1.0 - shadow) + light.colors.ambient * albedo * ao;
+
+    //    return normal;
     return result;
 }
 

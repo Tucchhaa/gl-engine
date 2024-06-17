@@ -17,7 +17,7 @@ public:
     void render() override;
 
 private:
-    void beforeRender();
+    void beforeRender() override;
 
     void renderEditorTools();
 

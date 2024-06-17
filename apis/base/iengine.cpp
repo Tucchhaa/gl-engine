@@ -17,6 +17,8 @@ Editor* IEngine::Editor;
 
 vector<IGameEventsListener*> IEngine::gameEventsListeners;
 
+float IEngine::rotationSpeed = 0.3f;
+float IEngine::speed = 15.0f;
 
 IEngine::IEngine() {
     Editor = new ::Editor();
@@ -65,9 +67,6 @@ void IEngine::cameraController() {
 
     static float yaw = 0;
     static float pitch = 0;
-
-    constexpr float rotationSpeed = 0.3f;
-    constexpr float speed = 15.0f;
 
     const float deltaX = -input->mouseDelta().x;
     const float deltaY = -input->mouseDelta().y;

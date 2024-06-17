@@ -11,6 +11,11 @@
 
 class IEngine {
 public:
+    // TODO: move to a proper place
+    static float rotationSpeed;
+    static float speed;
+
+public:
     static IWindow* Window;
     static IInput* Input;
     static Loader* Loader;
@@ -37,7 +42,7 @@ public:
     void start();
 public:
     // TODO: remove this method
-    static void cameraController();
+    void cameraController();
 
     // TODO: remove this method
     static void fpsDisplay();

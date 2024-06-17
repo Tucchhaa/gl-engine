@@ -12,7 +12,10 @@ DeferredRenderer::DeferredRenderer():
     pointLightShader("deferred/lighting.vert", "deferred/pbr-point-light.frag"),
     directLightShader("deferred/lighting.vert", "deferred/pbr-direct-light.frag"),
     skyboxShader("deferred/skybox.vert", "deferred/skybox.frag"),
-    cubicPatchShader("deferred/cubic-patch.vert", "deferred/mesh.frag", "deferred/cubic-patch.tesc", "deferred/cubic-patch.tese"),
+
+    // TODO: link cubic patch shaders
+    cubicPatchShader("deferred/mesh.vert", "deferred/mesh.frag"),
+    // cubicPatchShader("deferred/cubic-patch.vert", "deferred/mesh.frag", "deferred/cubic-patch.tesc", "deferred/cubic-patch.tese"),
     screenShader("deferred/screen.vert", "deferred/screen.frag")
 {
     resourceManager = dynamic_cast<ResourceManager*>(IEngine::ResourceManager);
@@ -557,7 +560,7 @@ void DeferredRenderer::renderCubicPatches(const mat4& viewProjection) {
 mat4 DeferredRenderer::calculatePointLightVolumeTransform(const PointLight* light) {
     auto transform = mat4(1.0f);
 
-    transform = translate(transform, light->transform->getPosition());
+    transform = translate(transform, light->transform->getAbsolutePosition());
     transform = scale(transform, vec3(light->getRadius()));
 
     return transform;

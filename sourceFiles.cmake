@@ -13,6 +13,9 @@ function(get_demos_source_files)
             demos/collision-demo.cpp
             demos/collision-demo.hpp
 
+            demos/fps-demo.hpp
+            demos/fps-demo.cpp
+
             PARENT_SCOPE
     )
 
