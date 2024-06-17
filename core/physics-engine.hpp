@@ -13,7 +13,7 @@ private:
 
     btSequentialImpulseConstraintSolver* solver;
 
-    btVector3 gravity = btVector3(0, -10, 0);
+    btVector3 gravity = btVector3(0, -15, 0);
 
     btAlignedObjectArray<btCollisionShape*> collisionShapes;
 

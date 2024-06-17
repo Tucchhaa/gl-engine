@@ -25,6 +25,11 @@ public:
 
     void beforeRender() override;
 
+    // TODO: remove this method
+    btRigidBody* getRigidBody() const;
+
+    void updateColliderTransform() const;
+
 private:
     btTransform getColliderTransform() const;
 

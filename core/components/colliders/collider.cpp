@@ -31,14 +31,22 @@ void Collider::setMass(float mass) {
 void Collider::onGameObjectSet() {
     ObjectComponent::onGameObjectSet();
 
-    const btTransform colliderTransform = getColliderTransform();
-    rigidBody->setWorldTransform(colliderTransform);
+    updateColliderTransform();
 }
 
 void Collider::beforeRender() {
     updateTransformFromCollider();
 
     ObjectComponent::beforeRender();
+}
+
+btRigidBody* Collider::getRigidBody() const {
+    return rigidBody;
+}
+
+void Collider::updateColliderTransform() const {
+    const btTransform colliderTransform = getColliderTransform();
+    rigidBody->setWorldTransform(colliderTransform);
 }
 
 btTransform Collider::getColliderTransform() const {

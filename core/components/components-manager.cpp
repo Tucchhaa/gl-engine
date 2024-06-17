@@ -10,6 +10,8 @@
 #include "lights/direct-light.hpp"
 #include "lights/point-light.hpp"
 #include "lights/spot-light.hpp"
+#include "colliders/box-collider.hpp"
+#include "colliders/sphere-collider.hpp"
 
 ComponentsManager::ComponentsManager(GameObject* gameObject): gameObject(gameObject) {}
 
@@ -102,3 +104,6 @@ INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(CubicPatch);
 INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(DirectLight);
 INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(PointLight);
 INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(SpotLight);
+
+INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(SphereCollider);
+INSTANTIATE_COMPONENTS_MANAGER_FUNCTIONS(BoxCollider);
