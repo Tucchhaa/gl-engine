@@ -10,9 +10,13 @@ uniform struct Material {
     sampler2D normal;
     sampler2D roughness;
     sampler2D ao;
-    float shininess;
+
     vec3 Kd;
     vec3 Ks;
+
+    float shininess;
+    float roughnessFactor;
+    float metalnessFactor;
 } material;
 
 in struct Vertex {
@@ -29,9 +33,9 @@ void main() {
     gNormal = calculateNormal();
 
     gAlbedoMetal.rgb = texture(material.diffuse, texCoord).rgb * material.Kd;
-    gAlbedoMetal.a = texture(material.specular, texCoord).r * material.Ks.r;
+    gAlbedoMetal.a = texture(material.specular, texCoord).r * material.metalnessFactor;
 
-    float roughness = texture(material.roughness, texCoord).r;
+    float roughness = texture(material.roughness, texCoord).r * material.roughnessFactor;
     float ao = texture(material.ao, texCoord).r;
     gAORoughness = vec3(ao, roughness, 0.0);
 }

@@ -112,6 +112,9 @@ Material* ModelParser::processMaterial(const aiMaterial* material) const {
     result->Kd = materialInfo.diffuseColor;
     result->Ks = materialInfo.specularColor;
 
+    result->roughness = materialInfo.roughness;
+    result->metalness = materialInfo.metalness;
+
     result->diffuseTexture = loadTextureByType(material, aiTextureType_DIFFUSE);
     result->specularTexture = loadTextureByType(material, aiTextureType_SPECULAR);
     result->normalTexture = loadTextureByType(material, aiTextureType_NORMALS);
@@ -145,17 +148,9 @@ Texture ModelParser::loadTextureByType(const aiMaterial* material, const aiTextu
 
 Texture* ModelParser::loadDefaultTexture(const aiTextureType type) const {
     switch (type) {
-        case aiTextureType_DIFFUSE:
-            return loader->loadTexture("textures/default_diffuse.png", TEXTURE_2D_OPTIONS);
-        case aiTextureType_SPECULAR:
-            return loader->loadTexture("textures/default_specular.png", TEXTURE_2D_OPTIONS);
         case aiTextureType_NORMALS:
             return loader->loadTexture("textures/default_normal.png", TEXTURE_2D_OPTIONS);
-        case aiTextureType_DIFFUSE_ROUGHNESS:
-            return loader->loadTexture("textures/default_roughness.png", TEXTURE_2D_OPTIONS);
-        case aiTextureType_AMBIENT:
-            return loader->loadTexture("textures/default_ao.png", TEXTURE_2D_OPTIONS);
         default:
-            throw runtime_error("Can not load default texture");
+            return loader->loadTexture("textures/solid_white.png", TEXTURE_2D_OPTIONS);
     }
 }

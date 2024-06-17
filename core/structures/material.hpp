@@ -31,6 +31,9 @@ public:
      */
     float shininess = 32.0f;
 
+    float metalness = 1.;
+
+    float roughness = 1.;
 
     Material();
 

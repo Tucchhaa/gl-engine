@@ -142,7 +142,7 @@ const aiScene* Loader::loadScene(const string &path) {
 
     constexpr unsigned int flags =
         aiProcess_PreTransformVertices | aiProcess_RemoveRedundantMaterials |
-        aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace;
+        aiProcess_Triangulate | aiProcess_CalcTangentSpace;
 
     const aiScene* scene = importer.ReadFile(fullPath, flags);
 

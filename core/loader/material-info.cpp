@@ -19,6 +19,9 @@ void MaterialInfo::collectInfo() {
     emissiveColor = getProperty<Vec3>(AI_MATKEY_COLOR_EMISSIVE);
     reflectiveColor = getProperty<Vec3>(AI_MATKEY_COLOR_REFLECTIVE);
 
+    roughness = getProperty<float>(AI_MATKEY_ROUGHNESS_FACTOR);
+    metalness = getProperty<float>(AI_MATKEY_METALLIC_FACTOR);
+
     collectTextures();
 }
 
@@ -27,13 +30,26 @@ string MaterialInfo::getProperty(const char* key, unsigned int type, unsigned in
     if(aiString str; material->Get(key, type, idx, str) == AI_SUCCESS) {
         return {str.C_Str()};
     }
+
+    return "";
 }
 
 template<>
 Vec3 MaterialInfo::getProperty(const char* key, unsigned int type, unsigned int idx) {
     if(aiColor4D color; material->Get(key, type, idx, color) == AI_SUCCESS) {
-        return Vec3(color.r, color.g, color.b);
+        return { color.r, color.g, color.b };
     }
+
+    return {0, 0, 0};
+}
+
+template<>
+float MaterialInfo::getProperty(const char* key, unsigned int type, unsigned int idx) {
+    if(float value; material->Get(key, type, idx, value) == AI_SUCCESS) {
+        return value;
+    }
+
+    return 1;
 }
 
 bool MaterialInfo::operator==(const MaterialInfo& other) const {
@@ -72,7 +88,10 @@ bool MaterialInfo::operator<(const MaterialInfo& other) const {
         specularColor < other.specularColor ||
         ambientColor < other.ambientColor ||
         emissiveColor < other.emissiveColor ||
-        reflectiveColor < other.reflectiveColor;
+        reflectiveColor < other.reflectiveColor ||
+
+        roughness < other.roughness ||
+        metalness < other.metalness;
 }
 
 void MaterialInfo::collectTextures() {
@@ -100,6 +119,10 @@ void MaterialInfo::print() {
     printProperty<Vec3>("Ambient color", AI_MATKEY_COLOR_AMBIENT);
     printProperty<Vec3>("Emissive color", AI_MATKEY_COLOR_EMISSIVE);
     printProperty<Vec3>("Reflective color", AI_MATKEY_COLOR_REFLECTIVE);
+    printProperty<Vec3>("Reflective color", AI_MATKEY_BASE_COLOR);
+
+    printProperty<float>("Metallness", AI_MATKEY_METALLIC_FACTOR);
+    printProperty<float>("Roughness", AI_MATKEY_ROUGHNESS_FACTOR);
 
     printTextures();
 }

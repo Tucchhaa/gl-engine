@@ -25,6 +25,9 @@ public:
     Vec3 emissiveColor;
     Vec3 reflectiveColor;
 
+    float roughness;
+    float metalness;
+
     /**
      * ID: Type, value: path to texture
      */
@@ -43,6 +46,10 @@ private:
 
     template<>
     Vec3 getProperty(const char* key, unsigned int type, unsigned int idx);
+
+    template<>
+    float getProperty(const char* key, unsigned int type, unsigned int idx);
+
 public:
     void print();
 
