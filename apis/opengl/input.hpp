@@ -26,6 +26,8 @@ private:
     float xNegativePressed = 0;
 
     bool shiftPressed = false;
+    bool spacePressed = false;
+    bool leftMousePressed = false;
 
     double mouseX = 0;
     double mouseY = 0;
@@ -53,6 +55,12 @@ public:
     // ===
 
     bool isShiftPressed() override;
+
+    bool isSpacePressed() override;
+
+    // ===
+
+    bool isLeftMousePressed() override;
 
     float getDeltaTime() override;
 

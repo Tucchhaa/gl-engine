@@ -45,6 +45,9 @@ void Input::process() {
     xNegativePressed = glfwGetKey(glfwWindow, GLFW_KEY_A) == GLFW_PRESS;
 
     shiftPressed = glfwGetKey(glfwWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+    spacePressed = glfwGetKey(glfwWindow, GLFW_KEY_SPACE) == GLFW_PRESS;
+
+    leftMousePressed = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
     // ===
 
@@ -78,6 +81,14 @@ vec2 Input::mouseDelta() {
 
 bool Input::isShiftPressed() {
     return shiftPressed;
+}
+
+bool Input::isSpacePressed() {
+    return spacePressed;
+}
+
+bool Input::isLeftMousePressed() {
+    return leftMousePressed;
 }
 
 float Input::getDeltaTime() {

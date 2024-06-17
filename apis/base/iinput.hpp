@@ -44,5 +44,11 @@ public:
 
     virtual bool isShiftPressed() = 0;
 
+    virtual bool isSpacePressed() = 0;
+
+    // ===
+
+    virtual bool isLeftMousePressed() = 0;
+
     virtual float getDeltaTime() = 0;
 };
